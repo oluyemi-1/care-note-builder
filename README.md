@@ -52,11 +52,12 @@ retyping them for each person you support.
 
 Activities are not one thing, and recording them as one produced poor notes.
 
-- **College courses** are chosen at enrolment for the term, so nothing is offered
-  on the day. The record covers whether the person was ready to go, the journey
-  and how it was kept safe, the support given in the session, and what they
-  gained from it. The app asks about readiness rather than choice, and never
-  writes up a choice that was not offered.
+- **College courses** are already arranged, so nothing is offered on the day.
+  The record covers whether the person was ready to go, the journey and how it
+  was kept safe, the support given in the session, and what they gained from it.
+  The app asks about readiness rather than choice, and never writes up a choice
+  that was not offered. Enrolment is start-of-term paperwork and stays out of
+  the daily note.
 - **In-house and community activities** are genuinely offered and chosen on the
   day, so the choice, the support and the safeguarding are what the note carries.
 

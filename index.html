@@ -763,9 +763,11 @@ const TRAVEL_RISK = ["seatbelt","doortodoor","stop","fare","crossing","road"];
 const OPEN_COLLEGE = [
   "{N} attended {act} at college at {time}.",
   "At {time}, staff supported {N} to attend {act} at college.",
-  "{N} was supported to attend {act}, the course {s} chose at enrolment.",
+  "{N} was supported to attend {act} at college at {time}.",
   "Staff supported {N} to college at {time} for {act}.",
-  "{N} went to college at {time} for {act}, as arranged for this term."
+  "{N} went to college at {time} for {act}.",
+  "Staff escorted {N} to college at {time} for {act}.",
+  "{N} attended college at {time} for {act}."
 ];
 
 const OPEN_ACT = {
@@ -1343,7 +1345,7 @@ function syncVisibility(s){
   const college = s.kind === "activity" && s.setting === "college";
   $("settingWrap").hidden = s.kind !== "activity";
   $("settingHint").textContent = !s.kind ? "" : college
-    ? "Chosen at enrolment for the term, so nothing is offered today \u2014 record the journey, the support and what they gained."
+    ? "Already arranged, so nothing is offered today \u2014 record the journey, the support and what they gained."
     : "Offered today and chosen from the options \u2014 record the choice, the support and how it went.";
   $("offerWrap").hidden = college;
   $("learnWrap").hidden = s.kind !== "activity";
