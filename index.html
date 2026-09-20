@@ -1,7 +1,7 @@
 <title>Gold Standard Notes</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0E5A63">
+<meta name="mobile-web-app-capable" content="yes">
 <style>
 :root{
   --ground:#F2F5F5; --surface:#FFFFFF; --surface-2:#E8EDED; --sunk:#DCE4E4;
@@ -11,8 +11,8 @@
   --ok:#2C6B48; --ok-wash:#E1EFE8; --warn:#8A5709; --warn-wash:#F7EEDC; --miss:#98291F; --miss-wash:#F6E4E2;
   --shadow:0 1px 2px rgba(17,24,25,.05), 0 8px 24px -14px rgba(17,24,25,.28);
   --r:10px;
-  --ui:"Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --doc:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --ui:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --doc:Georgia, "Noto Serif", "Droid Serif", "Times New Roman", serif;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -69,6 +69,18 @@ textarea{resize:vertical;min-height:70px;font-family:var(--ui)}
 input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent-2);outline-offset:1px}
 input:hover,select:hover,textarea:hover{border-color:var(--line-strong)}
 select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:32px}
+
+/* people switcher */
+.people{display:flex;flex-wrap:wrap;gap:7px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line-soft)}
+.pchip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--sunk);
+  border-radius:99px;padding:8px 14px;font-size:14.5px;font-weight:600;cursor:pointer;transition:.12s;letter-spacing:.02em}
+.pchip:hover{border-color:var(--line-strong)}
+.pchip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.pchip.add{font-weight:500;color:var(--ink-2);border-style:dashed;letter-spacing:0}
+.pchip .x{display:grid;place-items:center;width:19px;height:19px;border-radius:50%;
+  background:rgba(255,255,255,.22);font-size:14px;line-height:1;margin-right:-5px}
+.pchip .x:hover{background:rgba(255,255,255,.4)}
+.people-hint{font-size:12.5px;color:var(--ink-3);padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line-soft)}
 
 /* chip choices */
 .chips{display:flex;flex-wrap:wrap;gap:7px}
@@ -175,8 +187,9 @@ select.mini{width:auto;padding:5px 28px 5px 9px;font-size:12px;border-radius:6px
     <!-- ================= FORM ================= -->
     <div>
       <section class="step">
-        <header><span class="num">&#9679;</span><h2>The person</h2><span class="hint">Saved on this device</span></header>
+        <header><span class="num">&#9679;</span><h2>The person</h2><span class="hint">Saved on this device only</span></header>
         <div class="body">
+          <div class="people" id="people"></div>
           <div class="grid">
             <div class="f"><label for="initials">Initials</label><input type="text" id="initials" maxlength="4" placeholder="e.g. MA" autocomplete="off"></div>
             <div class="f"><label for="pronoun">Pronouns</label>
@@ -379,6 +392,9 @@ const OUTCOME = [
   ["enjoyed","Enjoyed it and would do it again"],
   ["proud","Pleased with what they had done"],
   ["home","Returned home safely and settled"],
+  ["nightsettled","Settled in bed and comfortable"],
+  ["slept","Settled and asleep at the next check"],
+  ["resettled","Resettled without distress"],
   ["later","Declined for now &mdash; to be offered again later"],
   ["nochangeout","No concerns; usual routine resumed"]
 ];
@@ -520,6 +536,34 @@ personal:[
   full:["Staff put on the watch and jewellery {s} chose.","Staff fitted {p} chosen jewellery for {o}."],
   declined:["{S} chose not to wear jewellery today.","{S} declined {p} watch and jewellery."]},
 
+ {id:"nightwear",label:"Night clothes",nf:"Choice of clothing made?",
+  ind:["{S} chose {p} night clothes and changed independently.","{S} got changed for bed without any help."],
+  prompt:["{S} changed into {p} night clothes after a prompt.","Staff offered {o} two sets of night clothes and {s} changed {r}."],
+  part:["{S} changed {p} top half {r} and staff supported with the rest.","Staff supported {o} to change into the night clothes {s} chose."],
+  full:["Staff supported {o} to change into {p} night clothes, keeping {o} covered throughout.","Staff changed {o} into the night clothes {s} chose, maintaining {p} dignity."],
+  declined:["{S} preferred to stay in what {s} was wearing and this was respected.","{S} declined to change for bed."]},
+
+ {id:"reposition",label:"Repositioning",nf:"Repositioning chart",
+  ind:["{S} repositioned {r} comfortably in bed.","{S} moved {r} into a comfortable position."],
+  prompt:["{S} repositioned {r} after a prompt from staff.","Staff prompted {o} and {s} shifted position {r}."],
+  part:["Staff supported {o} to reposition, following {p} lead on what felt comfortable.","{S} was helped to change position and said {s} was comfortable afterwards."],
+  full:["Staff repositioned {o} in line with {p} repositioning plan and recorded the position.","Staff changed {p} position as set out in {p} support plan; {s} appeared comfortable."],
+  declined:["{S} did not want to be repositioned and this was respected.","{S} declined repositioning at this time."]},
+
+ {id:"settle",label:"Settling for the night",nf:"Daily note",
+  ind:["{S} took {r} to bed when {s} was ready.","{S} decided when to go to bed and settled independently."],
+  prompt:["{S} went to bed after a reminder about the time.","A prompt was given and {S} settled down for the night."],
+  part:["Staff supported {o} to get into bed and settled {o} with {p} usual things nearby.","{S} was supported into bed, with {p} light and door left as {s} prefers."],
+  full:["Staff supported {o} fully to settle into bed and left the room as {s} prefers it.","Staff settled {o} for the night, following {p} usual bedtime routine."],
+  declined:["{S} was not ready for bed and chose to stay up; this was respected.","{S} declined to settle at this point and staff did not press the point."]},
+
+ {id:"sleepcheck",label:"Night check",nf:"Night checks",
+  ind:["{S} was awake and told staff {s} was fine.","{S} was awake, settled, and said {s} did not need anything."],
+  prompt:["{S} was checked and needed only reassurance before settling again.","A brief word from staff was enough for {o} to settle again."],
+  part:["Staff checked on {o} and gave the support {s} asked for before {s} settled.","{S} was checked and supported back to sleep."],
+  full:["Staff carried out the agreed night check; {S} was asleep and breathing comfortably.","A night check was completed as per {p} support plan; {S} was asleep and settled."],
+  declined:["{S} asked not to be disturbed and staff observed from the doorway only.","{S} did not want staff to come in; a discreet check was made instead."]},
+
  {id:"makeup",label:"Make up",nf:"Make Up",
   ind:["{S} applied {p} own make up.","{S} did {p} make up without support."],
   prompt:["{S} applied {p} make up after staff set it out for {o}.","{S} did {p} make up following a prompt."],
@@ -610,6 +654,25 @@ activity:[
 ]};
 
 /* ---------- opening & communication banks ---------- */
+/* personal care reads differently at 07:00 and at 22:00 */
+const OPEN_PC = {
+ pm:[
+  "{N} was offered support with {p} personal care at {time}, ahead of the evening.",
+  "At {time}, staff offered {N} support with {p} evening personal care{ratio}.",
+  "Evening personal care was offered to {N} at {time}.",
+  "{N} was asked at {time} whether {s} wanted support to get ready for the evening."],
+ night:[
+  "{N} was supported with {p} night routine at {time}.",
+  "At {time}, staff offered {N} support to get ready for bed{ratio}.",
+  "Support to settle for the night was offered to {N} at {time}.",
+  "{N} was approached at {time} and offered support with {p} night-time routine.",
+  "Staff checked on {N} at {time} as part of {p} agreed night support."],
+ continence:[
+  "{N} was offered continence support at {time}.",
+  "At {time}, staff offered {N} support with {p} personal hygiene{ratio}.",
+  "Continence support was offered to {N} at {time}, in line with {p} support plan."]
+};
+
 const OPEN = {
 personal:[
  "{N} was offered support with {p} personal care at {time}.",
@@ -734,6 +797,15 @@ const OUTBANK = {
        "{S} got home safely and settled straight away."],
  later:["Support was left for now and will be offered again later in the shift.",
         "This will be offered again later; {p} decision was respected."],
+ nightsettled:["{N} settled in bed and was comfortable when staff left the room.",
+        "{S} {vbe} settled in bed and appeared comfortable.",
+        "{S} got into bed and settled without distress."],
+ slept:["{S} settled quickly and was asleep at the next check.",
+        "{S} {vbe} asleep when staff checked a short time later.",
+        "{S} fell asleep soon afterwards and slept through the rest of the check period."],
+ resettled:["{S} {vbe} resettled without distress and stayed comfortable afterwards.",
+        "Staff resettled {o} and {s} went back to sleep.",
+        "{S} settled again with reassurance and remained comfortable."],
  nochangeout:["The interaction finished with no concerns and {p} usual routine continued.",
               "There were no concerns and {s} carried on with {p} usual routine."]
 };
@@ -751,8 +823,18 @@ const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(store)); }cat
 
 let chosenIdx = {};            // slot -> index used in the note now on screen
 let onScreen = {};             // what the visible note used, so a reword moves off it
-let salt = Math.floor(Math.random() * 1e9);   // changes only on Reword / after Copy,
-                                              // so the note stays still while you type
+let salt = 0;   // set by reseed(); changes only on Reword / after Copy,
+                // so the note stays still while you type
+/* Two staff writing about the same person on the same day must not produce the
+   same note. The seed therefore mixes a per-device id (random, never leaves the
+   browser) with the person, the date and the shift \u2014 so wording differs between
+   colleagues by construction, without any shared server. */
+function reseed(){
+  const d = new Date();
+  const day = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+  salt = hashStr([store.device, $("initials").value.trim().toUpperCase(),
+                  day, $("kind").value, $("slot").value].join("|"));
+}
 function hashStr(str){
   let h = 2166136261;
   for(let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
@@ -887,7 +969,8 @@ function buildNote(s){
   const add = (pri, text) => { if(pri <= L && text) out.push(text); };
 
   /* 1 OFFER */
-  add(1, T(pick(OPEN[s.kind], "open"), s));
+  const openBank = (s.kind === "personal" && OPEN_PC[s.slot]) ? OPEN_PC[s.slot] : OPEN[s.kind];
+  add(1, T(pick(openBank, "open"), s));
   if(s.offerA && s.offerB) add(1, T("{S} {vbe} offered a choice of " + s.offerA + " or " + s.offerB + ".", s));
   else if(s.offerA)        add(2, T("{S} {vbe} offered " + s.offerA + ".", s));
   if(s.comm.length) add(2, T(pick(COMMBANK[s.comm[0]], "comm"), s));
@@ -1042,7 +1125,7 @@ function render(){
 }
 
 function renderFields(s){
-  const rows = [];
+  let rows = [];
   const bank = TASKS[s.kind];
   const LVLTEXT = {ind:"Independent", prompt:"Prompted", part:"Assisted", full:"Full support", declined:"Declined"};
 
@@ -1066,6 +1149,15 @@ function renderFields(s){
   if(s.kind === "personal" && s.skin === "concern") rows.push(["Body Map", "Record the new mark"]);
   if(s.handover) rows.push(["Handover", "Tick the handover box"]);
 
+  /* two tasks can map to the same field (night clothes and dressing both set
+     "Choice of clothing made?"); show that field once, not twice */
+  const seen = new Map();
+  rows.forEach(([k, v]) => {
+    if(!seen.has(k)) seen.set(k, v);
+    else if(seen.get(k) !== v) seen.set(k, seen.get(k) + " / " + v);
+  });
+  rows = [...seen.entries()];
+
   const el = $("nf");
   el.innerHTML = rows.length
     ? rows.map(r => '<div class="nf-row"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>').join("")
@@ -1084,6 +1176,80 @@ function syncVisibility(s){
   $("chosenWrap").hidden = !(s.resp === "choseA" || s.resp === "choseB");
   document.querySelector('#skin').closest('fieldset').hidden = s.kind !== "personal";
 }
+
+/* ============================================================
+   People on this shift \u2014 profiles keyed by initials, on this device only
+   ============================================================ */
+const PROFILE_FIELDS = ["initials","pronoun","ratio"];
+
+function profileFromForm(){
+  return { initials: $("initials").value.trim().toUpperCase(), pronoun: $("pronoun").value,
+           ratio: $("ratio").value, comm: checked("comm"), flags: checked("flags") };
+}
+function applyProfile(pr){
+  $("initials").value = pr.initials || "";
+  $("pronoun").value  = pr.pronoun  || "he";
+  $("ratio").value    = pr.ratio    || "";
+  document.querySelectorAll('#comm input, #flags input').forEach(i => { i.checked = false; });
+  (pr.comm  || []).forEach(v => { const el = $("comm_"  + v); if(el) el.checked = true; });
+  (pr.flags || []).forEach(v => { const el = $("flags_" + v); if(el) el.checked = true; });
+}
+/* keep the store in step with the form, renaming rather than duplicating
+   when someone edits the initials of the person they are already on */
+function syncPerson(){
+  store.people = store.people || {};
+  const pr = profileFromForm();
+  if(!pr.initials){ return; }
+  if(store.active && store.active !== pr.initials && store.people[store.active]){
+    delete store.people[store.active];
+  }
+  store.people[pr.initials] = pr;
+  store.active = pr.initials;
+  save();
+}
+function loadPerson(name){
+  const pr = (store.people || {})[name];
+  if(!pr) return;
+  store.active = name; save();
+  applyProfile(pr);
+  reseed();
+  renderPeople();
+  render();
+}
+function newPerson(){
+  store.active = null; save();
+  applyProfile({ pronoun: "he" });
+  renderPeople();
+  render();
+  $("initials").focus();
+}
+function removePerson(name){
+  if(!(store.people || {})[name]) return;
+  delete store.people[name];
+  const left = Object.keys(store.people);
+  store.active = left[0] || null;
+  save();
+  if(store.active) applyProfile(store.people[store.active]); else applyProfile({ pronoun: "he" });
+  reseed(); renderPeople(); render();
+}
+function renderPeople(){
+  const names = Object.keys(store.people || {}).sort();
+  const el = $("people");
+  el.innerHTML = names.map(n =>
+      '<button type="button" class="pchip' + (n === store.active ? ' on' : '') + '" data-person="' + n + '">' +
+      n + (n === store.active ? '<span class="x" data-remove="' + n + '" role="button" aria-label="Remove ' + n + '">&times;</span>' : '') +
+      '</button>').join("") +
+    '<button type="button" class="pchip add" data-new="1">+ Add person</button>';
+  el.title = names.length ? "Tap a person to load their details" : "";
+}
+$("people").addEventListener("click", e => {
+  const rm = e.target.closest("[data-remove]");
+  if(rm){ e.stopPropagation(); removePerson(rm.getAttribute("data-remove")); return; }
+  const add = e.target.closest("[data-new]");
+  if(add){ newPerson(); return; }
+  const chip = e.target.closest("[data-person]");
+  if(chip) loadPerson(chip.getAttribute("data-person"));
+});
 
 /* ============================================================
    Build the DOM bits that come from data
@@ -1140,8 +1306,16 @@ fillSlots();
 /* ============================================================
    Wiring
    ============================================================ */
-document.addEventListener("input", render);
-document.addEventListener("change", e => { if(e.target.id === "kind") fillSlots(); render(); });
+const PERSON_INPUTS = new Set(["initials","pronoun","ratio"]);
+function onEdit(e){
+  const t = e.target;
+  const isPerson = PERSON_INPUTS.has(t.id) || t.closest("#comm") || t.closest("#flags");
+  if(isPerson){ syncPerson(); renderPeople(); }
+  if(isPerson || t.id === "kind" || t.id === "slot") reseed();
+  render();
+}
+document.addEventListener("input", onEdit);
+document.addEventListener("change", e => { if(e.target.id === "kind") fillSlots(); onEdit(e); });
 
 $("reword").addEventListener("click", () => {
   onScreen = Object.assign({}, chosenIdx);
@@ -1156,9 +1330,7 @@ function doCopy(){
     commitHistory();
     store.last = store.last || {};
     store.last[histKey()] = txt;
-    store.person = { initials: state().initials, pronoun: state().pronoun, ratio: state().ratio,
-                     comm: state().comm, flags: state().flags };
-    save();
+    syncPerson();
     salt = Math.floor(Math.random() * 1e9);
     const b = $("copy"), d = $("dockCopy"), old = b.textContent;
     b.textContent = "Copied"; d.textContent = "Copied";
@@ -1188,13 +1360,21 @@ $("theme").addEventListener("click", () => {
 
 /* restore the person from last time, and open on a realistic worked example */
 (function boot(){
-  const p = store.person;
-  if(p){
-    $("initials").value = p.initials || "";
-    $("pronoun").value  = p.pronoun || "he";
-    $("ratio").value    = p.ratio || "";
-    (p.comm||[]).forEach(v => { const el = $("comm_" + v); if(el) el.checked = true; });
-    (p.flags||[]).forEach(v => { const el = $("flags_" + v); if(el) el.checked = true; });
+  store.device = store.device || (Math.random().toString(36).slice(2) + Date.now().toString(36));
+  store.people = store.people || {};
+  /* carry over the single person remembered by earlier versions */
+  if(store.person && store.person.initials && !store.people[store.person.initials]){
+    store.people[store.person.initials] = store.person;
+    store.active = store.active || store.person.initials;
+    delete store.person;
+  }
+  save();
+
+  const first = store.active && store.people[store.active] ? store.people[store.active]
+              : store.people[Object.keys(store.people)[0]];
+  if(first){
+    store.active = first.initials;
+    applyProfile(first);
   } else {
     /* example entry, so the page opens showing what it does */
     $("initials").value = "MA";
@@ -1219,11 +1399,32 @@ $("theme").addEventListener("click", () => {
     $("mood_settled").checked = true;
     $("well_nochange").checked = true;
     $("outcome_ready").checked = true;
+    syncPerson();
   }
+  renderPeople();
   if(!$("time").value){
     const d = new Date();
     $("time").value = String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
   }
+  /* open on the shift that matches the clock */
+  const hr = new Date().getHours();
+  if($("kind").value === "personal" && !store.active)
+    $("slot").value = hr >= 20 || hr < 6 ? "night" : hr >= 14 ? "pm" : "am";
+  reseed();
   render();
+
+  /* self-check: every choice on screen must have a phrase bank behind it */
+  [[RESP,RESPBANK,"RESP"],[HOW,HOWBANK,"HOW"],[CONSENT,CONSENTBANK,"CONSENT"],
+   [SKIN,SKINBANK,"SKIN"],[MOOD,MOODBANK,"MOOD"],[WELL,WELLBANK,"WELL"],
+   [RISK,RISKBANK,"RISK"],[OUTCOME,OUTBANK,"OUTCOME"],[COMM,COMMBANK,"COMM"]]
+  .forEach(([opts, bank, name]) => opts.forEach(o => {
+    if(o[0] === "none" || o[0] === "noresp") return;
+    if(!bank[o[0]] || !bank[o[0]].length) console.warn("No wording for " + name + "." + o[0]);
+  }));
+  TASKS.personal.concat(TASKS.eating, TASKS.activity).forEach(t =>
+    LEVELS.forEach(l => { if(!t[l[0]] || !t[l[0]].length) console.warn("No wording for task " + t.id + "." + l[0]); }));
+
+  if("serviceWorker" in navigator && location.protocol === "https:")
+    navigator.serviceWorker.register("sw.js").catch(() => {});
 })();
 </script>
