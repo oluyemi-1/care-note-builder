@@ -70,6 +70,9 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 input:hover,select:hover,textarea:hover{border-color:var(--line-strong)}
 select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:32px}
 
+.needs{margin:0;padding:11px 20px;background:var(--warn-wash);color:var(--warn);
+  font-size:13px;font-weight:500;border-top:1px solid var(--line-soft)}
+.needs b{font-weight:700}
 .switch-note{margin:0 0 14px;padding:9px 12px;border-radius:8px;background:var(--warn-wash);
   color:var(--warn);font-size:13px;font-weight:500}
 
@@ -302,6 +305,7 @@ select.mini{width:auto;padding:5px 28px 5px 9px;font-size:12px;border-radius:6px
           <select id="len" class="mini" aria-label="Note length"><option value="short">Short</option><option value="std" selected>Gold standard</option><option value="full">Full detail</option></select>
           <span class="badge ok" id="fresh">Fresh wording</span></div></header>
         <div class="out empty" id="out">Fill in the steps and the note builds itself here.</div>
+        <p class="needs" id="needs" hidden></p>
         <div class="metrics"><span>Words <b id="wc">0</b></span><span>Sentences <b id="sc">0</b></span><span>Overlap with last note <b id="ov">&mdash;</b></span></div>
         <label class="confirm" for="attest"><input type="checkbox" id="attest">
           <span>I confirm this note reflects <b>what actually happened</b> on my shift.</span></label>
@@ -1105,7 +1109,9 @@ function render(){
   noteText = buildNote(s);
 
   const out = $("out");
-  const filled = noteText.trim().length > 0 && !!s.resp;
+  /* Show whatever has been answered so far. Requiring a response before
+     showing anything meant a half-filled entry looked like a broken app. */
+  const filled = noteText.trim().length > 0;
   out.textContent = filled ? noteText : "Fill in the steps and the note builds itself here.";
   out.classList.toggle("empty", !filled);
 
@@ -1126,6 +1132,12 @@ function render(){
 
   /* audit */
   const a = audit(s), passed = a.filter(x => x.ok).length;
+  const missing = a.slice(0, 6).filter(x => !x.ok).map(x => x.t.toLowerCase());
+  const needs = $("needs");
+  if(filled && missing.length){
+    needs.hidden = false;
+    needs.innerHTML = "Still to add: <b>" + missing.join("</b>, <b>") + "</b>.";
+  } else needs.hidden = true;
   $("audit").innerHTML = a.map(x =>
     '<li class="' + (x.ok ? "pass" : "fail") + '"><span class="mk">' + (x.ok ? "✓" : "!") + '</span>' +
     '<span>' + x.t + (x.ok ? "" : '<em>' + x.fix + '</em>') + '</span></li>').join("");
@@ -1370,7 +1382,9 @@ function prefillActivity(){
 
 function fillSlots(){
   const k = $("kind").value;
+  const keep = $("slot").value;            // a browser restoring the form on reload
   $("slot").innerHTML = SLOTS[k].map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join("");
+  if(keep && [...$("slot").options].some(o => o.value === keep)) $("slot").value = keep;
   $("slotWrap").querySelector("label").textContent =
     k === "activity" ? "Activity" : k === "eating" ? "Which meal" : "Which one";
   document.querySelector('label[for="offerA"]').textContent =
@@ -1487,6 +1501,11 @@ $("theme").addEventListener("click", () => {
     const d = new Date();
     $("time").value = String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
   }
+  /* the browser can restore the selects on reload without firing a change
+     event, which left the labels and the prefill out of step */
+  fillSlots();
+  prefillActivity();
+
   /* open on the shift that matches the clock */
   const hr = new Date().getHours();
   if($("kind").value === "personal" && !store.active)
