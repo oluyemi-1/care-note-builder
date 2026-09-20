@@ -76,6 +76,15 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,va
 .switch-note{margin:0 0 14px;padding:9px 12px;border-radius:8px;background:var(--warn-wash);
   color:var(--warn);font-size:13px;font-weight:500}
 
+/* weekly timetable rows */
+.ttrow{display:grid;grid-template-columns:1.1fr 1.2fr auto auto auto;gap:7px;align-items:center;margin-bottom:7px}
+.ttrow select,.ttrow input{padding:7px 9px;font-size:13.5px}
+.ttrow select{padding-right:26px;background-position:calc(100% - 12px) 50%,calc(100% - 8px) 50%}
+.ttrow .tt-x{border:1px solid var(--line);background:var(--sunk);border-radius:7px;width:32px;height:32px;
+  cursor:pointer;color:var(--ink-3);font-size:16px;line-height:1}
+.ttrow .tt-x:hover{border-color:var(--miss);color:var(--miss)}
+@media (max-width:640px){ .ttrow{grid-template-columns:1fr 1fr;gap:6px} .ttrow .tt-x{width:100%} }
+
 /* people switcher */
 .people{display:flex;flex-wrap:wrap;gap:7px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line-soft)}
 .pchip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--sunk);
@@ -211,6 +220,13 @@ select.mini{width:auto;padding:5px 28px 5px 9px;font-size:12px;border-radius:6px
           <fieldset><legend>Standing health &amp; risk notes (shape the wording)</legend>
             <div class="chips" id="flags"></div>
           </fieldset>
+          <div class="rule"></div>
+          <fieldset>
+            <legend>College timetable</legend>
+            <div id="tt"></div>
+            <button type="button" class="pchip add" id="ttAdd" style="margin-top:8px">+ Add a weekly session</button>
+            <p class="note-inline" style="margin-top:8px">Set once per person. Pick College on a day they have a class and the course and times fill in themselves.</p>
+          </fieldset>
         </div>
       </section>
 
@@ -221,6 +237,7 @@ select.mini{width:auto;padding:5px 28px 5px 9px;font-size:12px;border-radius:6px
           <fieldset id="settingWrap" hidden style="margin-bottom:14px"><legend>Where is this activity?</legend>
             <div class="chips" id="setting"></div>
             <p class="note-inline" id="settingHint" style="margin-top:8px"></p>
+            <p class="switch-note" id="ttHint" hidden style="margin:10px 0 0"></p>
           </fieldset>
           <div class="grid">
             <div class="f"><label for="kind">Type of interaction</label>
@@ -231,6 +248,7 @@ select.mini{width:auto;padding:5px 28px 5px 9px;font-size:12px;border-radius:6px
               </select></div>
             <div class="f" id="slotWrap"><label for="slot">Which one</label><select id="slot"></select></div>
             <div class="f"><label for="time">Time</label><input type="time" id="time"></div>
+            <div class="f" id="sessionToWrap" hidden><label for="sessionTo">Session ended</label><input type="time" id="sessionTo"></div>
             <div class="f" id="actOtherWrap" hidden><label for="actOther">Name the activity</label><input type="text" id="actOther" placeholder="e.g. a trip to the library" autocomplete="off"></div>
           </div>
           <div class="rule"></div>
@@ -1030,6 +1048,7 @@ function state(){
     kind:     $("kind").value,
     slot:     $("slot").value,
     setting:  one("setting") || "community",
+    sessionTo: $("sessionTo").value,
     learn:    checked("learn"),
     actOther: $("actOther").value.trim(),
     len:      $("len").value,
@@ -1129,6 +1148,12 @@ function buildNote(s){
   else if(s.offerA && s.kind !== "activity") add(2, T("{S} {vbe} offered " + s.offerA + ".", s));
   /* a college course was chosen at enrolment; nothing is offered on the day */
   /* a single activity is already named by the opener above */
+  if(s.kind === "activity" && s.setting === "college" && s.time && s.sessionTo && toMins(s.sessionTo) > toMins(s.time))
+    add(2, T(pick([
+      "{S} {vbe} at college from " + s.time + " until " + s.sessionTo + ".",
+      "The session ran from " + s.time + " to " + s.sessionTo + ".",
+      "The class lasted " + durText(s.time, s.sessionTo) + ", from " + s.time + " to " + s.sessionTo + "."
+    ], "session"), s));
   if(s.comm.length) add(2, T(pick(COMMBANK[s.comm[0]], "comm"), s));
   if(s.comm.length > 1) add(3, T(pick(COMMBANK[s.comm[1]], "comm2"), s));
 
@@ -1348,6 +1373,7 @@ function syncVisibility(s){
     ? "Already arranged, so nothing is offered today \u2014 record the journey, the support and what they gained."
     : "Offered today and chosen from the options \u2014 record the choice, the support and how it went.";
   $("offerWrap").hidden = college;
+  $("sessionToWrap").hidden = !college;
   $("learnWrap").hidden = s.kind !== "activity";
   $("actOtherWrap").hidden = !(s.kind === "activity" && s.slot === "other" && !college);
   /* only offer responses that make sense here */
@@ -1381,11 +1407,83 @@ function syncVisibility(s){
 /* ============================================================
    People on this shift \u2014 profiles keyed by initials, on this device only
    ============================================================ */
+const DAYS = [["1","Monday"],["2","Tuesday"],["3","Wednesday"],["4","Thursday"],
+              ["5","Friday"],["6","Saturday"],["0","Sunday"]];
+const toMins = t => { const [h,m] = (t || "0:0").split(":").map(Number); return (h||0)*60 + (m||0); };
+const dayLabel = d => (DAYS.find(x => x[0] === String(d)) || ["","that day"])[1];
+const courseLabel = c => (COURSES.find(x => x[0] === c) || ["","the class"])[1].replace(/&amp;/g,"&");
+
+function durText(a, b){
+  const d = toMins(b) - toMins(a);
+  if(d <= 0) return "";
+  const h = Math.floor(d / 60), m = d % 60;
+  const words = ["","one hour","two hours","three hours","four hours","five hours","six hours"];
+  const H = words[h] || (h + " hours");
+  if(h && m) return H + " and " + m + " minutes";
+  if(h) return H;
+  return m + " minutes";
+}
+
+/* ---------- the person's weekly college timetable ---------- */
+function ttRow(r){
+  r = r || {};
+  return '<div class="ttrow">' +
+    '<select class="tt-d" aria-label="Day">' + DAYS.map(d =>
+      '<option value="' + d[0] + '"' + (String(r.d) === d[0] ? ' selected' : '') + '>' + d[1] + '</option>').join("") + '</select>' +
+    '<select class="tt-c" aria-label="Course">' + COURSES.map(c =>
+      '<option value="' + c[0] + '"' + (r.c === c[0] ? ' selected' : '') + '>' + c[1] + '</option>').join("") + '</select>' +
+    '<input type="time" class="tt-from" aria-label="Starts" value="' + (r.from || "") + '">' +
+    '<input type="time" class="tt-to" aria-label="Ends" value="' + (r.to || "") + '">' +
+    '<button type="button" class="tt-x" aria-label="Remove this session">&times;</button></div>';
+}
+function renderTT(list){
+  $("tt").innerHTML = (list || []).map(ttRow).join("");
+}
+function readTT(){
+  return [...document.querySelectorAll("#tt .ttrow")].map(row => ({
+    d: row.querySelector(".tt-d").value, c: row.querySelector(".tt-c").value,
+    from: row.querySelector(".tt-from").value, to: row.querySelector(".tt-to").value
+  })).filter(r => r.from);
+}
+$("ttAdd").addEventListener("click", () => {
+  $("tt").insertAdjacentHTML("beforeend", ttRow({ d: String(new Date().getDay()) }));
+  syncPerson();
+});
+$("tt").addEventListener("click", e => {
+  if(e.target.classList.contains("tt-x")){ e.target.closest(".ttrow").remove(); syncPerson(); render(); }
+});
+
+/* pick out today's session so staff do not go hunting for it */
+function applyTodaySession(){
+  const hint = $("ttHint");
+  if($("kind").value !== "activity" || (one("setting") || "community") !== "college"){ hint.hidden = true; return; }
+  const pr = (store.people || {})[store.active];
+  const tt = (pr && pr.timetable) || [];
+  const now = new Date(), today = String(now.getDay()), mins = now.getHours() * 60 + now.getMinutes();
+  const todays = tt.filter(x => x.d === today && x.c).sort((a, b) => toMins(a.from) - toMins(b.from));
+  if(!todays.length){
+    hint.hidden = false;
+    hint.textContent = tt.length
+      ? "No college session on " + dayLabel(today) + "'s timetable \u2014 choose the course below if there was one."
+      : "No timetable saved for this person yet. Add their weekly sessions under The person and they will fill in here.";
+    return;
+  }
+  /* the one happening now, else the one closest to now */
+  const cur = todays.find(x => mins >= toMins(x.from) - 60 && mins <= toMins(x.to) + 120) || todays[0];
+  $("slot").value = cur.c;
+  if(cur.from) $("time").value = cur.from;
+  if(cur.to)   $("sessionTo").value = cur.to;
+  hint.hidden = false;
+  hint.textContent = "From the timetable: " + dayLabel(today) + " " + cur.from +
+    (cur.to ? "\u2013" + cur.to : "") + ", " + courseLabel(cur.c) + ". Change it if today ran differently.";
+}
+
 const PROFILE_FIELDS = ["initials","pronoun","ratio"];
 
 function profileFromForm(){
   return { initials: $("initials").value.trim().toUpperCase(), pronoun: $("pronoun").value,
-           ratio: $("ratio").value, comm: checked("comm"), flags: checked("flags") };
+           ratio: $("ratio").value, comm: checked("comm"), flags: checked("flags"),
+           timetable: readTT() };
 }
 function applyProfile(pr){
   $("initials").value = pr.initials || "";
@@ -1394,6 +1492,7 @@ function applyProfile(pr){
   document.querySelectorAll('#comm input, #flags input').forEach(i => { i.checked = false; });
   (pr.comm  || []).forEach(v => { const el = $("comm_"  + v); if(el) el.checked = true; });
   (pr.flags || []).forEach(v => { const el = $("flags_" + v); if(el) el.checked = true; });
+  renderTT(pr.timetable);
 }
 /* keep the store in step with the form, renaming rather than duplicating
    when someone edits the initials of the person they are already on */
@@ -1413,6 +1512,7 @@ function loadPerson(name){
   if(!pr) return;
   store.active = name; save();
   applyProfile(pr);
+  applyTodaySession();
   reseed();
   if(!one("setting")) $("setting_community").checked = true;
   renderPeople();
@@ -1571,8 +1671,9 @@ function onEdit(e){
 }
 document.addEventListener("input", e => { if(e.target.id === "actOther") prefillActivity(); onEdit(e); });
 document.addEventListener("change", e => {
-  if(e.target.id === "kind"){ fillSlots(); resetInteraction(); prefillActivity(); }
-  if(e.target.closest && e.target.closest("#setting")){ fillSlots(); prefillActivity(); }
+  if(e.target.id === "kind"){ fillSlots(); resetInteraction(); prefillActivity(); applyTodaySession(); }
+  if(e.target.closest && e.target.closest("#tt")){ syncPerson(); }
+  if(e.target.closest && e.target.closest("#setting")){ fillSlots(); prefillActivity(); applyTodaySession(); }
   if(e.target.id === "slot" || e.target.id === "actOther") prefillActivity();
   onEdit(e);
 });

@@ -65,6 +65,12 @@ Both record **skills and social outcomes** - practised a skill, followed the
 tutor, worked alongside others, waited their turn, asked for help, finished a
 piece of work - which is the part a course note lives or dies on.
 
+Each person can hold a **weekly college timetable** - day, course, start and
+end. Pick College on a day they have a class and the course and times fill in
+themselves, with a line naming what was found so staff can correct it if the
+day ran differently. Session times go into the note as fact, not as timetable
+admin. Enrolment itself is start-of-term paperwork and stays out of the note.
+
 Travel method (cab, bus, train, on foot, staff vehicle, minibus) and travel
 safeguarding (seatbelt, escorted door to door, waited at the stop, supported at
 crossings) sit with the journey in the finished note.
