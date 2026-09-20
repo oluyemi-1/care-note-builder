@@ -1,0 +1,1229 @@
+<title>Gold Standard Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --ground:#F2F5F5; --surface:#FFFFFF; --surface-2:#E8EDED; --sunk:#DCE4E4;
+  --line:#CFD9D9; --line-soft:#E2E9E9; --line-strong:#A9B8B8;
+  --ink:#111819; --ink-2:#3F4C4D; --ink-3:#697677;
+  --accent:#0E5A63; --accent-2:#14868F; --accent-ink:#FFFFFF; --accent-wash:#DFEDEE;
+  --ok:#2C6B48; --ok-wash:#E1EFE8; --warn:#8A5709; --warn-wash:#F7EEDC; --miss:#98291F; --miss-wash:#F6E4E2;
+  --shadow:0 1px 2px rgba(17,24,25,.05), 0 8px 24px -14px rgba(17,24,25,.28);
+  --r:10px;
+  --ui:"Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --doc:"Source Serif 4", Georgia, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D1213; --surface:#161E1F; --surface-2:#1E2829; --sunk:#111819;
+    --line:#2C3839; --line-soft:#222D2E; --line-strong:#435152;
+    --ink:#E8EFEF; --ink-2:#AEBCBC; --ink-3:#83918F;
+    --accent:#4FB3BC; --accent-2:#6FCBD3; --accent-ink:#06191C; --accent-wash:#16302F;
+    --ok:#6FC195; --ok-wash:#172C22; --warn:#DDA850; --warn-wash:#2C2416; --miss:#E78C81; --miss-wash:#2E1A18;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D1213; --surface:#161E1F; --surface-2:#1E2829; --sunk:#111819;
+  --line:#2C3839; --line-soft:#222D2E; --line-strong:#435152;
+  --ink:#E8EFEF; --ink-2:#AEBCBC; --ink-3:#83918F;
+  --accent:#4FB3BC; --accent-2:#6FCBD3; --accent-ink:#06191C; --accent-wash:#16302F;
+  --ok:#6FC195; --ok-wash:#172C22; --warn:#DDA850; --warn-wash:#2C2416; --miss:#E78C81; --miss-wash:#2E1A18;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--ground);color:var(--ink);font-family:var(--ui);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1260px;margin:0 auto;padding-inline:20px;padding-block:28px 140px}
+h1,h2,h3{text-wrap:balance;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+
+/* ---------- masthead ---------- */
+.mast{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;padding-bottom:20px;border-bottom:2px solid var(--ink)}
+.mast h1{font-size:clamp(27px,4vw,37px);font-weight:700;letter-spacing:-.024em;line-height:1.05}
+.mast .sub{color:var(--ink-2);max-width:56ch;margin-top:7px;font-size:14.5px}
+.spine{display:flex;flex-wrap:wrap;gap:5px;align-items:center;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.spine span{background:var(--accent-wash);padding:4px 8px;border-radius:5px;white-space:nowrap}
+.spine i{color:var(--ink-3);font-style:normal}
+.privacy{margin-top:14px;display:flex;gap:9px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--r);padding:11px 14px;font-size:13.5px;color:var(--ink-2)}
+.privacy b{color:var(--ink);font-weight:600}
+
+/* ---------- layout ---------- */
+.cols{display:grid;grid-template-columns:1fr;gap:26px;margin-top:26px}
+@media (min-width:1020px){ .cols{grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:30px;align-items:start} .rail{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 18px)} }
+
+/* ---------- steps ---------- */
+.step{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:16px;overflow:hidden}
+.step>header{display:flex;gap:12px;align-items:baseline;padding:14px 18px;border-bottom:1px solid var(--line-soft);background:var(--surface-2)}
+.step>header .num{font-family:var(--doc);font-size:13px;font-weight:600;color:var(--accent);background:var(--surface);border:1px solid var(--line);width:25px;height:25px;border-radius:50%;display:grid;place-items:center;flex:none;align-self:center}
+.step>header h2{font-size:12px;font-weight:700;letter-spacing:.11em;text-transform:uppercase}
+.step>header .hint{font-size:12.5px;color:var(--ink-3);margin-left:auto;text-align:right}
+.body{padding:18px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.f{display:flex;flex-direction:column;gap:5px;min-width:0}
+.f>label{font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+input[type=text],input[type=time],input[type=number],select,textarea{
+  background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:10px 11px;width:100%;min-width:0;transition:border-color .12s,background .12s}
+textarea{resize:vertical;min-height:70px;font-family:var(--ui)}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent-2);outline-offset:1px}
+input:hover,select:hover,textarea:hover{border-color:var(--line-strong)}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:32px}
+
+/* chip choices */
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+.chip span{display:block;border:1px solid var(--line);background:var(--sunk);border-radius:99px;padding:7px 13px;font-size:13.5px;cursor:pointer;transition:.12s;user-select:none}
+.chip input:checked+span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:500}
+.chip input:focus-visible+span{outline:2px solid var(--accent-2);outline-offset:2px}
+.chip:hover span{border-color:var(--line-strong)}
+
+/* task rows */
+.tasks{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.task{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;padding:10px 13px;border-bottom:1px solid var(--line-soft);background:var(--surface)}
+.task:last-child{border-bottom:0}
+.task.on{background:var(--accent-wash)}
+.task .tl{display:flex;gap:10px;align-items:center;min-width:0;cursor:pointer}
+.task .tl input{accent-color:var(--accent);width:18px;height:18px;flex:none}
+.task .tl b{font-weight:500;font-size:14.5px}
+.task .nf{display:block;font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+.task .ctl{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.task select{width:auto;padding:6px 30px 6px 9px;font-size:13px;background-position:calc(100% - 14px) 50%,calc(100% - 9px) 50%}
+.task[hidden]{display:none}
+@media (max-width:520px){ .task{grid-template-columns:1fr} .task .ctl{justify-content:flex-start} }
+
+.note-inline{font-size:12.5px;color:var(--ink-3);margin-top:10px}
+fieldset{border:0;padding:0;margin:0}
+legend{font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);padding:0;margin-bottom:6px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.rule{height:1px;background:var(--line-soft);margin:16px 0}
+
+/* ---------- rail ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.card>header{display:flex;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line-soft)}
+.card>header h2{font-size:12px;font-weight:700;letter-spacing:.11em;text-transform:uppercase}
+.card>header .r{margin-left:auto;display:flex;gap:7px;align-items:center}
+
+select.mini{width:auto;padding:5px 28px 5px 9px;font-size:12px;border-radius:6px;background-color:var(--sunk);background-position:calc(100% - 13px) 50%,calc(100% - 8px) 50%}
+.badge{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:3.5px 8px;border-radius:5px;white-space:nowrap}
+.badge.ok{background:var(--ok-wash);color:var(--ok)}
+.badge.warn{background:var(--warn-wash);color:var(--warn)}
+.badge.miss{background:var(--miss-wash);color:var(--miss)}
+
+.out{font-family:var(--doc);font-size:16.5px;line-height:1.62;padding:18px 20px;min-height:170px;white-space:pre-wrap;background:var(--surface)}
+.out.empty{color:var(--ink-3);font-style:italic;font-size:15px}
+.metrics{display:flex;gap:16px;padding:10px 20px;border-top:1px solid var(--line-soft);background:var(--surface-2);font-size:12px;color:var(--ink-3)}
+.metrics b{color:var(--ink-2);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* record fields */
+.nf-list{padding:6px 0;max-height:230px;overflow:auto}
+.nf-row{display:flex;gap:12px;justify-content:space-between;padding:7px 16px;font-size:13.5px;border-bottom:1px solid var(--line-soft)}
+.nf-row:last-child{border-bottom:0}
+.nf-row span:first-child{color:var(--ink-2);min-width:0}
+.nf-row span:last-child{font-weight:600;text-align:right;white-space:nowrap}
+.nf-empty{padding:14px 16px;font-size:13.5px;color:var(--ink-3)}
+
+/* audit */
+.audit{list-style:none;margin:0;padding:6px 0}
+.audit li{display:flex;gap:10px;align-items:flex-start;padding:7px 16px;font-size:13.5px;line-height:1.4}
+.audit .mk{width:17px;height:17px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:10px;font-weight:700;margin-top:1px}
+.audit .pass .mk{background:var(--ok-wash);color:var(--ok)}
+.audit .fail .mk{background:var(--miss-wash);color:var(--miss)}
+.audit .fail{color:var(--ink-2)}
+.audit .fail em{display:block;font-style:normal;font-size:12px;color:var(--ink-3)}
+
+/* actions */
+.confirm{display:flex;gap:11px;align-items:flex-start;padding:14px 16px;background:var(--warn-wash);border-top:1px solid var(--line-soft);cursor:pointer}
+.confirm input{accent-color:var(--accent);width:19px;height:19px;flex:none;margin-top:1px}
+.confirm span{font-size:13.5px;color:var(--ink)}
+.acts{display:flex;gap:9px;padding:14px 16px;border-top:1px solid var(--line-soft);flex-wrap:wrap}
+.btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:11px 16px;font-size:14.5px;font-weight:500;cursor:pointer;transition:.12s;flex:1;min-width:130px}
+.btn:hover:not(:disabled){border-color:var(--ink-3)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn.primary:hover:not(:disabled){background:var(--accent-2);border-color:var(--accent-2)}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+.why{padding:0 16px 14px;font-size:12.5px;color:var(--ink-3)}
+
+/* sticky bar (narrow) */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom, 0px));display:flex;gap:11px;align-items:center;box-shadow:0 -6px 22px -16px rgba(0,0,0,.5)}
+.dock .t{font-size:13px;color:var(--ink-2);min-width:0;flex:1}
+.dock .t b{color:var(--ink);font-weight:600}
+.dock .btn{flex:none;min-width:0;padding:9px 14px}
+@media (min-width:1020px){ .dock{display:none} }
+@media (max-width:1019px){ .wrap{padding-bottom:96px} }
+.foot{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}
+.tog{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:5px 10px;font-size:12.5px;cursor:pointer;color:var(--ink-2)}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <h1>Gold Standard Notes</h1>
+      <p class="sub">Answer what actually happened on the shift. The builder writes a fresh, person-centred daily care note — worded differently every time, so no two entries read like a paste of the last one.</p>
+    </div>
+    <div class="spine" aria-label="Recording spine">
+      <span>Offer</span><i>&rarr;</i><span>Choice</span><i>&rarr;</i><span>Support</span><i>&rarr;</i><span>Independence</span><i>&rarr;</i><span>Observation</span><i>&rarr;</i><span>Outcome</span>
+    </div>
+  </header>
+
+  <p class="privacy"><span aria-hidden="true">&#9679;</span><span><b>Initials only &mdash; nothing leaves this tablet.</b> There is no account, no server and no internet call. Everything you type stays in this browser, and the builder never adds a detail you did not record.</span></p>
+
+  <div class="cols">
+    <!-- ================= FORM ================= -->
+    <div>
+      <section class="step">
+        <header><span class="num">&#9679;</span><h2>The person</h2><span class="hint">Saved on this device</span></header>
+        <div class="body">
+          <div class="grid">
+            <div class="f"><label for="initials">Initials</label><input type="text" id="initials" maxlength="4" placeholder="e.g. MA" autocomplete="off"></div>
+            <div class="f"><label for="pronoun">Pronouns</label>
+              <select id="pronoun"><option value="he">He / him</option><option value="she">She / her</option><option value="they">They / them</option></select></div>
+            <div class="f"><label for="ratio">Staffing</label>
+              <select id="ratio"><option value="">Not stated</option><option value="1:1">1:1 support</option><option value="2:1">2:1 support</option><option value="shared">Shared staffing</option></select></div>
+          </div>
+          <div class="rule"></div>
+          <fieldset><legend>How this person communicates</legend>
+            <div class="chips" id="comm"></div>
+          </fieldset>
+          <div class="rule"></div>
+          <fieldset><legend>Standing health &amp; risk notes (shape the wording)</legend>
+            <div class="chips" id="flags"></div>
+          </fieldset>
+        </div>
+      </section>
+
+      <section class="step">
+        <header><span class="num">1</span><h2>Offer</h2><span class="hint">What was offered, and how</span></header>
+        <div class="body">
+          <div class="grid">
+            <div class="f"><label for="kind">Type of interaction</label>
+              <select id="kind">
+                <option value="personal">Personal Care</option>
+                <option value="eating">Eating &amp; Drinking</option>
+                <option value="activity">Activities</option>
+              </select></div>
+            <div class="f" id="slotWrap"><label for="slot">Which one</label><select id="slot"></select></div>
+            <div class="f"><label for="time">Time</label><input type="time" id="time"></div>
+            <div class="f" id="actOtherWrap" hidden><label for="actOther">Name the activity</label><input type="text" id="actOther" placeholder="e.g. a trip to the library" autocomplete="off"></div>
+          </div>
+          <div class="rule"></div>
+          <div class="f"><label for="offerA">Option offered</label><input type="text" id="offerA" placeholder="e.g. a shower" autocomplete="off"></div>
+          <div class="note-inline">Two real options is what evidences choice. Leave the second blank if only one was offered.</div>
+          <div class="f" style="margin-top:10px"><label for="offerB">Second option offered</label><input type="text" id="offerB" placeholder="e.g. a strip wash" autocomplete="off"></div>
+        </div>
+      </section>
+
+      <section class="step">
+        <header><span class="num">2</span><h2>Choice or response</h2><span class="hint">Their voice, not yours</span></header>
+        <div class="body stack">
+          <fieldset><legend>What they chose or how they responded</legend><div class="chips" id="resp"></div></fieldset>
+          <div class="f" id="chosenWrap"><label for="chosen">What they chose</label><input type="text" id="chosen" placeholder="e.g. a shower" autocomplete="off"></div>
+          <fieldset><legend>How they let you know</legend><div class="chips" id="how"></div></fieldset>
+          <fieldset><legend>Consent</legend><div class="chips" id="consent"></div></fieldset>
+          <div class="f" id="declWrap" hidden><label for="declined">If they declined &mdash; what you did to respect it</label>
+            <input type="text" id="declined" placeholder="e.g. left the room and offered again 20 minutes later" autocomplete="off"></div>
+        </div>
+      </section>
+
+      <section class="step">
+        <header><span class="num">3</span><h2>Support &amp; independence</h2><span class="hint">Tick only what happened</span></header>
+        <div class="body">
+          <div class="f" style="margin-bottom:14px"><label for="level">Overall level of support</label>
+            <select id="level">
+              <option value="">Not stated</option>
+              <option value="ind">Fully independent</option>
+              <option value="prompt">Prompting only</option>
+              <option value="min">Minimal hands-on support</option>
+              <option value="part">Part hands-on support</option>
+              <option value="full">Full hands-on support</option>
+            </select></div>
+          <div class="tasks" id="tasks"></div>
+          <div class="note-inline">Each row maps to a field in your care records system. Anything left unticked is not mentioned in the note.</div>
+        </div>
+      </section>
+
+      <section class="step">
+        <header><span class="num">4</span><h2>Observation</h2><span class="hint">Only what you actually saw</span></header>
+        <div class="body stack">
+          <div class="grid" id="intakeWrap" hidden>
+            <div class="f"><label for="ate">Amount eaten (%)</label>
+              <select id="ate"><option value="">&mdash;</option><option>All</option><option>Most</option><option>About half</option><option>A small amount</option><option>None</option></select></div>
+            <div class="f"><label for="whatAte">What was eaten</label><input type="text" id="whatAte" placeholder="e.g. chicken, rice and vegetables" autocomplete="off"></div>
+          </div>
+          <div class="grid" id="fluidWrap" hidden>
+            <div class="f"><label for="drinkChoice">Drink</label><input type="text" id="drinkChoice" placeholder="e.g. sugar-free squash" autocomplete="off"></div>
+            <div class="f"><label for="offered">Offered (mls)</label><input type="number" id="offered" min="0" step="10" inputmode="numeric"></div>
+            <div class="f"><label for="drunk">Drunk (mls)</label><input type="number" id="drunk" min="0" step="10" inputmode="numeric"></div>
+          </div>
+          <fieldset><legend>Skin (personal care)</legend><div class="chips" id="skin"></div></fieldset>
+          <div class="f" id="skinWrap" hidden><label for="skinDetail">What you saw and where</label>
+            <input type="text" id="skinDetail" placeholder="e.g. a small red area on his left heel" autocomplete="off"></div>
+          <fieldset><legend>How they presented</legend><div class="chips" id="mood"></div></fieldset>
+          <fieldset><legend>Wellbeing</legend><div class="chips" id="well"></div></fieldset>
+          <fieldset id="riskWrap" hidden><legend>Risk controls you used</legend><div class="chips" id="risk"></div></fieldset>
+        </div>
+      </section>
+
+      <section class="step">
+        <header><span class="num">5</span><h2>Outcome</h2><span class="hint">How it ended for them</span></header>
+        <div class="body stack">
+          <fieldset><legend>Outcome</legend><div class="chips" id="outcome"></div></fieldset>
+          <div class="f"><label for="extra">Anything else that actually happened</label>
+            <textarea id="extra" placeholder="Added to the note word for word. Leave blank if there is nothing."></textarea></div>
+          <div class="f"><label for="handover">Handover / follow-up needed</label><input type="text" id="handover" placeholder="e.g. GP to review the red area on Monday" autocomplete="off"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ================= RAIL ================= -->
+    <div class="rail">
+      <div class="card" style="margin-bottom:18px">
+        <header><h2>Daily note</h2><div class="r">
+          <select id="len" class="mini" aria-label="Note length"><option value="short">Short</option><option value="std" selected>Gold standard</option><option value="full">Full detail</option></select>
+          <span class="badge ok" id="fresh">Fresh wording</span></div></header>
+        <div class="out empty" id="out">Fill in the steps and the note builds itself here.</div>
+        <div class="metrics"><span>Words <b id="wc">0</b></span><span>Sentences <b id="sc">0</b></span><span>Overlap with last note <b id="ov">&mdash;</b></span></div>
+        <label class="confirm" for="attest"><input type="checkbox" id="attest">
+          <span>I confirm this note reflects <b>what actually happened</b> on my shift.</span></label>
+        <div class="acts">
+          <button class="btn primary" id="copy" disabled>Copy note</button>
+          <button class="btn" id="reword">Reword it</button>
+        </div>
+        <div class="why" id="why"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px">
+        <header><h2>Set these in your care system</h2></header>
+        <div class="nf-list" id="nf"><div class="nf-empty">Tick the tasks in step 3 and the matching record fields appear here.</div></div>
+      </div>
+
+      <div class="card">
+        <header><h2>Audit check</h2><div class="r"><span class="badge" id="auditBadge">0 / 7</span></div></header>
+        <ul class="audit" id="audit"></ul>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <span>Offer &rarr; choice &rarr; support &rarr; independence &rarr; observation &rarr; outcome. Record only what actually happened.</span>
+    <button class="tog" id="theme">Switch theme</button>
+  </footer>
+</div>
+
+<div class="dock">
+  <span class="t"><b id="dockScore">0 / 7</b> audit checks &middot; <span id="dockWords">0</span> words</span>
+  <button class="btn" id="dockJump">See note</button>
+  <button class="btn primary" id="dockCopy" disabled>Copy</button>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   Gold Standard Notes
+   A phrase-bank daily-note builder for any care setting. No network,
+   no model, no storage beyond this browser. Every sentence traces to
+   a ticked input. The field names in TASKS[].nf match the dropdowns
+   most care record systems use; edit them to match yours.
+   ============================================================ */
+
+const PRON = {
+  he:   {s:"he",   o:"him",  p:"his",   r:"himself",    vbe:"was",  vhave:"has"},
+  she:  {s:"she",  o:"her",  p:"her",   r:"herself",    vbe:"was",  vhave:"has"},
+  they: {s:"they", o:"them", p:"their", r:"themselves", vbe:"were", vhave:"have"}
+};
+
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const $  = id => document.getElementById(id);
+
+/* ---------- option sets ---------- */
+const COMM = [
+  ["verbal","Short, clear speech"],
+  ["makaton","Makaton signing"],
+  ["pictures","Pictures / communication book"],
+  ["nownext","Now and Next board"],
+  ["objects","Objects of reference"],
+  ["gesture","Gesture and body language"]
+];
+const FLAGS = [
+  ["diabetes","Type 2 diabetes"], ["cholesterol","Cholesterol management"],
+  ["softdiet","Soft diet"], ["choking","Choking risk"],
+  ["skin","Skin integrity monitoring"], ["epilepsy","Epilepsy"],
+  ["deaf","Cannot hear approaching traffic"], ["vision","Visual impairment"],
+  ["continence","Continence plan"], ["anxiety","Anxiety in new places"],
+  ["fluids","Fluid target"], ["privacy","Same-gender care preferred"]
+];
+const RESP = [
+  ["choseA","Chose the first option"], ["choseB","Chose the second option"],
+  ["agreed","Agreed to what was offered"], ["nonverbal","Showed a clear non-verbal choice"],
+  ["delayed","Declined at first, then agreed"], ["declined","Declined"], ["noresp","No clear response"]
+];
+const HOW = [
+  ["said","Told staff"], ["pointed","Pointed"], ["signed","Signed"],
+  ["nodded","Nodded"], ["led","Led staff to it"], ["reached","Reached for it"], ["facial","Facial expression"]
+];
+const CONSENT = [["yes","Consent given"],["implied","Consent implied through cooperation"],["no","Consent not given"]];
+const SKIN = [["clear","Observed &mdash; nothing new"],["concern","Observed &mdash; something new"],["none","Not observed this time"]];
+const MOOD = [["settled","Settled"],["cheerful","Cheerful"],["quiet","Quiet"],["chatty","Chatty"],["tired","Tired"],["anxious","Anxious"],["unsettled","Unsettled"]];
+const WELL = [["nochange","No change from usual"],["appetite","Appetite changed"],["pain","Signs of discomfort"],["cough","Coughing"],["sleep","Slept poorly"]];
+const RISK = [
+  ["sight","Stayed within sight"], ["road","Walked on the traffic side"],
+  ["toilet","Toilet before leaving"], ["accessible","Found an accessible toilet"],
+  ["space","Kept walking path clear"], ["plan","Explained the plan in advance"]
+];
+const OUTCOME = [
+  ["ready","Clean, comfortable and ready for the day"],
+  ["settled","Settled afterwards"],
+  ["enjoyed","Enjoyed it and would do it again"],
+  ["proud","Pleased with what they had done"],
+  ["home","Returned home safely and settled"],
+  ["later","Declined for now &mdash; to be offered again later"],
+  ["nochangeout","No concerns; usual routine resumed"]
+];
+const ACTS = [
+  ["college","College","{p} college session","attended college"],
+  ["laundry","Laundry","the laundry","did the laundry"],
+  ["cooking","Cooking","the cooking","cooked the meal"],
+  ["baking","Baking","the baking","did some baking"],
+  ["shopping","Shopping","the shopping","did the shopping"],
+  ["housework","Housework","the housework","did the housework"],
+  ["gardening","Gardening / allotment","the gardening","worked in the garden"],
+  ["walk","Walk","a walk","went for a walk"],
+  ["bus","Bus ride","a bus ride","went for a bus ride"],
+  ["park","Park","the park","spent time at the park"],
+  ["swim","Swimming","swimming","went swimming"],
+  ["cinema","Cinema","the cinema","went to the cinema"],
+  ["cafe","Cafe / eating out","a cafe trip","went to the cafe"],
+  ["church","Church / worship","church","went to church"],
+  ["daycentre","Day centre","the day centre","attended the day centre"],
+  ["volunteering","Volunteering / work placement","{p} volunteering placement","attended {p} volunteering placement"],
+  ["music","Music","music","listened to music"],
+  ["arts","Arts &amp; crafts","arts and crafts","did arts and crafts"],
+  ["games","Games / puzzles","a game","played a game"],
+  ["film","TV / film at home","a film","watched a film"],
+  ["exercise","Exercise / gym","exercise","did some exercise"],
+  ["appt","Appointment","{p} appointment","attended {p} appointment"],
+  ["family","Family visit","a family visit","had a family visit"],
+  ["drive","Drive out","a drive out","went out for a drive"],
+  ["other","Something else","the activity","took part in the activity"]
+];
+const SLOTS = {
+  personal:[["am","Personal Care &mdash; AM"],["pm","Personal Care &mdash; PM"],["night","Personal Care &mdash; Night"],["continence","Continence support"]],
+  eating:[["breakfast","Breakfast"],["lunch","Lunch"],["dinner","Dinner"],["snack","Snack"],["fluids","Daily Fluid Intake"]],
+  activity: ACTS.map(a => [a[0], a[1]])
+};
+
+/* ---------- tasks: each row mirrors a field in the care records system ---------- */
+const LEVELS = [["ind","Did it themselves"],["prompt","With prompting"],["part","Part-supported"],["full","Staff did it"],["declined","Declined"]];
+
+const TASKS = {
+personal:[
+ {id:"wash",label:"Washing",nf:"Method of Hygiene",opts:["a shower","a bath","a strip wash","a bed bath","a wash at the sink"],
+  ind:["{S} had {opt} independently, with staff outside the door and {p} privacy maintained.",
+       "{S} managed {opt} on {p} own and needed no hands-on help.",
+       "{S} completed {opt} independently while staff remained nearby in case {s} called."],
+  prompt:["{S} had {opt} following step-by-step verbal prompts and completed each stage {r}.",
+          "With prompts for each step, {s} washed {r} during {opt}.",
+          "{S} had {opt} and needed only reminders about the order of washing."],
+  part:["{S} washed {p} face and upper body {r} during {opt}, while staff gave hands-on support with the areas {s} could not reach thoroughly.",
+        "During {opt}, {s} did as much as {s} could {r} and staff supported with the remaining areas.",
+        "{S} had {opt}; {s} washed the parts {s} could manage and staff completed the rest to make sure {s} {vbe} thoroughly clean."],
+  full:["Staff provided full hands-on support with {opt}, keeping {p} covered and explaining each step before it happened.",
+        "{S} had {opt} with full support from staff, who maintained {p} privacy and dignity throughout.",
+        "Staff carried out {opt} for {o}, talking {o} through each stage as they went."],
+  declined:["{S} declined {opt} on this occasion and this was respected.",
+            "{S} did not want {opt} and staff did not press the point."]},
+
+ {id:"hair",label:"Hair washing",nf:"Hair Washing",
+  ind:["{S} washed {p} own hair.","{S} washed and dried {p} hair without help."],
+  prompt:["{S} washed {p} hair after a reminder and a demonstration.","{S} washed {p} hair {r} once staff prompted {o} to start."],
+  part:["Staff helped rinse {p} hair while {s} applied the shampoo {r}.","{S} shampooed {p} hair and staff supported with rinsing and drying."],
+  full:["Staff washed and dried {p} hair, checking the water temperature with {o} first.","Staff washed {p} hair for {o}, keeping the water out of {p} eyes."],
+  declined:["{S} declined to have {p} hair washed today.","{S} chose not to wash {p} hair and this was respected."]},
+
+ {id:"shave",label:"Shaving",nf:"Shaving",
+  ind:["{S} shaved {r} using {p} own razor.","{S} shaved independently at the sink."],
+  prompt:["{S} shaved {r} after staff set out {p} things and prompted {o} to start.","{S} shaved with verbal guidance about the areas {s} had missed."],
+  part:["{S} shaved most of {p} face and staff finished the areas {s} found difficult.","Staff steadied the razor while {s} shaved, then tidied the edges."],
+  full:["Staff shaved {o}, checking with {o} as they went and stopping when {s} asked.","Staff carried out {p} shave, explaining each stage beforehand."],
+  declined:["{S} declined a shave today.","{S} did not want to shave and this was respected."]},
+
+ {id:"oral",label:"Oral care",nf:"Oral Care",opts:["{p} teeth","{p} teeth with an electric toothbrush","{p} dentures"],
+  ind:["{S} brushed {opt} without any support.","{S} carried out {p} own oral care, brushing {opt} thoroughly."],
+  prompt:["{S} brushed {opt} following a demonstration and one reminder.","After a single prompt, {s} brushed {opt} {r}."],
+  part:["{S} started brushing {opt} and staff supported to finish the back teeth.","{S} brushed {opt} and staff assisted with the areas {s} missed."],
+  full:["Staff carried out oral care for {o}, brushing {opt} gently.","Staff brushed {opt} with {p} agreement."],
+  declined:["{S} declined oral care on this occasion.","{S} did not want {p} teeth brushed and this was respected."]},
+
+ {id:"nails",label:"Nail care",nf:"Nail Care",
+  ind:["{S} attended to {p} own nails.","{S} cleaned and filed {p} nails {r}."],
+  prompt:["{S} tended to {p} nails after a prompt from staff.","{S} filed {p} nails once staff handed {o} the file."],
+  part:["Staff supported with {p} nails while {s} held out {p} hands.","{S} cleaned {p} nails and staff trimmed them."],
+  full:["Staff checked and trimmed {p} nails with {p} agreement.","Staff attended to {p} nails; they were clean and a comfortable length afterwards."],
+  declined:["{S} declined nail care today.","{S} did not want {p} nails done and this was respected."]},
+
+ {id:"creams",label:"Creams",nf:"Creams Applied as per MAR chart",
+  ind:["{S} applied {p} prescribed cream {r} and it was signed for on the MAR chart.",
+       "{S} put on {p} own cream as prescribed; the MAR chart was signed."],
+  prompt:["{S} applied {p} cream after staff prompted {o} and signed the MAR chart.",
+          "Following a reminder, {s} applied {p} prescribed cream and this was signed for."],
+  part:["{S} applied cream to the areas {s} could reach and staff covered the rest, as recorded on the MAR chart.",
+        "Staff supported with the areas {s} could not reach; the cream was applied as prescribed and signed for."],
+  full:["Staff applied {p} prescribed cream in line with the MAR chart and signed for it.",
+        "Prescribed cream was applied by staff as set out on the MAR chart."],
+  declined:["{S} declined {p} cream; this was recorded on the MAR chart.","{S} refused the prescribed cream and this was signed as declined."]},
+
+ {id:"dress",label:"Dressing & clothing choice",nf:"Choice of clothing made?",
+  ind:["{S} chose {p} own clothes and dressed without help.","{S} picked out {p} outfit and dressed {r}."],
+  prompt:["{S} chose between two clean, weather-appropriate outfits and dressed {r} with verbal prompts for the order.",
+          "{S} selected {p} clothes from two options and dressed following prompts."],
+  part:["{S} chose between two clean outfits and dressed {p} top half {r}, with staff supporting with {p} lower half.",
+        "{S} chose {p} clothes and staff helped with fastenings and footwear."],
+  full:["Staff showed {o} two clean outfits, {s} indicated a preference, and staff dressed {o} in {p} choice.",
+        "Staff supported {o} to dress in the outfit {s} chose from two options."],
+  declined:["{S} declined to change {p} clothes at this point.","{S} kept the clothes {s} {vbe} wearing by choice."]},
+
+ {id:"continence",label:"Continence support",nf:"Continence chart",
+  ind:["{S} used the toilet independently.","{S} took {r} to the toilet without support."],
+  prompt:["{S} used the toilet after a prompt from staff.","Staff reminded {o} and {s} used the toilet {r}."],
+  part:["Staff supported {o} to the toilet and gave hands-on help with clothing only.","{S} {vbe} supported to the toilet; staff assisted with clothing and hand washing."],
+  full:["Staff provided full continence support in private, in line with {p} support plan.","Continence support was given by staff, with {p} dignity and privacy maintained."],
+  declined:["{S} declined support with the toilet at this time.","{S} did not want support and this was respected."]},
+
+ {id:"hearing",label:"Hearing aids",nf:"Hearing Aid(s)",
+  ind:["{S} put in {p} hearing aids {r}.","{S} fitted {p} own hearing aids and checked they were working."],
+  prompt:["{S} put in {p} hearing aids after a reminder.","A prompt was given and {s} fitted {p} hearing aids."],
+  part:["Staff supported {o} to fit {p} hearing aids and checked they were working.","{S} held the aids and staff helped fit them correctly."],
+  full:["Staff fitted and checked {p} hearing aids.","{P} hearing aids were cleaned, fitted and checked by staff."],
+  declined:["{S} declined to wear {p} hearing aids today.","{S} chose not to wear {p} hearing aids."]},
+
+ {id:"glasses",label:"Glasses / lenses",nf:"Glasses / Contact Lenses",
+  ind:["{S} put on {p} glasses {r}.","{S} chose to wear {p} glasses and put them on without help."],
+  prompt:["{S} put on {p} glasses once staff handed them to {o}.","{S} wore {p} glasses after a prompt."],
+  part:["Staff cleaned {p} glasses and {s} put them on.","{P} glasses were cleaned by staff and {s} put them on {r}."],
+  full:["Staff cleaned {p} glasses and helped {o} to put them on.","Staff fitted {p} glasses for {o} after cleaning them."],
+  declined:["{S} declined to wear {p} glasses today.","{S} chose not to wear {p} glasses."]},
+
+ {id:"aids",label:"Assistive aids",nf:"Assistive Aids Checked, Cleaned & Issued",
+  ind:["{S} collected and used {p} own equipment.","{S} checked and used {p} aid without support."],
+  prompt:["{S} used {p} equipment after staff prompted {o} to collect it.","Staff reminded {o} and {s} used {p} aid correctly."],
+  part:["Staff checked and cleaned {p} equipment before {s} used it.","{P} aid was checked and cleaned by staff, then used by {o}."],
+  full:["Staff checked, cleaned and issued {p} equipment before use.","{P} assistive equipment was checked, cleaned and set up by staff."],
+  declined:["{S} declined to use {p} equipment on this occasion.","{S} chose not to use {p} aid."]},
+
+ {id:"jewellery",label:"Watch & jewellery",nf:"Watch & Jewellery",
+  ind:["{S} chose and put on {p} own watch and jewellery.","{S} selected the jewellery {s} wanted to wear."],
+  prompt:["{S} put on {p} watch after a prompt.","Staff offered {o} {p} jewellery and {s} put it on {r}."],
+  part:["Staff fastened {p} watch after {s} chose it.","{S} chose {p} jewellery and staff helped fasten it."],
+  full:["Staff put on the watch and jewellery {s} chose.","Staff fitted {p} chosen jewellery for {o}."],
+  declined:["{S} chose not to wear jewellery today.","{S} declined {p} watch and jewellery."]},
+
+ {id:"makeup",label:"Make up",nf:"Make Up",
+  ind:["{S} applied {p} own make up.","{S} did {p} make up without support."],
+  prompt:["{S} applied {p} make up after staff set it out for {o}.","{S} did {p} make up following a prompt."],
+  part:["{S} applied most of {p} make up and staff supported to finish.","Staff steadied the mirror while {s} applied {p} make up."],
+  full:["Staff applied {p} make up the way {s} asked for it.","Staff did {p} make up to {p} preference."],
+  declined:["{S} declined make up today.","{S} chose not to wear make up."]}
+],
+
+eating:[
+ {id:"choose",label:"Choosing the meal",nf:"Choices Offered",
+  ind:["{S} decided what {s} wanted without any help.","{S} chose {p} meal independently."],
+  prompt:["{S} chose after staff talked through the options with {o}.","Staff described the options and {s} made {p} choice."],
+  part:["Staff showed {o} both options side by side and {s} indicated {p} preference.","{S} {vbe} shown both meals and chose the one {s} wanted."],
+  full:["Staff offered two options and {s} responded to the one {s} preferred.","Both options were presented and {P} response was followed."],
+  declined:["{S} did not want to choose a meal at this point.","{S} declined both options offered."]},
+
+ {id:"prep",label:"Preparing the meal",nf:"Daily note",
+  ind:["{S} gathered the ingredients and prepared the meal {r}.","{S} made the meal independently from start to finish."],
+  prompt:["{S} prepared the meal with verbal guidance about order and timings.","{S} cooked the meal following prompts at each stage."],
+  part:["{S} completed most of the preparation and staff supported with the hot pans.","{S} prepared what {s} could safely manage and staff did the rest."],
+  full:["Staff prepared the meal while {s} watched and chose the seasoning.","Staff cooked the meal, involving {o} in the choices along the way."],
+  declined:["{S} did not want to help prepare the meal today.","{S} declined to take part in preparing the meal."]},
+
+ {id:"eat",label:"Eating",nf:"Amount Eaten (%)",
+  ind:["{S} ate independently and stayed settled at the table.","{S} ate the meal without any support."],
+  prompt:["{S} ate independently with occasional encouragement, offered without pressure.","{S} needed a gentle reminder to keep going and finished the meal {r}."],
+  part:["{S} ate most of the meal {r} and staff supported with cutting up the food.","Staff helped with cutting and {s} ate the meal {r}."],
+  full:["Staff supported {o} to eat at {p} own pace, following {p} lead on each mouthful.","Staff assisted {o} with eating, pausing whenever {s} indicated."],
+  declined:["{S} declined the meal and this was respected.","{S} did not want to eat at this time."]},
+
+ {id:"drink",label:"Drinking",nf:"Daily Fluid Intake",
+  ind:["{S} poured and drank {p} own drink.","{S} got {r} a drink without support."],
+  prompt:["{S} drank after being offered and reminded.","A drink was offered and {s} took it after a prompt."],
+  part:["Staff poured the drink {s} chose and {s} drank it {r}.","{S} chose {p} drink and staff poured it for {o}."],
+  full:["Staff supported {o} with {p} drink at {p} own pace.","Staff assisted {o} to drink, following {p} pace."],
+  declined:["{S} declined a drink at this point; it was offered again later.","{S} did not want a drink and this was respected."]}
+],
+
+activity:[
+ {id:"plan",label:"Planning &amp; preparing",nf:"Daily note",
+  ind:["{S} got everything ready for {act} without any help.","{S} prepared for {act} independently."],
+  prompt:["Staff talked through the plan for {act} and {s} got ready with prompts.","{S} got ready for {act} after staff explained what would happen."],
+  part:["Staff explained the plan for {act} and supported {o} to get ready.","{S} got ready for {act} with hands-on support from staff."],
+  full:["Staff prepared everything for {act} and talked {o} through what was going to happen.","Staff got things ready and explained each step of {act} to {o} beforehand."],
+  declined:["{S} declined {act} at the planning stage.","{S} did not want to go ahead with {act} and this was respected."]},
+
+ {id:"travel",label:"Travelling there",nf:"Daily note",
+  ind:["{S} travelled independently and managed the journey well.","{S} made {p} own way there without support."],
+  prompt:["{S} travelled with staff nearby and needed only occasional guidance.","Staff walked alongside and gave guidance where it was needed."],
+  part:["{S} travelled with staff support and stayed settled during the journey.","Staff supported {o} throughout the journey; {s} remained calm."],
+  full:["Staff supported {o} closely throughout the journey, in line with {p} assessed arrangements.","{S} {vbe} supported throughout the journey as set out in {p} risk assessment."],
+  declined:["{S} declined to travel today.","{S} chose not to go out and this was respected."]},
+
+ {id:"engage",label:"Taking part",nf:"Daily note",
+  ind:["{S} {did} without any support.","{S} {did} on {p} own and set {p} own pace.","{S} {did} independently and kept going until {s} had finished."],
+  prompt:["{S} {did} and needed one gentle prompt to return to the task when {s} became distracted.","{S} {did} with occasional prompts from staff to refocus.","{S} {did} following a prompt at each stage."],
+  part:["{S} {did} with verbal and visual guidance from staff.","Staff guided {o} through {act} step by step and {s} completed it.","{S} did as much of {act} as {s} could and staff supported with the rest."],
+  full:["Staff supported {o} throughout {act}, following {p} lead on how long to stay.","{S} {vbe} supported throughout {act} and staff worked at {p} pace."],
+  declined:["{S} chose not to take part once {s} arrived, and this was respected.","{S} declined {act} and staff did not press the point."]},
+
+ {id:"tools",label:"Using equipment",nf:"Daily note",
+  ind:["{S} used the equipment safely and without supervision.","{S} operated the machine {r} and followed the steps {s} knows well."],
+  prompt:["{S} used the equipment after staff prompted {o} through the settings.","Staff reminded {o} of the steps and {s} used the equipment safely."],
+  part:["Staff set the equipment up and {s} used it with supervision.","{S} loaded and started the machine with staff supervising for safety."],
+  full:["Staff operated the equipment while {s} watched and made the choices.","Staff handled the equipment for safety reasons and kept {o} involved in each decision."],
+  declined:["{S} did not want to use the equipment today.","{S} declined to use the machine and this was respected."]},
+
+ {id:"money",label:"Money &amp; paying",nf:"Daily note",
+  ind:["{S} paid at the till {r} and checked {p} change.","{S} handled {p} own money and paid independently."],
+  prompt:["{S} paid at the till after a prompt about the amount.","Staff reminded {o} of the amount and {s} paid {r}."],
+  part:["Staff counted out the money with {o} and {s} handed it over at the till.","{S} paid with staff support to count the money."],
+  full:["Staff handled the payment and showed {o} the receipt afterwards.","Payment was made by staff, with {p} money recorded as per the finance procedure."],
+  declined:["{S} did not want to handle money today.","{S} declined to pay and this was respected."]},
+
+ {id:"tidy",label:"Clearing up afterwards",nf:"Daily note",
+  ind:["{S} cleared up afterwards without being asked.","{S} tidied away independently once {s} had finished."],
+  prompt:["{S} cleared up after a reminder from staff.","A prompt was given and {s} tidied away {r}."],
+  part:["{S} cleared up with staff working alongside {o}.","Staff and {N} cleared up together afterwards."],
+  full:["Staff cleared up afterwards while {s} rested.","Clearing up was done by staff as {s} had had enough for the day."],
+  declined:["{S} did not want to clear up today.","{S} declined to help tidy away and this was respected."]},
+
+ {id:"finish",label:"Finishing &amp; coming home",nf:"Daily note",
+  ind:["{S} decided when {s} had had enough and finished {r}.","{S} chose when to stop and made {p} own way back."],
+  prompt:["{S} chose to stop when the agreed time was finished.","{S} finished at the agreed time after a reminder."],
+  part:["Staff let {o} know the time was nearly up and {s} agreed to finish.","{S} {vbe} given notice that it was time to go and agreed to leave."],
+  full:["Staff brought {act} to a close and supported {o} home.","Staff ended the session and supported {o} to return home safely."],
+  declined:["{S} wanted to stay longer; staff explained why it was time to go and {s} accepted this.","{S} {vbe} reluctant to finish and staff gave {o} extra time."]}
+]};
+
+/* ---------- opening & communication banks ---------- */
+const OPEN = {
+personal:[
+ "{N} was offered support with {p} personal care at {time}.",
+ "At {time}, staff offered {N} support with {p} personal care{ratio}.",
+ "Support with personal care was offered to {N} at {time}, while {s} {vbe} settled.",
+ "{N} was approached at {time} and offered support with {p} personal care routine.",
+ "Personal care was offered to {N} at {time}, early enough in the day to suit {p} usual routine."],
+eating:[
+ "{N} was offered {meal} at {time}.",
+ "At {time}, staff offered {N} {meal}{ratio}.",
+ "{meal2} was offered to {N} at {time}.",
+ "{N} was invited to {meal} at {time} and came to the table.",
+ "Staff offered {N} {meal} at {time} and talked through what was available."],
+activity:[
+ "{N} was offered a choice of activity at {time}.",
+ "At {time}, staff offered {N} a choice of what to do{ratio}.",
+ "{N} was offered {act} at {time}, alongside another option.",
+ "Staff sat with {N} at {time} to talk through the options for the day.",
+ "{act2} was offered to {N} at {time}, with the plan explained in advance."]
+};
+
+const COMMBANK = {
+ verbal:["Staff used short, clear sentences and allowed time for {o} to respond.",
+         "Staff spoke in simple, calm language and gave {o} time to answer.",
+         "Staff kept the language simple and waited for {p} reply without rushing {o}."],
+ makaton:["Staff gained {p} attention, faced {o} directly and used Makaton alongside speech.",
+          "Makaton signs were used with speech and {s} {vbe} given time to respond.",
+          "Staff signed each step in Makaton and checked {s} had understood before continuing."],
+ pictures:["Staff used {p} picture-based communication book, showing a picture for each step.",
+           "Pictures were used so {s} could see each option before choosing.",
+           "Staff showed {o} pictures for each part of the routine and waited for {p} response."],
+ nownext:["Staff used a Now and Next prompt so {s} knew what was coming.",
+          "A Now and Next board was used and {s} {vbe} given time to process the information.",
+          "Staff set out the sequence on {p} Now and Next board before starting."],
+ objects:["Staff used objects of reference and gave {o} time to respond.",
+          "Objects of reference were used so {s} could see what was being offered."],
+ gesture:["Staff watched {p} body language closely and responded to the cues {s} gave.",
+          "Staff read {p} gestures and expressions and followed {p} lead."]
+};
+
+const RESPBANK = {
+ choseA:["{S} chose {chosen}.","{S} indicated {chosen}.","{S} picked {chosen} from the two options."],
+ choseB:["{S} chose {chosen}.","{S} went for {chosen}.","{S} selected {chosen} once both options had been shown."],
+ agreed:["{S} agreed to the support that was offered.","{S} {vbe} happy to go ahead.","{S} accepted the offer."],
+ nonverbal:["{S} gave a clear non-verbal response and staff followed {p} lead.",
+            "{S} made {p} preference clear without words and this was acted on.",
+            "{S} showed {p} choice non-verbally and staff responded to it."],
+ delayed:["{S} declined at first. {declined} {s} then agreed and support went ahead.",
+          "{S} said no to begin with. {declined} On the second offer {s} agreed."],
+ declined:["{S} declined. {declined}","{S} did not want to go ahead. {declined}"],
+ noresp:["{S} did not give a clear response, so staff waited and offered again a short time later.",
+         "No clear response was given; staff allowed more time rather than pressing on."]
+};
+
+const HOWBANK = {
+ said:["{S} told staff what {s} wanted.","{S} said so in {p} own words."],
+ pointed:["{S} pointed to {p} choice.","{S} made {p} choice by pointing."],
+ signed:["{S} signed {p} choice.","{S} used Makaton to show what {s} wanted."],
+ nodded:["{S} nodded to show {p} choice.","{S} nodded when the option {s} wanted was offered."],
+ led:["{S} led staff to what {s} wanted.","{S} took staff to {p} choice."],
+ reached:["{S} reached for the option {s} wanted.","{S} reached out towards {p} choice."],
+ facial:["{P} facial expression made {p} preference clear.","Staff read {p} expression and followed {p} preference."]
+};
+
+const CONSENTBANK = {
+ yes:["Consent was obtained before any support began.","{S} gave consent before support started.","Consent was checked and given before staff began."],
+ implied:["{S} cooperated throughout and consent was implied by {p} response.","Consent was implied through {p} cooperation and body language."],
+ no:["Consent was not given and no support was carried out.","{S} did not consent and staff did not proceed."]
+};
+
+const SKINBANK = {
+ clear:["{P} skin was observed during care and no new redness, bruising, scratches or broken areas were seen.",
+        "Staff observed {p} skin throughout and it appeared intact with no new concerns.",
+        "{P} skin was checked during personal care and looked the same as usual."],
+ concern:["A new mark was seen during care &mdash; {skinDetail}. This has been recorded on the body map and handed over.",
+          "During care staff noticed {skinDetail}; this is on the body map and has been passed on.",
+          "{skinDetail} was observed during care, recorded on the body map and reported."]
+};
+
+const MOODBANK = {
+ settled:["{S} remained settled throughout.","{S} stayed calm and settled from start to finish."],
+ cheerful:["{S} {vbe} cheerful and smiled during the interaction.","{S} seemed in good spirits throughout."],
+ quiet:["{S} {vbe} quieter than usual but showed no signs of distress.","{S} {vbe} quiet throughout; there were no signs {s} {vbe} unhappy."],
+ chatty:["{S} chatted with staff throughout.","{S} {vbe} talkative and engaged with staff."],
+ tired:["{S} appeared tired but took part willingly.","{S} seemed tired, so staff worked at {p} pace."],
+ anxious:["{S} appeared anxious at the start; staff slowed down and {s} settled.","{S} showed some anxiety and staff gave {o} more time and reassurance."],
+ unsettled:["{S} {vbe} unsettled at points; staff gave {o} space and {s} calmed.","{S} became unsettled and staff paused until {s} {vbe} ready to continue."]
+};
+
+const WELLBANK = {
+ nochange:["No change from {p} usual presentation, appetite or energy was observed.",
+           "Nothing was different from {p} usual self.",
+           "{S} presented as usual with no change in appetite, energy or mood."],
+ appetite:["{P} appetite was different from usual today and this has been handed over."],
+ pain:["{S} showed signs of discomfort during the interaction; this has been reported."],
+ cough:["{S} coughed during the interaction and staff monitored {o} closely afterwards."],
+ sleep:["{S} reported sleeping poorly and seemed tired as a result."]
+};
+
+const RISKBANK = {
+ sight:["Staff remained within sight of {o} throughout.","{S} stayed within staff sight for the whole time."],
+ road:["Near roads, staff gained {p} attention and walked on the traffic side.","Staff walked on the traffic side and used visual prompts at every crossing."],
+ toilet:["{S} used the toilet before leaving, in line with {p} continence plan."],
+ accessible:["Staff identified an accessible toilet on arrival."],
+ space:["Staff kept {p} walking path clear and avoided blocking shared items."],
+ plan:["The plan and the leaving time were explained to {o} in advance."]
+};
+
+const OUTBANK = {
+ ready:["{N} was clean, comfortable and ready for the day.",
+        "{S} {vbe} clean, dressed and comfortable afterwards.",
+        "{N} finished clean, comfortable and ready to start {p} day."],
+ settled:["{S} {vbe} settled afterwards and moved on to the rest of {p} day.",
+          "{S} remained settled once the interaction had finished.",
+          "{S} {vbe} calm and settled at the end."],
+ enjoyed:["{S} said {s} had enjoyed it and would like to do it again.",
+          "{S} made it clear {s} had enjoyed the time and wanted to go again.",
+          "{S} showed {s} had enjoyed it and asked about doing it again."],
+ proud:["{S} seemed pleased with what {s} had done.",
+        "{S} looked pleased with {r} afterwards."],
+ home:["{S} returned home safely and settled without distress.",
+       "{S} got home safely and settled straight away."],
+ later:["Support was left for now and will be offered again later in the shift.",
+        "This will be offered again later; {p} decision was respected."],
+ nochangeout:["The interaction finished with no concerns and {p} usual routine continued.",
+              "There were no concerns and {s} carried on with {p} usual routine."]
+};
+
+const MEALWORD = {breakfast:["breakfast","Breakfast"],lunch:["lunch","Lunch"],dinner:["{p} evening meal","The evening meal"],
+                  snack:["a snack","A snack"],fluids:["a drink","A drink"]};
+
+/* ============================================================
+   State + persistence (this browser only)
+   ============================================================ */
+const KEY = "gsn.v1";
+let store = {};
+try { store = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e){ store = {}; }
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} };
+
+let chosenIdx = {};            // slot -> index used in the note now on screen
+let onScreen = {};             // what the visible note used, so a reword moves off it
+let salt = Math.floor(Math.random() * 1e9);   // changes only on Reword / after Copy,
+                                              // so the note stays still while you type
+function hashStr(str){
+  let h = 2166136261;
+  for(let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+
+function histKey(){ return (state().initials||"_") + "|" + $("kind").value; }
+
+/* pick a phrase, steering away from the ones recently used for this person */
+function pick(bank, slot){
+  if(!bank || !bank.length) return "";
+  let hist = ((store.hist||{})[histKey()]||{})[slot] || [];
+  if(slot in onScreen) hist = [onScreen[slot]].concat(hist.filter(x => x !== onScreen[slot]));
+  let best = [], bestScore = Infinity;
+  bank.forEach((_, i) => {
+    const pos = hist.indexOf(i);
+    const score = pos === -1 ? -1 : (hist.length - pos);
+    if(score < bestScore){ bestScore = score; best = [i]; }
+    else if(score === bestScore) best.push(i);
+  });
+  const i = best[hashStr(salt + "|" + slot) % best.length];
+  chosenIdx[slot] = i;
+  return bank[i];
+}
+function commitHistory(){
+  store.hist = store.hist || {};
+  const k = histKey();
+  store.hist[k] = store.hist[k] || {};
+  for(const slot in chosenIdx){
+    const arr = store.hist[k][slot] || [];
+    arr.unshift(chosenIdx[slot]);
+    store.hist[k][slot] = arr.slice(0, 4);
+  }
+  save();
+}
+
+/* ============================================================
+   Reading the form
+   ============================================================ */
+const checked = id => [...document.querySelectorAll('#'+id+' input:checked')].map(i => i.value);
+const one     = id => (document.querySelector('#'+id+' input:checked')||{}).value || "";
+
+function state(){
+  return {
+    initials: $("initials").value.trim().toUpperCase(),
+    pronoun:  $("pronoun").value,
+    ratio:    $("ratio").value,
+    comm:     checked("comm"),
+    flags:    checked("flags"),
+    kind:     $("kind").value,
+    slot:     $("slot").value,
+    actOther: $("actOther").value.trim(),
+    len:      $("len").value,
+    time:     $("time").value,
+    offerA:   $("offerA").value.trim(),
+    offerB:   $("offerB").value.trim(),
+    resp:     one("resp"),
+    chosen:   $("chosen").value.trim(),
+    how:      checked("how"),
+    consent:  one("consent"),
+    declined: $("declined").value.trim(),
+    level:    $("level").value,
+    tasks:    readTasks(),
+    ate:      $("ate").value,
+    whatAte:  $("whatAte").value.trim(),
+    drinkChoice: $("drinkChoice").value.trim(),
+    offered:  $("offered").value,
+    drunk:    $("drunk").value,
+    skin:     one("skin"),
+    skinDetail: $("skinDetail").value.trim(),
+    mood:     checked("mood"),
+    well:     checked("well"),
+    risk:     checked("risk"),
+    outcome:  one("outcome"),
+    extra:    $("extra").value.trim(),
+    handover: $("handover").value.trim()
+  };
+}
+function readTasks(){
+  const out = [];
+  document.querySelectorAll('#tasks .task').forEach(row => {
+    if(row.hidden) return;
+    const box = row.querySelector('input[type=checkbox]');
+    if(!box.checked) return;
+    const lvl = row.querySelector('select.lvl');
+    const opt = row.querySelector('select.opt');
+    out.push({ id: box.value, level: lvl ? lvl.value : "ind", opt: opt ? opt.value : "" });
+  });
+  return out;
+}
+
+/* ---------- template fill ---------- */
+function actPhrase(s, i){
+  if(s.kind !== "activity") return i === 3 ? "took part in the activity" : "the activity";
+  if(s.slot === "other"){
+    const n = s.actOther || "the activity";
+    return i === 3 ? "took part in " + n : n;
+  }
+  const a = ACTS.find(x => x[0] === s.slot);
+  return a ? a[i] : (i === 3 ? "took part in the activity" : "the activity");
+}
+
+function T(str, s, extra){
+  if(!str) return "";
+  const pr = PRON[s.pronoun];
+  const map = Object.assign({
+    N: s.initials || "[Initials]",
+    s: pr.s, S: cap(pr.s), o: pr.o, p: pr.p, P: cap(pr.p), r: pr.r,
+    vbe: pr.vbe, vhave: pr.vhave,
+    time: s.time || "the agreed time",
+    chosen: s.chosen || s.offerA || "what was offered",
+    declined: s.declined ? (cap(s.declined).replace(/\.?$/, ".")) : "This was respected.",
+    skinDetail: s.skinDetail || "a change to the skin",
+    ratio: s.ratio && s.ratio !== "shared" ? " with " + s.ratio + " support" : "",
+    meal:  (MEALWORD[s.slot]||["the meal","The meal"])[0],
+    meal2: (MEALWORD[s.slot]||["the meal","The meal"])[1],
+    opt: extra && extra.opt ? extra.opt : "",
+    act: actPhrase(s,2), act2: cap(actPhrase(s,2)), did: actPhrase(s,3)
+  }, extra || {});
+  // resolve nested pronoun tokens inside substituted values (e.g. "{p} teeth")
+  let outStr = str.replace(/\{(\w+)\}/g, (m,k) => (k in map) ? map[k] : m);
+  return outStr.replace(/\{(\w+)\}/g, (m,k) => (k in map) ? map[k] : m);
+}
+
+/* ============================================================
+   Building the note
+   ============================================================ */
+function buildNote(s){
+  chosenIdx = {};
+  const L = s.len === "short" ? 1 : s.len === "std" ? 2 : 3;
+  const out = [];
+  const add = (pri, text) => { if(pri <= L && text) out.push(text); };
+
+  /* 1 OFFER */
+  add(1, T(pick(OPEN[s.kind], "open"), s));
+  if(s.offerA && s.offerB) add(1, T("{S} {vbe} offered a choice of " + s.offerA + " or " + s.offerB + ".", s));
+  else if(s.offerA)        add(2, T("{S} {vbe} offered " + s.offerA + ".", s));
+  if(s.comm.length) add(2, T(pick(COMMBANK[s.comm[0]], "comm"), s));
+  if(s.comm.length > 1) add(3, T(pick(COMMBANK[s.comm[1]], "comm2"), s));
+
+  /* 2 CHOICE OR RESPONSE */
+  if(s.resp) add(1, T(pick(RESPBANK[s.resp], "resp"), s));
+  if(s.how.length && s.resp !== "declined") add(2, T(pick(HOWBANK[s.how[0]], "how"), s));
+  if(s.consent) add(1, T(pick(CONSENTBANK[s.consent], "consent"), s));
+
+  /* 3 SUPPORT + 4 INDEPENDENCE */
+  if(s.consent !== "no" && s.resp !== "declined"){
+    if(s.level){
+      const LV = {
+        ind:   ["{S} completed this independently.","No hands-on support was needed.","{S} managed the whole interaction {r}."],
+        prompt:["Support was limited to prompting; no hands-on help was needed.","Only verbal and gestural prompts were used.","{S} needed prompts alone, with no hands-on support."],
+        min:   ["{S} {vbe} minimally supported throughout.","Support was kept to the minimum {s} needed.","Only minimal support was given, so {s} could do as much as possible {r}."],
+        part:  ["{S} did what {s} could {r} and staff supported with the rest.","Support was shared \u2014 {s} led and staff filled the gaps."],
+        full:  ["Staff provided full hands-on support throughout, explaining each step beforehand.","Full support was given by staff, with {p} dignity maintained at every stage."]
+      }[s.level];
+      add(2, T(pick(LV, "level"), s));
+    }
+    const bank = TASKS[s.kind];
+    s.tasks.forEach((t, n) => {
+      const def = bank.find(d => d.id === t.id);
+      if(!def) return;
+      const arr = def[t.level];
+      if(!arr || !arr.length) return;
+      add(n < 2 ? 1 : n < 5 ? 2 : 3, T(pick(arr, "task_" + t.id), s, { opt: t.opt ? T(t.opt, s) : "" }));
+    });
+  }
+
+  /* 5 OBSERVATION */
+  if(s.kind === "eating"){
+    if(s.ate && s.whatAte)      add(1, T("{S} ate " + s.ate.toLowerCase() + " of " + s.whatAte + ".", s));
+    else if(s.ate)              add(1, T("{S} ate " + s.ate.toLowerCase() + " of the meal.", s));
+    else if(s.whatAte)          add(1, T("{S} had " + s.whatAte + ".", s));
+    if(s.drunk && s.offered)    add(1, T("{S} {vbe} offered " + s.offered + "ml and drank " + s.drunk + "ml" + (s.drinkChoice ? " of " + s.drinkChoice : "") + ".", s));
+    else if(s.drunk)            add(1, T("{S} drank " + s.drunk + "ml" + (s.drinkChoice ? " of " + s.drinkChoice : "") + ".", s));
+    else if(s.drinkChoice)      add(2, T("{S} chose " + s.drinkChoice + " to drink.", s));
+    if(s.flags.includes("diabetes"))    add(2, T("Portion size and sugar content were discussed with {o} to support {p} Type 2 diabetes.", s));
+    if(s.flags.includes("cholesterol")) add(2, T("A lower-fat option was prepared to support {p} cholesterol management.", s));
+    if(s.flags.includes("choking") || s.flags.includes("softdiet"))
+      add(2, T("Food was prepared to {p} agreed consistency and no coughing or difficulty swallowing was seen.", s));
+  }
+  if(s.kind === "personal" && s.skin && s.skin !== "none")
+    add(s.skin === "concern" ? 1 : 2, T(pick(SKINBANK[s.skin], "skin"), s));
+  if(s.kind === "activity") s.risk.forEach((r, i) => add(i === 0 ? 2 : 3, T(pick(RISKBANK[r], "risk_" + r), s)));
+  if(s.kind === "activity" && s.flags.includes("deaf") && !s.risk.includes("road"))
+    add(2, T("Near roads staff gained {p} attention first, as {s} cannot hear approaching vehicles.", s));
+  if(s.mood.length) add(2, T(pick(MOODBANK[s.mood[0]], "mood"), s));
+  s.well.forEach(w => add(w === "nochange" ? 3 : 2, T(pick(WELLBANK[w], "well_" + w), s)));
+
+  /* free text, word for word */
+  if(s.extra) add(1, s.extra.replace(/\s*$/, "").replace(/([^.!?])$/, "$1."));
+
+  /* 6 OUTCOME */
+  if(s.outcome) add(1, T(pick(OUTBANK[s.outcome], "out"), s));
+  if(s.handover) add(1, T("Handed over: " + s.handover.replace(/\.?$/, "") + ".", s));
+
+  return out.filter(Boolean).join(" ")
+    .replace(/&mdash;/g, "\u2014").replace(/&amp;/g, "&")
+    .replace(/\s+([.,])/g, "$1").replace(/ {2,}/g, " ").trim();
+}
+
+/* ============================================================
+   Audit checks (the org's 7)
+   ============================================================ */
+function audit(s){
+  const declined = s.resp === "declined" || s.resp === "delayed" || s.consent === "no";
+  return [
+    {ok: !!s.kind && !!s.slot,                    t:"Correct interaction selected",              fix:"Pick the type of interaction in step 1."},
+    {ok: !!s.resp && !!s.consent,                 t:"Choice, consent or response recorded",      fix:"Record their response and consent in step 2."},
+    {ok: !!s.level && (s.tasks.length > 0 || declined), t:"Independence and support level clear", fix:"Set the overall support level and tick what you supported in step 3."},
+    {ok: s.mood.length > 0 || s.well.length > 0 || (s.kind==="personal" && !!s.skin) || (s.kind==="activity" && s.risk.length > 0) || (s.kind==="eating" && (!!s.ate || !!s.drunk)),
+                                                  t:"Relevant risk controls and observations included", fix:"Add at least one observation in step 4."},
+    {ok: !!s.outcome,                             t:"Meaningful outcome recorded",               fix:"Choose an outcome in step 5."},
+    {ok: !declined || !!s.declined,               t:"Refusal or non-engagement respected",       fix:"Say what you did to respect the refusal in step 2."},
+    {ok: $("attest").checked,                     t:"Entry reflects what actually happened",     fix:"Tick the confirmation under the note."}
+  ];
+}
+
+/* similarity against the last saved note for this person + interaction */
+function trigrams(t){
+  const w = t.toLowerCase().replace(/[^a-z0-9 ]/g," ").split(/\s+/).filter(Boolean);
+  const set = new Set();
+  for(let i=0;i<w.length-2;i++) set.add(w[i]+" "+w[i+1]+" "+w[i+2]);
+  return set;
+}
+function overlap(a, b){
+  if(!a || !b) return null;
+  const A = trigrams(a), B = trigrams(b);
+  if(!A.size || !B.size) return null;
+  let hit = 0;
+  A.forEach(g => { if(B.has(g)) hit++; });
+  return Math.round(100 * hit / new Set([...A, ...B]).size);
+}
+
+/* ============================================================
+   Render
+   ============================================================ */
+let noteText = "";
+
+function render(){
+  syncVisibility(state());   // unhide this interaction's rows first...
+  const s = state();         // ...then read them
+
+  noteText = buildNote(s);
+
+  const out = $("out");
+  const filled = noteText.trim().length > 0 && !!s.resp;
+  out.textContent = filled ? noteText : "Fill in the steps and the note builds itself here.";
+  out.classList.toggle("empty", !filled);
+
+  const words = filled ? noteText.trim().split(/\s+/).length : 0;
+  $("wc").textContent = words;
+  $("sc").textContent = filled ? (noteText.match(/[.!?](\s|$)/g) || []).length : 0;
+  $("dockWords").textContent = words;
+
+  /* freshness */
+  const prev = ((store.last||{})[histKey()]) || "";
+  const ov = filled ? overlap(noteText, prev) : null;
+  $("ov").textContent = ov === null ? "—" : ov + "%";
+  const fresh = $("fresh");
+  if(ov === null){ fresh.className = "badge ok"; fresh.textContent = "Fresh wording"; }
+  else if(ov < 45){ fresh.className = "badge ok"; fresh.textContent = "Clearly different"; }
+  else if(ov < 65){ fresh.className = "badge warn"; fresh.textContent = "Some repetition"; }
+  else { fresh.className = "badge miss"; fresh.textContent = "Too close to last — reword"; }
+
+  /* audit */
+  const a = audit(s), passed = a.filter(x => x.ok).length;
+  $("audit").innerHTML = a.map(x =>
+    '<li class="' + (x.ok ? "pass" : "fail") + '"><span class="mk">' + (x.ok ? "✓" : "!") + '</span>' +
+    '<span>' + x.t + (x.ok ? "" : '<em>' + x.fix + '</em>') + '</span></li>').join("");
+  const ab = $("auditBadge");
+  ab.textContent = passed + " / 7";
+  ab.className = "badge " + (passed === 7 ? "ok" : passed >= 5 ? "warn" : "miss");
+  $("dockScore").textContent = passed + " / 7";
+
+  /* record field mirror */
+  renderFields(s);
+
+  /* copy gate: the five content checks, plus the attestation */
+  const contentOk = a.slice(0,6).every(x => x.ok);
+  const ready = contentOk && $("attest").checked && filled;
+  $("copy").disabled = !ready;
+  $("dockCopy").disabled = !ready;
+  $("why").textContent = ready ? "Ready to paste into the daily note box in your care system."
+    : !filled ? "The note fills in as you answer the steps."
+    : !contentOk ? "Clear the outstanding audit checks below before copying."
+    : "Tick the confirmation above to unlock the copy button.";
+}
+
+function renderFields(s){
+  const rows = [];
+  const bank = TASKS[s.kind];
+  const LVLTEXT = {ind:"Independent", prompt:"Prompted", part:"Assisted", full:"Full support", declined:"Declined"};
+
+  if(s.kind === "personal" && s.consent) rows.push(["Consent to personal care obtained?", s.consent === "no" ? "No" : "Yes"]);
+  s.tasks.forEach(t => {
+    const def = bank.find(d => d.id === t.id);
+    if(!def || def.nf === "Daily note") return;
+    let v = LVLTEXT[t.level];
+    if(t.id === "wash" && t.opt) v = cap(t.opt.replace(/^an? /, "")) + " — " + v;
+    rows.push([def.nf, v]);
+  });
+  if(s.kind === "eating"){
+    if(s.offerA && s.offerB) rows.push(["Choices Offered", "Yes"]);
+    if(s.offerA || s.offerB) rows.push(["What choices were offered", [s.offerA, s.offerB].filter(Boolean).join(" / ")]);
+    if(s.ate) rows.push(["Amount Eaten (%)", s.ate]);
+    if(s.whatAte) rows.push(["What was eaten", s.whatAte]);
+    if(s.offered) rows.push(["Amount offered (mls)", s.offered]);
+    if(s.drunk){ rows.push(["Fluid intake (mls)", s.drunk]); rows.push(["Amount drunk (Mls)", s.drunk]); }
+    if(s.drinkChoice) rows.push(["Drink choice", s.drinkChoice]);
+  }
+  if(s.kind === "personal" && s.skin === "concern") rows.push(["Body Map", "Record the new mark"]);
+  if(s.handover) rows.push(["Handover", "Tick the handover box"]);
+
+  const el = $("nf");
+  el.innerHTML = rows.length
+    ? rows.map(r => '<div class="nf-row"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>').join("")
+    : '<div class="nf-empty">Tick the tasks in step 3 and the matching record fields appear here.</div>';
+}
+
+/* show only the fields that belong to this interaction */
+function syncVisibility(s){
+  document.querySelectorAll('#tasks .task').forEach(row => { row.hidden = row.dataset.kind !== s.kind; });
+  $("intakeWrap").hidden = !(s.kind === "eating" && s.slot !== "fluids");
+  $("fluidWrap").hidden  = !(s.kind === "eating");
+  $("riskWrap").hidden   = s.kind !== "activity";
+  $("skinWrap").hidden   = s.skin !== "concern";
+  $("actOtherWrap").hidden = !(s.kind === "activity" && s.slot === "other");
+  $("declWrap").hidden   = !(s.resp === "declined" || s.resp === "delayed" || s.consent === "no");
+  $("chosenWrap").hidden = !(s.resp === "choseA" || s.resp === "choseB");
+  document.querySelector('#skin').closest('fieldset').hidden = s.kind !== "personal";
+}
+
+/* ============================================================
+   Build the DOM bits that come from data
+   ============================================================ */
+function chips(id, list, type){
+  $(id).innerHTML = list.map((o,i) =>
+    '<label class="chip"><input type="' + type + '" name="' + id + '" value="' + o[0] + '" id="' + id + '_' + o[0] + '"><span>' + o[1] + '</span></label>'
+  ).join("");
+}
+chips("comm", COMM, "checkbox");
+chips("flags", FLAGS, "checkbox");
+chips("resp", RESP, "radio");
+chips("how", HOW, "checkbox");
+chips("consent", CONSENT, "radio");
+chips("skin", SKIN, "radio");
+chips("mood", MOOD, "checkbox");
+chips("well", WELL, "checkbox");
+chips("risk", RISK, "checkbox");
+chips("outcome", OUTCOME, "radio");
+
+function buildTasks(){
+  let html = "";
+  for(const kind in TASKS){
+    TASKS[kind].forEach(t => {
+      const optSel = t.opts
+        ? '<select class="opt" id="opt_' + kind + '_' + t.id + '" aria-label="Detail for ' + t.label + '">' +
+          t.opts.map(o => '<option value="' + o + '">' + o.replace(/\{p\}/g, "their") + '</option>').join("") + '</select>'
+        : "";
+      html += '<div class="task" data-kind="' + kind + '" hidden>' +
+        '<label class="tl" for="t_' + kind + '_' + t.id + '"><input type="checkbox" id="t_' + kind + '_' + t.id + '" value="' + t.id + '">' +
+        '<span><b>' + t.label + '</b><span class="nf">' + t.nf + '</span></span></label>' +
+        '<div class="ctl">' + optSel +
+        '<select class="lvl" id="lvl_' + kind + '_' + t.id + '" aria-label="Support level for ' + t.label + '">' +
+        LEVELS.map(l => '<option value="' + l[0] + '">' + l[1] + '</option>').join("") + '</select></div></div>';
+    });
+  }
+  $("tasks").innerHTML = html;
+  document.querySelectorAll('#tasks .task').forEach(row => {
+    const box = row.querySelector('input[type=checkbox]');
+    const sync = () => row.classList.toggle("on", box.checked);
+    box.addEventListener("change", sync); sync();
+  });
+}
+buildTasks();
+
+function fillSlots(){
+  const k = $("kind").value;
+  $("slot").innerHTML = SLOTS[k].map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join("");
+  $("slotWrap").querySelector("label").textContent =
+    k === "activity" ? "Activity" : k === "eating" ? "Which meal" : "Which one";
+}
+fillSlots();
+
+/* ============================================================
+   Wiring
+   ============================================================ */
+document.addEventListener("input", render);
+document.addEventListener("change", e => { if(e.target.id === "kind") fillSlots(); render(); });
+
+$("reword").addEventListener("click", () => {
+  onScreen = Object.assign({}, chosenIdx);
+  salt = Math.floor(Math.random() * 1e9);
+  render();
+  onScreen = {};
+});
+
+function doCopy(){
+  const txt = noteText;
+  const done = () => {
+    commitHistory();
+    store.last = store.last || {};
+    store.last[histKey()] = txt;
+    store.person = { initials: state().initials, pronoun: state().pronoun, ratio: state().ratio,
+                     comm: state().comm, flags: state().flags };
+    save();
+    salt = Math.floor(Math.random() * 1e9);
+    const b = $("copy"), d = $("dockCopy"), old = b.textContent;
+    b.textContent = "Copied"; d.textContent = "Copied";
+    setTimeout(() => { b.textContent = old; d.textContent = "Copy"; }, 1600);
+    render();
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done, fallback);
+  } else fallback();
+  function fallback(){
+    const ta = document.createElement("textarea");
+    ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta); done();
+  }
+}
+$("copy").addEventListener("click", doCopy);
+$("dockCopy").addEventListener("click", doCopy);
+$("dockJump").addEventListener("click", () => $("out").scrollIntoView({behavior:"smooth", block:"center"}));
+
+$("theme").addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const dark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "light" : "dark");
+});
+
+/* restore the person from last time, and open on a realistic worked example */
+(function boot(){
+  const p = store.person;
+  if(p){
+    $("initials").value = p.initials || "";
+    $("pronoun").value  = p.pronoun || "he";
+    $("ratio").value    = p.ratio || "";
+    (p.comm||[]).forEach(v => { const el = $("comm_" + v); if(el) el.checked = true; });
+    (p.flags||[]).forEach(v => { const el = $("flags_" + v); if(el) el.checked = true; });
+  } else {
+    /* example entry, so the page opens showing what it does */
+    $("initials").value = "MA";
+    $("comm_verbal").checked = true;
+    $("flags_skin").checked = true;
+    $("time").value = "08:00";
+    $("offerA").value = "a shower";
+    $("offerB").value = "a strip wash";
+    $("resp_choseA").checked = true;
+    $("chosen").value = "a shower";
+    $("how_said").checked = true;
+    $("consent_yes").checked = true;
+    $("level").value = "min";
+    ["wash","oral","shave","dress"].forEach(id => {
+      const box = $("t_personal_" + id); if(box){ box.checked = true; box.dispatchEvent(new Event("change")); }
+    });
+    $("lvl_personal_wash").value = "part";
+    $("lvl_personal_oral").value = "prompt";
+    $("lvl_personal_shave").value = "part";
+    $("lvl_personal_dress").value = "prompt";
+    $("skin_clear").checked = true;
+    $("mood_settled").checked = true;
+    $("well_nochange").checked = true;
+    $("outcome_ready").checked = true;
+  }
+  if(!$("time").value){
+    const d = new Date();
+    $("time").value = String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+  }
+  render();
+})();
+</script>
