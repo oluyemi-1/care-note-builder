@@ -26,6 +26,10 @@ These are deliberate. Please keep them if you fork this.
   `localStorage` on the device, used to remember recent phrasing so notes vary.
 - **It never records what you didn't.** Every sentence traces to a ticked input.
   Skin is not mentioned unless skin was observed.
+- **It never assumes independence.** Support level has no default: a ticked task
+  with no level set says nothing at all, and the entry cannot be copied until
+  every ticked task has one. Claiming someone managed unaided because a dropdown
+  was left alone is the worst thing this tool could do.
 - **Colleagues do not produce matching notes.** Wording is seeded from a random
   per-device id combined with the person, the date and the shift, so two staff
   writing about the same person on the same day diverge by construction — with

@@ -111,6 +111,8 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,va
 .task{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;padding:10px 13px;border-bottom:1px solid var(--line-soft);background:var(--surface)}
 .task:last-child{border-bottom:0}
 .task.on{background:var(--accent-wash)}
+.task.needlvl{background:var(--warn-wash)}
+.task.needlvl select.lvl{border-color:var(--warn);color:var(--warn);font-weight:600}
 .task .tl{display:flex;gap:10px;align-items:center;min-width:0;cursor:pointer}
 .task .tl input{accent-color:var(--accent);width:18px;height:18px;flex:none}
 .task .tl b{font-weight:500;font-size:14.5px}
@@ -482,7 +484,10 @@ const SLOTS = {
 };
 
 /* ---------- tasks: each row mirrors a field in the care records system ---------- */
-const LEVELS = [["ind","Did it themselves"],["prompt","With prompting"],["part","Part-supported"],["full","Staff did it"],["declined","Declined"]];
+/* No default. A blank level means the row says nothing, rather than claiming
+   the person did it unaided because nobody touched the dropdown. */
+const LEVELS = [["","How much support?"],["ind","Did it themselves"],["prompt","With prompting"],
+                ["part","Part-supported"],["full","Staff did it"],["declined","Declined"]];
 
 const TASKS = {
 personal:[
@@ -676,16 +681,16 @@ activity:[
   declined:["{S} chose not to take part once {s} arrived, and this was respected.","{S} declined {act} and staff did not press the point."]},
 
  {id:"tools",label:"Using equipment",nf:"Daily note",
-  ind:["{S} used the equipment safely and without supervision.","{S} operated the machine {r} and followed the steps {s} knows well."],
-  prompt:["{S} used the equipment after staff prompted {o} through the settings.","Staff reminded {o} of the steps and {s} used the equipment safely."],
-  part:["Staff set the equipment up and {s} used it with supervision.","{S} loaded and started the machine with staff supervising for safety."],
+  ind:["{S} used the equipment safely and without supervision.","{S} set up and used the equipment {r}, following the steps {s} knows well."],
+  prompt:["{S} used the equipment after staff prompted {o} through the steps.","Staff reminded {o} of the steps and {s} used the equipment safely."],
+  part:["Staff set the equipment up and {s} used it with supervision.","{S} used the equipment with staff supervising for safety."],
   full:["Staff operated the equipment while {s} watched and made the choices.","Staff handled the equipment for safety reasons and kept {o} involved in each decision."],
-  declined:["{S} did not want to use the equipment today.","{S} declined to use the machine and this was respected."]},
+  declined:["{S} did not want to use the equipment today.","{S} declined to use the equipment and this was respected."]},
 
  {id:"money",label:"Money &amp; paying",nf:"Daily note",
-  ind:["{S} paid at the till {r} and checked {p} change.","{S} handled {p} own money and paid independently."],
-  prompt:["{S} paid at the till after a prompt about the amount.","Staff reminded {o} of the amount and {s} paid {r}."],
-  part:["Staff counted out the money with {o} and {s} handed it over at the till.","{S} paid with staff support to count the money."],
+  ind:["{S} paid {r} and checked {p} change.","{S} handled {p} own money and paid independently."],
+  prompt:["{S} paid after a prompt about the amount.","Staff reminded {o} of the amount and {s} paid {r}."],
+  part:["Staff counted out the money with {o} and {s} handed it over.","{S} paid with staff support to count the money."],
   full:["Staff handled the payment and showed {o} the receipt afterwards.","Payment was made by staff, with {p} money recorded as per the finance procedure."],
   declined:["{S} did not want to handle money today.","{S} declined to pay and this was respected."]},
 
@@ -1172,12 +1177,15 @@ function buildNote(s){
         part:  ["{S} did what {s} could {r} and staff supported with the rest.","Support was shared \u2014 {s} led and staff filled the gaps."],
         full:  ["Staff provided full hands-on support throughout, explaining each step beforehand.","Full support was given by staff, with {p} dignity maintained at every stage."]
       }[s.level];
-      add(2, T(pick(LV, "level"), s));
+      /* only narrate the overall level when no rows were ticked - otherwise the
+         rows say it more precisely and the two can disagree */
+      if(!s.tasks.some(t => t.level)) add(2, T(pick(LV, "level"), s));
     }
     const bank = TASKS[s.kind];
     s.tasks.forEach((t, n) => {
       const def = bank.find(d => d.id === t.id);
       if(!def) return;
+      if(!t.level) return;                 // ticked but not yet said how much support
       const arr = def[t.level];
       if(!arr || !arr.length) return;
       add(n < 2 ? 1 : n < 5 ? 2 : 3, T(pick(arr, "task_" + t.id), s, { opt: t.opt ? T(t.opt, s) : "" }));
@@ -1232,7 +1240,12 @@ function audit(s){
   return [
     {ok: !!s.kind && !!s.slot,                    t:"Correct interaction selected", need:"the type of interaction", fix:"Pick the type of interaction in step 1."},
     {ok: !!s.resp && !!s.consent,                 t:"Choice, consent or response recorded", need:"their response and consent", fix:"Record their response and consent in step 2."},
-    {ok: !!s.level && (s.tasks.length > 0 || declined), t:"Independence and support level clear", need:"what you supported in step 3", fix:"Set the overall support level and tick what you supported in step 3."},
+    {ok: !!s.level && (s.tasks.some(t => t.level) || declined) && s.tasks.every(t => t.level),
+     t:"Independence and support level clear",
+     need: s.tasks.some(t => !t.level) ? "how much support on each task you ticked" : "what you supported in step 3",
+     fix: s.tasks.some(t => !t.level)
+       ? "One or more ticked tasks in step 3 still need a support level."
+       : "Set the overall support level and tick what you supported in step 3."},
     {ok: s.mood.length > 0 || s.well.length > 0 || (s.kind==="personal" && !!s.skin) || (s.kind==="activity" && (s.risk.length > 0 || s.learn.length > 0)) || (s.kind==="eating" && (!!s.ate || !!s.drunk)),
                                                   t:"Relevant risk controls and observations included", need:"an observation", fix:"Add at least one observation in step 4."},
     {ok: !!s.outcome,                             t:"Meaningful outcome recorded", need:"how it ended for them", fix:"Choose an outcome in step 5."},
@@ -1263,6 +1276,7 @@ function overlap(a, b){
 let noteText = "";
 
 function render(){
+  document.dispatchEvent(new Event("gsn:sync"));
   syncVisibility(state());   // unhide this interaction's rows first...
   const s = state();         // ...then read them
 
@@ -1328,7 +1342,7 @@ function renderFields(s){
   if(s.kind === "personal" && s.consent) rows.push(["Consent to personal care obtained?", s.consent === "no" ? "No" : "Yes"]);
   s.tasks.forEach(t => {
     const def = bank.find(d => d.id === t.id);
-    if(!def || def.nf === "Daily note") return;
+    if(!def || def.nf === "Daily note" || !t.level) return;
     let v = LVLTEXT[t.level];
     if(t.id === "wash" && t.opt) v = cap(t.opt.replace(/^an? /, "")) + " — " + v;
     rows.push([def.nf, v]);
@@ -1594,8 +1608,16 @@ function buildTasks(){
   $("tasks").innerHTML = html;
   document.querySelectorAll('#tasks .task').forEach(row => {
     const box = row.querySelector('input[type=checkbox]');
-    const sync = () => row.classList.toggle("on", box.checked);
-    box.addEventListener("change", sync); sync();
+    const lvl = row.querySelector("select.lvl");
+    const sync = () => {
+      const need = box.checked && lvl && !lvl.value;
+      row.classList.toggle("on", box.checked && !need);
+      row.classList.toggle("needlvl", need);
+    };
+    box.addEventListener("change", sync);
+    if(lvl) lvl.addEventListener("change", sync);
+    document.addEventListener("gsn:sync", sync);
+    sync();
   });
 }
 buildTasks();
@@ -1614,7 +1636,7 @@ function resetInteraction(){
   document.querySelectorAll('#tasks .task').forEach(row => {
     const box = row.querySelector('input[type=checkbox]');
     box.checked = false; row.classList.remove("on");
-    const lvl = row.querySelector('select.lvl'); if(lvl) lvl.value = "ind";
+    const lvl = row.querySelector('select.lvl'); if(lvl) lvl.value = "";
   });
   lastActPhrase = "";
   flash("Switched interaction \u2014 the previous entry was cleared.");
