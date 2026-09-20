@@ -70,6 +70,9 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 input:hover,select:hover,textarea:hover{border-color:var(--line-strong)}
 select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:32px}
 
+.switch-note{margin:0 0 14px;padding:9px 12px;border-radius:8px;background:var(--warn-wash);
+  color:var(--warn);font-size:13px;font-weight:500}
+
 /* people switcher */
 .people{display:flex;flex-wrap:wrap;gap:7px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line-soft)}
 .pchip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--sunk);
@@ -211,6 +214,7 @@ select.mini{width:auto;padding:5px 28px 5px 9px;font-size:12px;border-radius:6px
       <section class="step">
         <header><span class="num">1</span><h2>Offer</h2><span class="hint">What was offered, and how</span></header>
         <div class="body">
+          <p class="switch-note" id="switchNote" hidden></p>
           <div class="grid">
             <div class="f"><label for="kind">Type of interaction</label>
               <select id="kind">
@@ -425,6 +429,20 @@ const ACTS = [
   ["drive","Drive out","a drive out","went out for a drive"],
   ["other","Something else","the activity","took part in the activity"]
 ];
+/* an activity cannot end "ready for the day"; a morning wash cannot end "asleep" */
+const OUT_SCOPE = {
+  ready:        {kinds:["personal"], slots:["am","pm","continence"]},
+  settled:      {kinds:["personal","eating","activity"]},
+  enjoyed:      {kinds:["eating","activity"]},
+  proud:        {kinds:["eating","activity"]},
+  home:         {kinds:["activity"]},
+  nightsettled: {kinds:["personal"], slots:["pm","night"]},
+  slept:        {kinds:["personal"], slots:["pm","night"]},
+  resettled:    {kinds:["personal"], slots:["pm","night"]},
+  later:        {kinds:["personal","eating","activity"]},
+  nochangeout:  {kinds:["personal","eating","activity"]}
+};
+
 const SLOTS = {
   personal:[["am","Personal Care &mdash; AM"],["pm","Personal Care &mdash; PM"],["night","Personal Care &mdash; Night"],["continence","Continence support"]],
   eating:[["breakfast","Breakfast"],["lunch","Lunch"],["dinner","Dinner"],["snack","Snack"],["fluids","Daily Fluid Intake"]],
@@ -969,7 +987,13 @@ function buildNote(s){
   const add = (pri, text) => { if(pri <= L && text) out.push(text); };
 
   /* 1 OFFER */
-  const openBank = (s.kind === "personal" && OPEN_PC[s.slot]) ? OPEN_PC[s.slot] : OPEN[s.kind];
+  let openBank = (s.kind === "personal" && OPEN_PC[s.slot]) ? OPEN_PC[s.slot] : OPEN[s.kind];
+  /* when both options are named below, an opener that also names the activity
+     says the same thing twice */
+  if(s.kind === "activity" && s.offerA && s.offerB){
+    const plain = openBank.filter(t => t.indexOf("{act") === -1);
+    if(plain.length) openBank = plain;
+  }
   add(1, T(pick(openBank, "open"), s));
   if(s.offerA && s.offerB) add(1, T("{S} {vbe} offered a choice of " + s.offerA + " or " + s.offerB + ".", s));
   else if(s.offerA)        add(2, T("{S} {vbe} offered " + s.offerA + ".", s));
@@ -1175,6 +1199,14 @@ function syncVisibility(s){
   $("declWrap").hidden   = !(s.resp === "declined" || s.resp === "delayed" || s.consent === "no");
   $("chosenWrap").hidden = !(s.resp === "choseA" || s.resp === "choseB");
   document.querySelector('#skin').closest('fieldset').hidden = s.kind !== "personal";
+  OUTCOME.forEach(o => {
+    const sc = OUT_SCOPE[o[0]] || {};
+    const ok = (!sc.kinds || sc.kinds.includes(s.kind)) && (!sc.slots || sc.slots.includes(s.slot));
+    const input = $("outcome_" + o[0]);
+    if(!input) return;
+    input.closest(".chip").hidden = !ok;
+    if(!ok && input.checked) input.checked = false;   // never leave a hidden answer selected
+  });
 }
 
 /* ============================================================
@@ -1295,11 +1327,56 @@ function buildTasks(){
 }
 buildTasks();
 
+/* Everything below the person belongs to ONE interaction. Carrying it across
+   produced notes like "offered the cooking ... he chose a shower", so switching
+   type clears the entry and says so. */
+const SCOPED_TEXT = ["offerA","offerB","chosen","declined","whatAte","drinkChoice",
+                     "offered","drunk","skinDetail","extra","handover","actOther"];
+const SCOPED_CHIPS = ["resp","how","consent","skin","mood","well","risk","outcome"];
+
+function resetInteraction(){
+  SCOPED_TEXT.forEach(id => { $(id).value = ""; });
+  SCOPED_CHIPS.forEach(g => document.querySelectorAll('#'+g+' input').forEach(i => { i.checked = false; }));
+  $("ate").value = ""; $("level").value = "";
+  document.querySelectorAll('#tasks .task').forEach(row => {
+    const box = row.querySelector('input[type=checkbox]');
+    box.checked = false; row.classList.remove("on");
+    const lvl = row.querySelector('select.lvl'); if(lvl) lvl.value = "ind";
+  });
+  lastActPhrase = "";
+  flash("Switched interaction \u2014 the previous entry was cleared.");
+}
+
+let flashTimer = null;
+function flash(msg){
+  const el = $("switchNote");
+  el.textContent = msg; el.hidden = false;
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => { el.hidden = true; }, 5000);
+}
+
+/* ---------- 2. picking an activity fills the offer in for you ---------- */
+let lastActPhrase = "";
+function prefillActivity(){
+  if($("kind").value !== "activity"){ lastActPhrase = ""; return; }
+  const phrase = T(actPhrase(state(), 2), state());
+  const a = $("offerA");
+  if(!a.value.trim() || a.value.trim() === lastActPhrase) a.value = phrase;
+  const resp = (document.querySelector('#resp input:checked')||{}).value;
+  const c = $("chosen");
+  if(resp === "choseA" && (!c.value.trim() || c.value.trim() === lastActPhrase)) c.value = phrase;
+  lastActPhrase = phrase;
+}
+
 function fillSlots(){
   const k = $("kind").value;
   $("slot").innerHTML = SLOTS[k].map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join("");
   $("slotWrap").querySelector("label").textContent =
     k === "activity" ? "Activity" : k === "eating" ? "Which meal" : "Which one";
+  document.querySelector('label[for="offerA"]').textContent =
+    k === "activity" ? "Activity offered" : k === "eating" ? "Meal offered" : "Option offered";
+  document.querySelector('label[for="offerB"]').textContent =
+    k === "activity" ? "Other activity offered" : k === "eating" ? "Other meal offered" : "Second option offered";
 }
 fillSlots();
 
@@ -1315,7 +1392,11 @@ function onEdit(e){
   render();
 }
 document.addEventListener("input", onEdit);
-document.addEventListener("change", e => { if(e.target.id === "kind") fillSlots(); onEdit(e); });
+document.addEventListener("change", e => {
+  if(e.target.id === "kind"){ fillSlots(); resetInteraction(); prefillActivity(); }
+  if(e.target.id === "slot") prefillActivity();
+  onEdit(e);
+});
 
 $("reword").addEventListener("click", () => {
   onScreen = Object.assign({}, chosenIdx);
