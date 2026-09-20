@@ -218,6 +218,10 @@ select.mini{width:auto;padding:5px 28px 5px 9px;font-size:12px;border-radius:6px
         <header><span class="num">1</span><h2>Offer</h2><span class="hint">What was offered, and how</span></header>
         <div class="body">
           <p class="switch-note" id="switchNote" hidden></p>
+          <fieldset id="settingWrap" hidden style="margin-bottom:14px"><legend>Where is this activity?</legend>
+            <div class="chips" id="setting"></div>
+            <p class="note-inline" id="settingHint" style="margin-top:8px"></p>
+          </fieldset>
           <div class="grid">
             <div class="f"><label for="kind">Type of interaction</label>
               <select id="kind">
@@ -230,16 +234,18 @@ select.mini{width:auto;padding:5px 28px 5px 9px;font-size:12px;border-radius:6px
             <div class="f" id="actOtherWrap" hidden><label for="actOther">Name the activity</label><input type="text" id="actOther" placeholder="e.g. a trip to the library" autocomplete="off"></div>
           </div>
           <div class="rule"></div>
+          <div id="offerWrap">
           <div class="f"><label for="offerA">Option offered</label><input type="text" id="offerA" placeholder="e.g. a shower" autocomplete="off"></div>
           <div class="note-inline">Two real options is what evidences choice. Leave the second blank if only one was offered.</div>
           <div class="f" style="margin-top:10px"><label for="offerB">Second option offered</label><input type="text" id="offerB" placeholder="e.g. a strip wash" autocomplete="off"></div>
+          </div>
         </div>
       </section>
 
       <section class="step">
         <header><span class="num">2</span><h2>Choice or response</h2><span class="hint">Their voice, not yours</span></header>
         <div class="body stack">
-          <fieldset><legend>What they chose or how they responded</legend><div class="chips" id="resp"></div></fieldset>
+          <fieldset><legend>What they chose or how they responded</legend><div class="chips" id="resp"></div><div class="chips" id="respc"></div></fieldset>
           <div class="f" id="chosenWrap"><label for="chosen">What they chose</label><input type="text" id="chosen" placeholder="e.g. a shower" autocomplete="off"></div>
           <fieldset><legend>How they let you know</legend><div class="chips" id="how"></div></fieldset>
           <fieldset><legend>Consent</legend><div class="chips" id="consent"></div></fieldset>
@@ -283,7 +289,8 @@ select.mini{width:auto;padding:5px 28px 5px 9px;font-size:12px;border-radius:6px
             <input type="text" id="skinDetail" placeholder="e.g. a small red area on his left heel" autocomplete="off"></div>
           <fieldset><legend>How they presented</legend><div class="chips" id="mood"></div></fieldset>
           <fieldset><legend>Wellbeing</legend><div class="chips" id="well"></div></fieldset>
-          <fieldset id="riskWrap" hidden><legend>Risk controls you used</legend><div class="chips" id="risk"></div></fieldset>
+          <fieldset id="riskWrap" hidden><legend>Keeping them safe &mdash; what you did</legend><div class="chips" id="risk"></div></fieldset>
+          <fieldset id="learnWrap" hidden><legend>What they got out of it &mdash; skills and social</legend><div class="chips" id="learn"></div></fieldset>
         </div>
       </section>
 
@@ -392,7 +399,10 @@ const WELL = [["nochange","No change from usual"],["appetite","Appetite changed"
 const RISK = [
   ["sight","Stayed within sight"], ["road","Walked on the traffic side"],
   ["toilet","Toilet before leaving"], ["accessible","Found an accessible toilet"],
-  ["space","Kept walking path clear"], ["plan","Explained the plan in advance"]
+  ["space","Kept walking path clear"], ["plan","Explained the plan in advance"],
+  ["seatbelt","Seatbelt worn"], ["doortodoor","Escorted door to door"],
+  ["stop","Waited together at the stop"], ["fare","Staff held the fare or ticket"],
+  ["crossing","Supported at crossings"]
 ];
 const OUTCOME = [
   ["ready","Clean, comfortable and ready for the day"],
@@ -633,10 +643,11 @@ activity:[
   declined:["{S} declined {act} at the planning stage.","{S} did not want to go ahead with {act} and this was respected."]},
 
  {id:"travel",label:"Travelling there",nf:"Daily note",
-  ind:["{S} travelled independently and managed the journey well.","{S} made {p} own way there without support."],
-  prompt:["{S} travelled with staff nearby and needed only occasional guidance.","Staff walked alongside and gave guidance where it was needed."],
-  part:["{S} travelled with staff support and stayed settled during the journey.","Staff supported {o} throughout the journey; {s} remained calm."],
-  full:["Staff supported {o} closely throughout the journey, in line with {p} assessed arrangements.","{S} {vbe} supported throughout the journey as set out in {p} risk assessment."],
+  opts:["by cab","by bus","by train","on foot","in the staff vehicle","by minibus"],
+  ind:["{S} travelled {opt} independently and managed the journey well.","{S} made {p} own way there {opt} without support."],
+  prompt:["{S} travelled {opt} with staff nearby and needed only occasional guidance.","Staff travelled {opt} alongside {o} and gave guidance where it was needed."],
+  part:["{S} travelled {opt} with staff support and stayed settled for the journey.","Staff supported {o} {opt} throughout the journey; {s} remained calm."],
+  full:["Staff supported {o} closely {opt} throughout the journey, in line with {p} assessed arrangements.","{S} travelled {opt} and {vbe} supported throughout as set out in {p} risk assessment."],
   declined:["{S} declined to travel today.","{S} chose not to go out and this was respected."]},
 
  {id:"engage",label:"Taking part",nf:"Daily note",
@@ -679,6 +690,84 @@ activity:[
 /* An activity offered on its own is not a choice. Saying "a choice of activity"
    or "alongside another option" when one thing was offered puts something in the
    record that did not happen. */
+/* Activities come in two shapes and they are not the same record.
+   A college course was chosen at enrolment for the term, so nothing is offered
+   on the day - what matters is that they went, how the journey was kept safe,
+   the support given in the session, and what they gained from it.
+   In-house and community activities are genuinely offered and chosen. */
+const ACT_SETTING = [["college","College course"],["community","At home or in the community"]];
+
+const COURSES = [
+  ["music","Music","{p} music class","attended {p} music class"],
+  ["cooking","Cooking","{p} cooking class","attended {p} cooking class"],
+  ["baking","Baking","{p} baking class","attended {p} baking class"],
+  ["dance","Dance","{p} dance class","attended {p} dance class"],
+  ["singing","Singing","{p} singing class","attended {p} singing class"],
+  ["exercise","Exercise","{p} exercise class","attended {p} exercise class"],
+  ["allotment","Allotment","{p} allotment session","attended {p} allotment session"],
+  ["art","Art &amp; painting","{p} art class","attended {p} art class"],
+  ["drama","Drama","{p} drama class","attended {p} drama class"],
+  ["computing","Computing","{p} computing class","attended {p} computing class"],
+  ["literacy","Literacy &amp; numeracy","{p} literacy and numeracy class","attended {p} literacy and numeracy class"],
+  ["lifeskills","Life skills","{p} life skills session","attended {p} life skills session"],
+  ["othercourse","Another course","{p} class","attended {p} class"]
+];
+
+/* a college session is not offered on the day, so the response is about
+   readiness to go, not about picking from a menu */
+const RESP_COLLEGE = [
+  ["keen","Ready and keen to go"], ["agreedgo","Agreed readily"],
+  ["encouraged","Needed some encouragement"], ["reluctant","Reluctant but agreed"],
+  ["declinedgo","Declined to attend"]
+];
+const RESP_SCOPE = {
+  choseA:"offer", choseB:"offer",
+  agreed:"all", nonverbal:"all", delayed:"all", declined:"all", noresp:"all",
+  keen:"college", agreedgo:"college", encouraged:"college", reluctant:"college", declinedgo:"college"
+};
+
+/* what the person got out of it - the part a course note lives or dies on */
+const LEARN = [
+  ["skill","Practised a skill they are working on"], ["instructions","Followed the tutor's instructions"],
+  ["alongside","Worked alongside others"], ["conversation","Talked with peers or staff"],
+  ["turn","Waited their turn or shared"], ["askedhelp","Asked for help when needed"],
+  ["safe","Used tools or equipment safely"], ["finished","Finished a piece of work"],
+  ["pride","Showed pride in what they did"], ["change","Managed a change of plan"]
+];
+const LEARNBANK = {
+  skill:["{S} practised the skill {s} has been working on and staff saw steady progress.",
+         "{S} worked on the skill {s} is building and managed more of it {r} than last time."],
+  instructions:["{S} listened to the tutor and followed the instructions given.",
+                "{S} took direction from the tutor and carried out each step as asked."],
+  alongside:["{S} worked alongside the other learners without difficulty.",
+             "{S} shared the space and the work with others and settled in well."],
+  conversation:["{S} talked with peers and staff during the session.",
+                "{S} joined in conversation with others and seemed comfortable doing so."],
+  turn:["{S} waited {p} turn and shared the equipment with others.",
+        "{S} took turns with the others and gave up the equipment when asked."],
+  askedhelp:["{S} asked for help when {s} needed it rather than giving up.",
+             "{S} let staff know when {s} was stuck, which is something {s} is working on."],
+  safe:["{S} used the tools and equipment safely throughout.",
+        "{S} handled the equipment safely and followed the safety instructions given."],
+  finished:["{S} finished a piece of work and took it home.",
+            "{S} completed what {s} had started before the session ended."],
+  pride:["{S} was visibly pleased with what {s} had produced and showed it to staff.",
+         "{S} showed pride in {p} work and wanted others to see it."],
+  change:["A change to the usual plan was explained and {S} managed it without distress.",
+          "{S} coped well with the session running differently from usual."]
+};
+
+/* safeguarding on the journey belongs with the journey, not after the class */
+const TRAVEL_RISK = ["seatbelt","doortodoor","stop","fare","crossing","road"];
+
+const OPEN_COLLEGE = [
+  "{N} attended {act} at college at {time}.",
+  "At {time}, staff supported {N} to attend {act} at college.",
+  "{N} was supported to attend {act}, the course {s} chose at enrolment.",
+  "Staff supported {N} to college at {time} for {act}.",
+  "{N} went to college at {time} for {act}, as arranged for this term."
+];
+
 const OPEN_ACT = {
  choice:[
   "{N} was offered a choice of activity at {time}.",
@@ -762,6 +851,13 @@ const RESPBANK = {
  delayed:["{S} declined at first. {declined} {s} then agreed and support went ahead.",
           "{S} said no to begin with. {declined} On the second offer {s} agreed."],
  declined:["{S} declined. {declined}","{S} did not want to go ahead. {declined}"],
+ keen:["{S} was ready on time and keen to go.","{S} was looking forward to it and ready to leave on time."],
+ agreedgo:["{S} agreed to go and got ready in good time.","{S} was happy to attend and got {r} ready."],
+ encouraged:["{S} needed some encouragement to set off; staff allowed extra time and {s} agreed to go.",
+             "{S} was slow to get going, and staff encouraged {o} without pressure until {s} was ready."],
+ reluctant:["{S} was reluctant to go at first. {declined} {S} then agreed to attend.",
+            "{S} did not want to go to begin with. {declined} {S} changed {p} mind and attended."],
+ declinedgo:["{S} declined to attend today. {declined}","{S} chose not to go to college today. {declined}"],
  noresp:["{S} did not give a clear response, so staff waited and offered again a short time later.",
          "No clear response was given; staff allowed more time rather than pressing on."]
 };
@@ -817,7 +913,13 @@ const RISKBANK = {
  toilet:["{S} used the toilet before leaving, in line with {p} continence plan."],
  accessible:["Staff identified an accessible toilet on arrival."],
  space:["Staff kept {p} walking path clear and avoided blocking shared items."],
- plan:["The plan and the leaving time were explained to {o} in advance."]
+ plan:["The plan and the leaving time were explained to {o} in advance."],
+ seatbelt:["{S} wore a seatbelt for the whole journey.","Staff checked {p} seatbelt was fastened before setting off."],
+ doortodoor:["Staff escorted {o} door to door and handed over to the tutor on arrival.",
+             "{S} was escorted from the door of the house to the door of the venue."],
+ stop:["Staff waited with {o} at the stop until the bus arrived.","{S} was not left alone while waiting for transport."],
+ fare:["Staff held the fare and ticket on {p} behalf, as agreed in {p} support plan."],
+ crossing:["Staff supported {o} at every crossing and waited for the signal together."]
 };
 
 const OUTBANK = {
@@ -925,12 +1027,14 @@ function state(){
     flags:    checked("flags"),
     kind:     $("kind").value,
     slot:     $("slot").value,
+    setting:  one("setting") || "community",
+    learn:    checked("learn"),
     actOther: $("actOther").value.trim(),
     len:      $("len").value,
     time:     $("time").value,
     offerA:   $("offerA").value.trim(),
     offerB:   $("offerB").value.trim(),
-    resp:     one("resp"),
+    resp:     one("resp") || one("respc"),
     chosen:   $("chosen").value.trim(),
     how:      checked("how"),
     consent:  one("consent"),
@@ -968,6 +1072,10 @@ function readTasks(){
 /* ---------- template fill ---------- */
 function actPhrase(s, i){
   if(s.kind !== "activity") return i === 3 ? "took part in the activity" : "the activity";
+  if(s.setting === "college"){
+    const c = COURSES.find(x => x[0] === s.slot);
+    return c ? c[i] : (i === 3 ? "attended {p} class" : "{p} class");
+  }
   if(s.slot === "other"){
     const n = s.actOther || "the activity";
     return i === 3 ? "took part in " + n : n;
@@ -1005,15 +1113,19 @@ function T(str, s, extra){
 function buildNote(s){
   chosenIdx = {};
   const L = s.len === "short" ? 1 : s.len === "std" ? 2 : 3;
+  const travelDone = [];
   const out = [];
   const add = (pri, text) => { if(pri <= L && text) out.push(text); };
 
   /* 1 OFFER */
   let openBank = (s.kind === "personal" && OPEN_PC[s.slot]) ? OPEN_PC[s.slot] : OPEN[s.kind];
-  if(s.kind === "activity") openBank = (s.offerA && s.offerB) ? OPEN_ACT.choice : OPEN_ACT.single;
+  if(s.kind === "activity")
+    openBank = s.setting === "college" ? OPEN_COLLEGE
+             : (s.offerA && s.offerB) ? OPEN_ACT.choice : OPEN_ACT.single;
   add(1, T(pick(openBank, "open"), s));
   if(s.offerA && s.offerB) add(1, T("{S} {vbe} offered a choice of " + s.offerA + " or " + s.offerB + ".", s));
   else if(s.offerA && s.kind !== "activity") add(2, T("{S} {vbe} offered " + s.offerA + ".", s));
+  /* a college course was chosen at enrolment; nothing is offered on the day */
   /* a single activity is already named by the opener above */
   if(s.comm.length) add(2, T(pick(COMMBANK[s.comm[0]], "comm"), s));
   if(s.comm.length > 1) add(3, T(pick(COMMBANK[s.comm[1]], "comm2"), s));
@@ -1042,6 +1154,10 @@ function buildNote(s){
       const arr = def[t.level];
       if(!arr || !arr.length) return;
       add(n < 2 ? 1 : n < 5 ? 2 : 3, T(pick(arr, "task_" + t.id), s, { opt: t.opt ? T(t.opt, s) : "" }));
+      /* keep the journey and how it was kept safe together */
+      if(s.kind === "activity" && t.id === "travel")
+        s.risk.filter(r => TRAVEL_RISK.includes(r))
+              .forEach((r, i) => { add(i < 3 ? 2 : 3, T(pick(RISKBANK[r], "risk_" + r), s)); travelDone.push(r); });
     });
   }
 
@@ -1060,9 +1176,12 @@ function buildNote(s){
   }
   if(s.kind === "personal" && s.skin && s.skin !== "none")
     add(s.skin === "concern" ? 1 : 2, T(pick(SKINBANK[s.skin], "skin"), s));
-  if(s.kind === "activity") s.risk.forEach((r, i) => add(i === 0 ? 2 : 3, T(pick(RISKBANK[r], "risk_" + r), s)));
+  if(s.kind === "activity")
+    s.risk.filter(r => !travelDone.includes(r))
+          .forEach((r, i) => add(i < 3 ? 2 : 3, T(pick(RISKBANK[r], "risk_" + r), s)));
   if(s.kind === "activity" && s.flags.includes("deaf") && !s.risk.includes("road"))
     add(2, T("Near roads staff gained {p} attention first, as {s} cannot hear approaching vehicles.", s));
+  if(s.kind === "activity") s.learn.forEach((l, i) => add(i < 2 ? 1 : 2, T(pick(LEARNBANK[l], "learn_" + l), s)));
   if(s.mood.length) add(2, T(pick(MOODBANK[s.mood[0]], "mood"), s));
   s.well.forEach(w => add(w === "nochange" ? 3 : 2, T(pick(WELLBANK[w], "well_" + w), s)));
 
@@ -1087,7 +1206,7 @@ function audit(s){
     {ok: !!s.kind && !!s.slot,                    t:"Correct interaction selected", need:"the type of interaction", fix:"Pick the type of interaction in step 1."},
     {ok: !!s.resp && !!s.consent,                 t:"Choice, consent or response recorded", need:"their response and consent", fix:"Record their response and consent in step 2."},
     {ok: !!s.level && (s.tasks.length > 0 || declined), t:"Independence and support level clear", need:"what you supported in step 3", fix:"Set the overall support level and tick what you supported in step 3."},
-    {ok: s.mood.length > 0 || s.well.length > 0 || (s.kind==="personal" && !!s.skin) || (s.kind==="activity" && s.risk.length > 0) || (s.kind==="eating" && (!!s.ate || !!s.drunk)),
+    {ok: s.mood.length > 0 || s.well.length > 0 || (s.kind==="personal" && !!s.skin) || (s.kind==="activity" && (s.risk.length > 0 || s.learn.length > 0)) || (s.kind==="eating" && (!!s.ate || !!s.drunk)),
                                                   t:"Relevant risk controls and observations included", need:"an observation", fix:"Add at least one observation in step 4."},
     {ok: !!s.outcome,                             t:"Meaningful outcome recorded", need:"how it ended for them", fix:"Choose an outcome in step 5."},
     {ok: !declined || !!s.declined,               t:"Refusal or non-engagement respected", need:"how you respected the refusal", fix:"Say what you did to respect the refusal in step 2."},
@@ -1221,11 +1340,30 @@ function syncVisibility(s){
   $("fluidWrap").hidden  = !(s.kind === "eating");
   $("riskWrap").hidden   = s.kind !== "activity";
   $("skinWrap").hidden   = s.skin !== "concern";
-  $("actOtherWrap").hidden = !(s.kind === "activity" && s.slot === "other");
-  $("declWrap").hidden   = !(s.resp === "declined" || s.resp === "delayed" || s.consent === "no");
+  const college = s.kind === "activity" && s.setting === "college";
+  $("settingWrap").hidden = s.kind !== "activity";
+  $("settingHint").textContent = !s.kind ? "" : college
+    ? "Chosen at enrolment for the term, so nothing is offered today \u2014 record the journey, the support and what they gained."
+    : "Offered today and chosen from the options \u2014 record the choice, the support and how it went.";
+  $("offerWrap").hidden = college;
+  $("learnWrap").hidden = s.kind !== "activity";
+  $("actOtherWrap").hidden = !(s.kind === "activity" && s.slot === "other" && !college);
+  /* only offer responses that make sense here */
+  const ctx = college ? "college" : "offer";
+  [...RESP, ...RESP_COLLEGE].forEach(o => {
+    const el = $("resp_" + o[0]) || $("respc_" + o[0]);
+    if(!el) return;
+    const sc = RESP_SCOPE[o[0]] || "all";
+    const ok = sc === "all" || sc === ctx;
+    el.closest(".chip").hidden = !ok;
+    if(!ok && el.checked) el.checked = false;
+  });
+  $("declWrap").hidden   = !["declined","delayed","declinedgo","reluctant"].includes(s.resp) && s.consent !== "no";
   $("chosenWrap").hidden = !(s.resp === "choseA" || s.resp === "choseB");
   document.querySelector('#skin').closest('fieldset').hidden = s.kind !== "personal";
-  $("taskHint").innerHTML = s.kind === "activity"
+  $("taskHint").innerHTML = college
+    ? "Tick <b>Travelling there</b> and <b>Taking part</b> \u2014 the journey and the session are what a college note has to evidence."
+    : s.kind === "activity"
     ? "Tick <b>Taking part</b> at least &mdash; without it the note never says what they actually did. Anything left unticked is not mentioned."
     : "Each row maps to a field in your care records system. Anything left unticked is not mentioned in the note.";
   OUTCOME.forEach(o => {
@@ -1274,6 +1412,7 @@ function loadPerson(name){
   store.active = name; save();
   applyProfile(pr);
   reseed();
+  if(!one("setting")) $("setting_community").checked = true;
   renderPeople();
   render();
 }
@@ -1330,6 +1469,9 @@ chips("mood", MOOD, "checkbox");
 chips("well", WELL, "checkbox");
 chips("risk", RISK, "checkbox");
 chips("outcome", OUTCOME, "radio");
+chips("setting", ACT_SETTING, "radio");
+chips("learn", LEARN, "checkbox");
+chips("respc", RESP_COLLEGE, "radio");
 
 function buildTasks(){
   let html = "";
@@ -1388,6 +1530,7 @@ function flash(msg){
 let lastActPhrase = "";
 function prefillActivity(){
   if($("kind").value !== "activity"){ lastActPhrase = ""; return; }
+  if((one("setting") || "community") === "college"){ lastActPhrase = ""; return; }
   const phrase = T(actPhrase(state(), 2), state());
   const a = $("offerA");
   if(!a.value.trim() || a.value.trim() === lastActPhrase) a.value = phrase;
@@ -1400,10 +1543,12 @@ function prefillActivity(){
 function fillSlots(){
   const k = $("kind").value;
   const keep = $("slot").value;            // a browser restoring the form on reload
-  $("slot").innerHTML = SLOTS[k].map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join("");
+  const college = k === "activity" && (one("setting") || "community") === "college";
+  const list = college ? COURSES.map(c => [c[0], c[1]]) : SLOTS[k];
+  $("slot").innerHTML = list.map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join("");
   if(keep && [...$("slot").options].some(o => o.value === keep)) $("slot").value = keep;
   $("slotWrap").querySelector("label").textContent =
-    k === "activity" ? "Activity" : k === "eating" ? "Which meal" : "Which one";
+    college ? "Course" : k === "activity" ? "Activity" : k === "eating" ? "Which meal" : "Which one";
   document.querySelector('label[for="offerA"]').textContent =
     k === "activity" ? "Activity offered" : k === "eating" ? "Meal offered" : "Option offered";
   document.querySelector('label[for="offerB"]').textContent =
@@ -1425,6 +1570,7 @@ function onEdit(e){
 document.addEventListener("input", e => { if(e.target.id === "actOther") prefillActivity(); onEdit(e); });
 document.addEventListener("change", e => {
   if(e.target.id === "kind"){ fillSlots(); resetInteraction(); prefillActivity(); }
+  if(e.target.closest && e.target.closest("#setting")){ fillSlots(); prefillActivity(); }
   if(e.target.id === "slot" || e.target.id === "actOther") prefillActivity();
   onEdit(e);
 });

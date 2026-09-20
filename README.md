@@ -48,6 +48,26 @@ Profiles are kept per person, keyed by initials, on that device only. Tap a name
 to load their pronouns, communication method and health flags rather than
 retyping them for each person you support.
 
+### Two kinds of activity
+
+Activities are not one thing, and recording them as one produced poor notes.
+
+- **College courses** are chosen at enrolment for the term, so nothing is offered
+  on the day. The record covers whether the person was ready to go, the journey
+  and how it was kept safe, the support given in the session, and what they
+  gained from it. The app asks about readiness rather than choice, and never
+  writes up a choice that was not offered.
+- **In-house and community activities** are genuinely offered and chosen on the
+  day, so the choice, the support and the safeguarding are what the note carries.
+
+Both record **skills and social outcomes** - practised a skill, followed the
+tutor, worked alongside others, waited their turn, asked for help, finished a
+piece of work - which is the part a course note lives or dies on.
+
+Travel method (cab, bus, train, on foot, staff vehicle, minibus) and travel
+safeguarding (seatbelt, escorted door to door, waited at the stop, supported at
+crossings) sit with the journey in the finished note.
+
 ### Shifts
 
 Personal care reads differently at 07:00 and 22:00. The app opens on the shift

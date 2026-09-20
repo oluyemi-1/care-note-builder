@@ -1,7 +1,7 @@
 /* Offline support. Care homes have patchy wifi and a note written at 22:00
    must not depend on a signal. Cache-first: once opened, the app works with
    the network off, on any tablet, indefinitely. */
-const CACHE = "gold-standard-notes-v4";
+const CACHE = "gold-standard-notes-v5";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", e => {
