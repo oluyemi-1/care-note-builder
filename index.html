@@ -261,7 +261,7 @@ select.mini{width:auto;padding:5px 28px 5px 9px;font-size:12px;border-radius:6px
               <option value="full">Full hands-on support</option>
             </select></div>
           <div class="tasks" id="tasks"></div>
-          <div class="note-inline">Each row maps to a field in your care records system. Anything left unticked is not mentioned in the note.</div>
+          <div class="note-inline" id="taskHint">Each row maps to a field in your care records system. Anything left unticked is not mentioned in the note.</div>
         </div>
       </section>
 
@@ -676,6 +676,23 @@ activity:[
 ]};
 
 /* ---------- opening & communication banks ---------- */
+/* An activity offered on its own is not a choice. Saying "a choice of activity"
+   or "alongside another option" when one thing was offered puts something in the
+   record that did not happen. */
+const OPEN_ACT = {
+ choice:[
+  "{N} was offered a choice of activity at {time}.",
+  "At {time}, staff offered {N} a choice of what to do{ratio}.",
+  "Staff sat with {N} at {time} to talk through the options for the day.",
+  "{N} was offered two options at {time} and given time to decide."],
+ single:[
+  "{N} was offered {offer} at {time}.",
+  "At {time}, staff offered {N} {offer}{ratio}.",
+  "{Offer} was offered to {N} at {time}, with the plan explained in advance.",
+  "Staff offered {N} {offer} at {time} and explained what it would involve.",
+  "{N} was offered {offer} at {time} and given time to decide."]
+};
+
 /* personal care reads differently at 07:00 and at 22:00 */
 const OPEN_PC = {
  pm:[
@@ -974,7 +991,8 @@ function T(str, s, extra){
     meal:  (MEALWORD[s.slot]||["the meal","The meal"])[0],
     meal2: (MEALWORD[s.slot]||["the meal","The meal"])[1],
     opt: extra && extra.opt ? extra.opt : "",
-    act: actPhrase(s,2), act2: cap(actPhrase(s,2)), did: actPhrase(s,3)
+    act: actPhrase(s,2), act2: cap(actPhrase(s,2)), did: actPhrase(s,3),
+    offer: s.offerA || actPhrase(s,2), Offer: cap(s.offerA || actPhrase(s,2))
   }, extra || {});
   // resolve nested pronoun tokens inside substituted values (e.g. "{p} teeth")
   let outStr = str.replace(/\{(\w+)\}/g, (m,k) => (k in map) ? map[k] : m);
@@ -992,15 +1010,11 @@ function buildNote(s){
 
   /* 1 OFFER */
   let openBank = (s.kind === "personal" && OPEN_PC[s.slot]) ? OPEN_PC[s.slot] : OPEN[s.kind];
-  /* when both options are named below, an opener that also names the activity
-     says the same thing twice */
-  if(s.kind === "activity" && s.offerA && s.offerB){
-    const plain = openBank.filter(t => t.indexOf("{act") === -1);
-    if(plain.length) openBank = plain;
-  }
+  if(s.kind === "activity") openBank = (s.offerA && s.offerB) ? OPEN_ACT.choice : OPEN_ACT.single;
   add(1, T(pick(openBank, "open"), s));
   if(s.offerA && s.offerB) add(1, T("{S} {vbe} offered a choice of " + s.offerA + " or " + s.offerB + ".", s));
-  else if(s.offerA)        add(2, T("{S} {vbe} offered " + s.offerA + ".", s));
+  else if(s.offerA && s.kind !== "activity") add(2, T("{S} {vbe} offered " + s.offerA + ".", s));
+  /* a single activity is already named by the opener above */
   if(s.comm.length) add(2, T(pick(COMMBANK[s.comm[0]], "comm"), s));
   if(s.comm.length > 1) add(3, T(pick(COMMBANK[s.comm[1]], "comm2"), s));
 
@@ -1070,13 +1084,13 @@ function buildNote(s){
 function audit(s){
   const declined = s.resp === "declined" || s.resp === "delayed" || s.consent === "no";
   return [
-    {ok: !!s.kind && !!s.slot,                    t:"Correct interaction selected",              fix:"Pick the type of interaction in step 1."},
-    {ok: !!s.resp && !!s.consent,                 t:"Choice, consent or response recorded",      fix:"Record their response and consent in step 2."},
-    {ok: !!s.level && (s.tasks.length > 0 || declined), t:"Independence and support level clear", fix:"Set the overall support level and tick what you supported in step 3."},
+    {ok: !!s.kind && !!s.slot,                    t:"Correct interaction selected", need:"the type of interaction", fix:"Pick the type of interaction in step 1."},
+    {ok: !!s.resp && !!s.consent,                 t:"Choice, consent or response recorded", need:"their response and consent", fix:"Record their response and consent in step 2."},
+    {ok: !!s.level && (s.tasks.length > 0 || declined), t:"Independence and support level clear", need:"what you supported in step 3", fix:"Set the overall support level and tick what you supported in step 3."},
     {ok: s.mood.length > 0 || s.well.length > 0 || (s.kind==="personal" && !!s.skin) || (s.kind==="activity" && s.risk.length > 0) || (s.kind==="eating" && (!!s.ate || !!s.drunk)),
-                                                  t:"Relevant risk controls and observations included", fix:"Add at least one observation in step 4."},
-    {ok: !!s.outcome,                             t:"Meaningful outcome recorded",               fix:"Choose an outcome in step 5."},
-    {ok: !declined || !!s.declined,               t:"Refusal or non-engagement respected",       fix:"Say what you did to respect the refusal in step 2."},
+                                                  t:"Relevant risk controls and observations included", need:"an observation", fix:"Add at least one observation in step 4."},
+    {ok: !!s.outcome,                             t:"Meaningful outcome recorded", need:"how it ended for them", fix:"Choose an outcome in step 5."},
+    {ok: !declined || !!s.declined,               t:"Refusal or non-engagement respected", need:"how you respected the refusal", fix:"Say what you did to respect the refusal in step 2."},
     {ok: $("attest").checked,                     t:"Entry reflects what actually happened",     fix:"Tick the confirmation under the note."}
   ];
 }
@@ -1132,7 +1146,7 @@ function render(){
 
   /* audit */
   const a = audit(s), passed = a.filter(x => x.ok).length;
-  const missing = a.slice(0, 6).filter(x => !x.ok).map(x => x.t.toLowerCase());
+  const missing = a.slice(0, 6).filter(x => !x.ok).map(x => x.need || x.t.toLowerCase());
   const needs = $("needs");
   if(filled && missing.length){
     needs.hidden = false;
@@ -1211,6 +1225,9 @@ function syncVisibility(s){
   $("declWrap").hidden   = !(s.resp === "declined" || s.resp === "delayed" || s.consent === "no");
   $("chosenWrap").hidden = !(s.resp === "choseA" || s.resp === "choseB");
   document.querySelector('#skin').closest('fieldset').hidden = s.kind !== "personal";
+  $("taskHint").innerHTML = s.kind === "activity"
+    ? "Tick <b>Taking part</b> at least &mdash; without it the note never says what they actually did. Anything left unticked is not mentioned."
+    : "Each row maps to a field in your care records system. Anything left unticked is not mentioned in the note.";
   OUTCOME.forEach(o => {
     const sc = OUT_SCOPE[o[0]] || {};
     const ok = (!sc.kinds || sc.kinds.includes(s.kind)) && (!sc.slots || sc.slots.includes(s.slot));
@@ -1405,10 +1422,10 @@ function onEdit(e){
   if(isPerson || t.id === "kind" || t.id === "slot") reseed();
   render();
 }
-document.addEventListener("input", onEdit);
+document.addEventListener("input", e => { if(e.target.id === "actOther") prefillActivity(); onEdit(e); });
 document.addEventListener("change", e => {
   if(e.target.id === "kind"){ fillSlots(); resetInteraction(); prefillActivity(); }
-  if(e.target.id === "slot") prefillActivity();
+  if(e.target.id === "slot" || e.target.id === "actOther") prefillActivity();
   onEdit(e);
 });
 
