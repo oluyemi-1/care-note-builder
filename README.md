@@ -111,9 +111,14 @@ Activities are not one thing, and recording them as one produced poor notes.
 - **In-house and community activities** are genuinely offered and chosen on the
   day, so the choice, the support and the safeguarding are what the note carries.
 
-Both record **skills and social outcomes** - practised a skill, followed the
-tutor, worked alongside others, waited their turn, asked for help, finished a
-piece of work - which is the part a course note lives or dies on.
+Both record **what the person did during it** - the particular events of that
+kind of activity, such as washing hands before handling food, following the
+recipe, choosing the music, dancing, using garden tools - and **skills and
+social outcomes**: practised a skill, followed the tutor, worked alongside
+others, waited their turn, asked for help, finished a piece of work. An
+activity note reads in time order: getting ready and the journey, taking part,
+what happened and what was seen, then clearing up and coming home. Anything
+staff write in their own words goes straight after what the person did.
 
 Each person can hold a **weekly college timetable** - day, course, start and
 end. Pick College on a day they have a class and the course and times fill in

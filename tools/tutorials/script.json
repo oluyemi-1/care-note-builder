@@ -104,8 +104,8 @@
           "say": "For college, add their weekly sessions to their profile, just once." },
         { "id": "college", "title": "College fills itself in",
           "say": "Then choose College. Today's course and times fill in from the timetable." },
-        { "id": "skills", "title": "What they gained",
-          "say": "Record the skills they practised, and how they got on with others. That is where a college note shows its value." }
+        { "id": "skills", "title": "What they did and gained",
+          "say": "Tick the particular things they did, like washing their hands before handling food. Then record the skills they practised, and how they got on with others. That is where a college note shows its value." }
       ]
     },
     {

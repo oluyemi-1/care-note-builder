@@ -12,7 +12,7 @@ const {
   COMM, FLAGS, RESP, HOW, CONSENT, SKIN, MOOD, WELL, RISK, OUTCOME, OUT_SCOPE, SLOTS, LEVELS, TASKS, ACT_SETTING,
   COURSES, RESP_COLLEGE, RESP_SCOPE, LEARN, COMMBANK, RESPBANK, HOWBANK, CONSENTBANK, SKINBANK, MOODBANK,
   WELLBANK, RISKBANK, OUTBANK, DAYS, DIGNITY, CONT_OBS, SLEEP_OBS, BEHAVIOUR, FOLLOWUP, STAFFING, RISK_SCOPE,
-  JOURNEY
+  JOURNEY, DURING, ACT_INFO
 } = GSN.data;
 const { PROFILE_SECTIONS, normalizeProfile, contextSummary } = GSN.profiles;
 
@@ -82,6 +82,7 @@ function state(){
     setting:  one("setting") || "community",
     sessionTo: $("sessionTo").value,
     learn:    checked("learn"),
+    during:   checked("during"),
     actOther: $("actOther").value.trim(),
     len:      $("len").value,
     time:     $("time").value,
@@ -582,6 +583,7 @@ function syncVisibility(s){
   $("offerWrap").hidden = college;
   $("sessionToWrap").hidden = !college;
   $("learnWrap").hidden = s.kind !== "activity";
+  syncDuring(s);
   $("actOtherWrap").hidden = !(s.kind === "activity" && s.slot === "other" && !college);
   /* only offer responses that make sense here */
   const ctx = college ? "college" : "offer";
@@ -629,6 +631,23 @@ function syncVisibility(s){
     input.closest(".chip").hidden = !ok;
     if(!ok && input.checked) input.checked = false;   // never leave a hidden answer selected
   });
+}
+
+/* The things a person might do during THIS kind of activity - cooking has
+   different events from a swim. The choices are rebuilt only when the
+   activity's kind changes, so ticks survive every other edit; ticks for a
+   different kind of activity go with it, as they no longer apply. */
+let duringSig = "";
+function syncDuring(s){
+  const tags = s.kind === "activity" ? ((ACT_INFO[s.slot] || {}).tags || []) : [];
+  const list = tags.flatMap(t => DURING[t] || []);
+  const sig = list.map(o => o[0]).join(",");
+  if(sig !== duringSig){
+    duringSig = sig;
+    chips("during", list, "checkbox");
+  }
+  $("duringWrap").hidden = !list.length;
+  if(list.length) setText($("duringHead"), "What they did during " + GSN.core.plain(GSN.rules.activityName(s)).replace(/ \(college\)$/, "") + " \u2014 tick what happened");
 }
 
 /* a hidden choice is never left selected, so it cannot reach the note */
@@ -877,7 +896,7 @@ buildTasks();
    type clears the entry and says so. */
 const SCOPED_TEXT = ["offerA","offerB","chosen","declined","whatAte","drinkChoice",
                      "offered","drunk","skinDetail","extra","handover","actOther","behaviourOther","sessionTo"];
-const SCOPED_CHIPS = ["resp","how","consent","skin","mood","well","risk","outcome","learn",
+const SCOPED_CHIPS = ["resp","how","consent","skin","mood","well","risk","outcome","learn","during",
                       "commUsed","dignity","contObs","sleepObs","behaviour","followup"];
 
 /* Everything below the person belongs to one entry, for one person. It is
@@ -1067,7 +1086,7 @@ function omittedLabel(key){
   const [g, id] = key.split(/_(.+)/);
   const from = (list, v) => GSN.core.plain((list.find(x => x[0] === v) || ["", v])[1]).toLowerCase();
   if(g === "task") return GSN.rules.taskLabel($("kind").value, id).toLowerCase();
-  const lists = { comm: COMM, how: HOW, risk: RISK, dig: DIGNITY, learn: LEARN, mood: MOOD, well: WELL };
+  const lists = { comm: COMM, how: HOW, risk: RISK, dig: DIGNITY, learn: LEARN, mood: MOOD, well: WELL, during: Object.values(DURING).flat() };
   if(lists[g]) return from(lists[g], id);
   return { session: "session times", offer: "the option offered", level: "the overall support level", fluid: "the drink chosen",
            skin: "the skin check", prompt: "an answer to a profile question" }[g] || "a detail";

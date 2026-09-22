@@ -345,7 +345,8 @@ const TUTORIALS = {
       college: async h => { await h.tap("#setting_college"); await h.spot("#settingWrap", 6); await h.wait(1500); await h.spot("#ttHint", 6); },
       skills: async h => {
         await h.unspot();
-        await h.tap("#learn_skill"); await h.tap("#learn_alongside"); await h.tap("#learn_conversation");
+        await h.tap("#during_food-hands"); await h.tap("#during_food-recipe");
+        await h.tap("#learn_skill"); await h.tap("#learn_conversation");
         await h.railTop(); await h.spot("#noteCard .out", 6);
       }
     }

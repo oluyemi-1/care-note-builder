@@ -20,8 +20,11 @@
 const { cap, fill, personVars, hashStr, toMins, plain, present } = G.core;
 const D = G.data;
 
-const SECTIONS = ["context", "offer", "choice", "consent", "independence", "support", "declinedTasks",
-                  "observation", "risk", "explain", "outcome", "followup"];
+/* An activity is told in time order: getting ready and the journey ("start"),
+   what the person did and the support given, what happened and was seen,
+   then clearing up and coming home ("closing") just before the outcome. */
+const SECTIONS = ["context", "offer", "choice", "consent", "start", "independence", "support", "declinedTasks",
+                  "observation", "risk", "explain", "closing", "outcome", "followup"];
 /* sections that open a new paragraph when the note is split into paragraphs */
 const PARA_START = { independence: 1, observation: 1 };
 
@@ -121,19 +124,24 @@ function plan(s, opts, pre){
     });
   if(s.consent) add({ key: "consent", section: "consent", pri: 1, bank: D.CONSENTBANK[s.consent], src: ["consent"] });
 
-  /* what the person did, then the support given, then what they declined */
+  /* what the person did, then the support given, then what they declined -
+     except that an activity's opening and closing tasks keep their place in time */
   const bank = (opts.tasks || D.TASKS)[s.kind] || [];
-  const withLevel = (s.tasks || []).map((t, n) => ({ t, n })).filter(x => x.t.level);
+  const withLevel = (s.tasks || []).map((t, n) => ({ t, n, def: bank.find(d => d.id === t.id) })).filter(x => x.t.level && x.def);
   const rank = l => ORDER_OWN.includes(l) ? 0 : l === "declined" ? 2 : 1;
   const lvlOrder = ["ind", "prompt", "min", "part", "full", "declined"];
-  withLevel.sort((a, b) => (rank(a.t.level) - rank(b.t.level)) ||
-                           (lvlOrder.indexOf(a.t.level) - lvlOrder.indexOf(b.t.level)) || (a.n - b.n));
-  withLevel.forEach(({ t, n }) => {
-    const def = bank.find(d => d.id === t.id);
-    if(!def || !def[t.level] || !def[t.level].length) return;
+  const phase = def => def.phase === "start" ? 0 : def.phase === "end" ? 2 : 1;
+  withLevel.sort((a, b) => (phase(a.def) - phase(b.def)) ||
+                           (phase(a.def) === 1 && ((rank(a.t.level) - rank(b.t.level)) ||
+                                                   (lvlOrder.indexOf(a.t.level) - lvlOrder.indexOf(b.t.level)))) ||
+                           (a.n - b.n));
+  withLevel.forEach(({ t, n, def }) => {
+    if(!def[t.level] || !def[t.level].length) return;
     const src = ["tasks." + t.id + ".level"].concat(def.opts && t.opt ? ["tasks." + t.id + ".opt"] : []);
     const optVal = t.opt ? pre(t.opt) : "";
-    add({ key: "task_" + t.id, section: rank(t.level) === 0 ? "independence" : t.level === "declined" ? "declinedTasks" : "support",
+    add({ key: "task_" + t.id,
+          section: def.phase === "start" ? "start" : def.phase === "end" ? "closing"
+                 : rank(t.level) === 0 ? "independence" : t.level === "declined" ? "declinedTasks" : "support",
           pri: n < 2 ? 1 : n < 5 ? 2 : 3, bank: def[t.level], src, vars: { opt: optVal }, varSrc: { opt: src.slice(1) },
           task: { id: t.id, level: t.level, verb: def.verb, noun: def.opts ? "" : def.noun } });
     /* the journey and how it was kept safe stay together */
@@ -147,7 +155,13 @@ function plan(s, opts, pre){
   if(s.kind === "personal")
     (s.dignity || []).forEach((d, i) => add({ key: "dig_" + d, section: "support", pri: i < 2 ? 2 : 3, bank: D.DIGNITYBANK[d], src: ["dignity." + d] }));
 
-  /* observation */
+  /* observation: first the particular things they did during an activity and
+     the staff member's own account of what happened, then what was measured
+     and seen, then how they seemed */
+  if(s.kind === "activity")
+    (s.during || []).filter(d => D.DURINGBANK[d]).forEach((d, i) =>
+      add({ key: "during_" + d, section: "observation", pri: i < 2 ? 1 : 2, bank: D.DURINGBANK[d], src: ["during." + d] }));
+  if(s.extra) add({ key: "extra", section: "observation", pri: 1, text: verbatim(s.extra), src: ["extra"] });
   if(s.kind === "eating"){
     if(s.ate && s.whatAte) add({ key: "intake", section: "observation", pri: 1, bank: D.INTAKEBANK.ateWhat });
     else if(s.ate)         add({ key: "intake", section: "observation", pri: 1, bank: D.INTAKEBANK.ate });
@@ -172,7 +186,6 @@ function plan(s, opts, pre){
     add({ key: "beh_" + b, section: "observation", pri: 1, bank: D.BEHAVIOURBANK[b], src: ["behaviour." + b] }));
   if((s.behaviour || []).includes("other") && s.behaviourOther)
     add({ key: "behOther", section: "observation", pri: 1, text: verbatim(s.behaviourOther), src: ["behaviour.other", "behaviourOther"] });
-  if(s.extra) add({ key: "extra", section: "observation", pri: 1, text: verbatim(s.extra), src: ["extra"] });
 
   /* risk management staff confirmed: safety choices, then answers to the profile's questions */
   if(s.kind === "activity")

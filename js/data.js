@@ -101,14 +101,70 @@ const OUT_SCOPE = {
    recorded against one is worth a second look; "either" depends on whether a
    journey was recorded. Tags let rules pick out, say, water-based activities. */
 const ACT_INFO = {
-  college:{where:"out"}, laundry:{where:"home"}, cooking:{where:"home", tags:["food"]},
-  baking:{where:"home", tags:["food"]}, shopping:{where:"out"}, housework:{where:"home"},
-  gardening:{where:"either"}, walk:{where:"out", tags:["walking"]}, bus:{where:"out", tags:["transport"]},
+  college:{where:"out"}, laundry:{where:"home", tags:["laundry"]}, cooking:{where:"home", tags:["food"]},
+  baking:{where:"home", tags:["food"]}, shopping:{where:"out", tags:["shopping"]}, housework:{where:"home", tags:["chores"]},
+  gardening:{where:"either", tags:["garden"]}, walk:{where:"out", tags:["walking"]}, bus:{where:"out", tags:["transport"]},
   park:{where:"out", tags:["walking"]}, swim:{where:"out", tags:["water","physical"]}, cinema:{where:"out"},
   cafe:{where:"out", tags:["food"]}, church:{where:"out"}, daycentre:{where:"out"},
-  volunteering:{where:"out"}, music:{where:"either"}, arts:{where:"either"}, games:{where:"home"},
+  volunteering:{where:"out"}, music:{where:"either", tags:["music"]}, arts:{where:"either", tags:["arts"]}, games:{where:"home"},
   film:{where:"home"}, exercise:{where:"either", tags:["physical"]}, appt:{where:"out"},
-  family:{where:"either"}, drive:{where:"out", tags:["transport"]}, other:{where:"either"}
+  family:{where:"either"}, drive:{where:"out", tags:["transport"]}, other:{where:"either"},
+  /* college courses that are not also an activity above */
+  dance:{where:"out", tags:["music","physical"]}, singing:{where:"out", tags:["music"]}, allotment:{where:"out", tags:["garden"]},
+  art:{where:"out", tags:["arts"]}
+};
+
+/* What the person did during the activity - the particular events staff want
+   in the note, offered only for the kind of activity in hand. Each tick is
+   exactly one sentence; nothing is written for an activity on its own. */
+const DURING = {};
+DURING.food = [["food-hands","Washed hands before handling food"],["food-ingredients","Chose the ingredients"],
+               ["food-recipe","Followed the recipe"],["food-hob","Used the hob or oven safely"],
+               ["food-served","Served the food"],["food-tasted","Tasted what they had made"]];
+DURING.music = [["music-chose","Chose the music"],["music-sang","Sang along"],["music-instrument","Played an instrument"],
+                ["music-danced","Danced"],["music-listened","Listened and kept time"]];
+DURING.arts = [["arts-materials","Chose the materials"],["arts-made","Made something of their own design"],
+               ["arts-showed","Showed their work to others"]];
+DURING.physical = [["physical-warmup","Joined in the warm-up"],["physical-pace","Set their own pace"],
+                   ["physical-rest","Took a rest when they needed one"]];
+DURING.water = [["water-changed","Got changed for the water"],["water-swam","Swam or moved about in the water"]];
+DURING.walking = [["walking-route","Chose the route"],["walking-stopped","Stopped to look at things on the way"]];
+DURING.shopping = [["shopping-list","Used a shopping list"],["shopping-items","Chose the items"],["shopping-bags","Carried the bags"]];
+DURING.garden = [["garden-planted","Planted or watered"],["garden-tools","Used garden tools"]];
+DURING.laundry = [["laundry-sorted","Sorted the washing"],["laundry-machine","Loaded and started the machine"],["laundry-folded","Folded the clean washing"]];
+DURING.chores = [["chores-room","Tidied their own room"],["chores-hoover","Hoovered or dusted"]];
+const DURINGBANK = {
+ "food-hands":["{S} washed {p} hands before handling food.","Before handling food, {s} washed {p} hands."],
+ "food-ingredients":["{S} chose the ingredients.","{S} picked out the ingredients."],
+ "food-recipe":["{S} followed the recipe.","{S} worked through the recipe."],
+ "food-hob":["{S} used the hob or oven safely.","{S} used the hob or oven without incident."],
+ "food-served":["{S} served the food.","{S} served up the food."],
+ "food-tasted":["{S} tasted what {s} had made.","{S} tried what {s} had made."],
+ "music-chose":["{S} chose the music.","{S} picked the music."],
+ "music-sang":["{S} sang along.","{S} joined in with the singing."],
+ "music-instrument":["{S} played an instrument.","{S} played along on an instrument."],
+ "music-danced":["{S} danced.","{S} danced to the music."],
+ "music-listened":["{S} listened and kept time with the music.","{S} kept time with the music."],
+ "arts-materials":["{S} chose the materials.","{S} picked out the materials {s} wanted to use."],
+ "arts-made":["{S} made something of {p} own design.","{S} made a piece of {p} own design."],
+ "arts-showed":["{S} showed {p} work to others.","{S} showed others what {s} had made."],
+ "physical-warmup":["{S} joined in the warm-up.","{S} took part in the warm-up."],
+ "physical-pace":["{S} set {p} own pace.","{S} went at {p} own pace."],
+ "physical-rest":["{S} took a rest when {s} needed one.","{S} rested when {s} needed to."],
+ "water-changed":["{S} got changed for the water.","{S} changed into {p} swimwear."],
+ "water-swam":["{S} swam and moved about in the water.","{S} moved about in the water."],
+ "walking-route":["{S} chose the route.","{S} decided which way to go."],
+ "walking-stopped":["{S} stopped to look at things on the way.","{S} took time to look at things along the way."],
+ "shopping-list":["{S} used a shopping list.","{S} worked from a shopping list."],
+ "shopping-items":["{S} chose the items.","{S} picked the items {s} wanted."],
+ "shopping-bags":["{S} carried the bags.","{S} carried the shopping."],
+ "garden-planted":["{S} planted and watered.","{S} did some planting and watering."],
+ "garden-tools":["{S} used garden tools.","{S} worked with garden tools."],
+ "laundry-sorted":["{S} sorted the washing.","{S} sorted the washing into loads."],
+ "laundry-machine":["{S} loaded and started the machine.","{S} loaded the machine and started it."],
+ "laundry-folded":["{S} folded the clean washing.","{S} folded the washing once it was dry."],
+ "chores-room":["{S} tidied {p} own room.","{S} tidied {p} room."],
+ "chores-hoover":["{S} hoovered and dusted.","{S} did the hoovering and dusting."]
 };
 
 /* the overall level in step 3, most to least independent */
@@ -290,14 +346,14 @@ eating:[
 ],
 
 activity:[
- {id:"plan",label:"Planning &amp; preparing",nf:"Daily note",verb:"got ready for {act}",noun:"getting ready",
+ {id:"plan",label:"Planning &amp; preparing",nf:"Daily note",phase:"start",verb:"got ready",noun:"getting ready",
   ind:["{S} got ready for {act} without any help.","{S} prepared for {act} independently."],
   prompt:["{S} got ready for {act} with prompts from staff.","With prompting, {s} got ready for {act}."],
   part:["{S} got ready for {act} with some hands-on help from staff.","Staff supported {o} to get ready for {act}."],
   full:["Staff got everything ready for {act}.","Staff prepared for {act} on {p} behalf."],
   declined:["{S} declined {act} at the planning stage.","{S} did not want to go ahead with {act} and this was respected."]},
 
- {id:"travel",label:"Travelling there",nf:"Daily note",
+ {id:"travel",label:"Travelling there",nf:"Daily note",phase:"start",
   opts:["by cab","by bus","by train","on foot","in the staff vehicle","by minibus"],
   verb:"travelled {opt}",
   ind:["{S} travelled {opt} independently.","{S} made {p} own way there {opt} without support."],
@@ -327,14 +383,14 @@ activity:[
   full:["Staff handled the payment.","Payment was made by staff."],
   declined:["{S} did not want to handle money today.","{S} declined to pay."]},
 
- {id:"tidy",label:"Clearing up afterwards",nf:"Daily note",verb:"cleared up afterwards",noun:"clearing up",
+ {id:"tidy",label:"Clearing up afterwards",nf:"Daily note",phase:"end",verb:"cleared up afterwards",noun:"clearing up",
   ind:["{S} cleared up afterwards without support.","{S} tidied away independently."],
   prompt:["{S} cleared up after a prompt from staff.","Following a prompt, {s} tidied away {r}."],
   part:["{S} cleared up with some help from staff.","Staff and {N} cleared up together afterwards."],
   full:["Staff cleared up afterwards.","Clearing up was done by staff."],
   declined:["{S} did not want to clear up today.","{S} declined to help tidy away."]},
 
- {id:"finish",label:"Finishing &amp; coming home",nf:"Daily note",
+ {id:"finish",label:"Finishing &amp; coming home",nf:"Daily note",phase:"end",
   ind:["{S} decided when to finish.","{S} chose when to stop."],
   prompt:["{S} finished after a prompt from staff.","Following a prompt, {s} finished."],
   min:["{S} finished with minimal support from staff.","Minimal support from staff was needed to finish."],
@@ -700,6 +756,6 @@ G.data = {
   COMM, FLAGS, RESP, HOW, CONSENT, SKIN, MOOD, WELL, RISK, OUTCOME, ACTS, ACT_INFO, OVERALL_LEVELS, OUT_SCOPE, SLOTS, LEVELS, TASKS, ACT_SETTING, COURSES, RESP_COLLEGE, RESP_SCOPE, LEARN, LEARNBANK, TRAVEL_RISK, OPEN_COLLEGE, OPEN_ACT, OPEN_PC, OPEN, COMMBANK, RESPBANK, HOWBANK, CONSENTBANK, SKINBANK, MOODBANK, WELLBANK, RISKBANK, OUTBANK, MEALWORD, DAYS, OUT_LEAD,
   GROUPBANK, LEVELBANK, OFFERBANK, SESSIONBANK, INTAKEBANK, HOW_JOIN, OPEN_COLLEGE_DECLINED,
   DIGNITY, DIGNITYBANK, CONT_OBS, CONTBANK, SLEEP_OBS, SLEEPBANK, BEHAVIOUR, BEHAVIOURBANK, FOLLOWUP, FOLLOWBANK,
-  STAFFING, RISK_SCOPE, JOURNEY
+  STAFFING, RISK_SCOPE, JOURNEY, DURING, DURINGBANK
 };
 })(globalThis.GSN = globalThis.GSN || {});

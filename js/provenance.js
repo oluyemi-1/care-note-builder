@@ -16,7 +16,7 @@
 
 const { present } = G.core;
 
-const GROUPS = ["risk", "mood", "well", "how", "commUsed", "dignity", "contObs", "sleepObs", "behaviour", "followup", "learn"];
+const GROUPS = ["risk", "mood", "well", "how", "commUsed", "dignity", "contObs", "sleepObs", "behaviour", "followup", "learn", "during"];
 
 function resolve(s, path){
   if(path.startsWith("prompts.")) return String((s.prompts || {})[path.slice(8)] || "");

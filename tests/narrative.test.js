@@ -49,6 +49,9 @@ const GUARDS = [
   [/\btraffic side\b/i,          s => has(s.risk, "road")],
   [/\bdiscomfort\b|\bpain\b/i,   s => has(s.well, "pain")],
   [/\bincontinence\b/i,          s => has(s.contObs, "episode")],
+  [/\bwashed (his|her|their) hands\b/i, s => has(s.during, "food-hands")],
+  [/\bdanced\b/i,                s => has(s.during, "music-danced") || /danc/i.test(s.extra + s.behaviourOther)],
+  [/\brecipe\b/i,                s => has(s.during, "food-recipe")],
   [/\bbowels\b/i,                s => has(s.contObs, "bowels")],
   [/\basleep\b/i,                s => has(s.sleepObs, "asleep") || s.outcome === "slept"],
   [/\btutor\b/i,                 s => has(s.learn, "instructions")],
@@ -199,4 +202,46 @@ test("wording varies between notes", () => {
   const texts = new Set();
   for(let salt = 0; salt < 40; salt++) texts.add(compose(x, salt).note.text);
   assert.ok(texts.size > 10, "only " + texts.size + " different notes from 40 seeds");
+});
+
+/* keys of the sentences in a note, with a grouped sentence counting for each of its members */
+const order = note => note.sentences.flatMap(x => x.members || [x.key]);
+const before = (keys, a, b) => { assert.ok(keys.includes(a) && keys.includes(b), a + " and " + b + " in " + keys); assert.ok(keys.indexOf(a) < keys.indexOf(b), a + " should come before " + b + " in " + keys.join(", ")); };
+
+test("an activity note reads in time order, whatever the level of support", () => {
+  const s = makeState({ kind: "activity", setting: "college", slot: "music", time: "10:00", sessionTo: "12:00", resp: "keen", consent: "implied", len: "full",
+    tasks: [{ id: "plan", level: "prompt", opt: "" }, { id: "travel", level: "part", opt: "by cab" }, { id: "engage", level: "prompt", opt: "" },
+            { id: "money", level: "full", opt: "" }, { id: "finish", level: "full", opt: "" }],
+    risk: ["seatbelt"], learn: ["instructions", "pride"], mood: ["cheerful"], outcome: "enjoyed",
+    extra: "He danced with other attendees and joined in the drumming and karaoke." });
+  for(let salt = 0; salt < 12; salt++){
+    const keys = order(compose({ s, profile: P.none }, salt).note);
+    before(keys, "task_plan", "task_travel");
+    before(keys, "risk_seatbelt", "task_engage");        // the journey and its safety, then the class
+    before(keys, "task_engage", "extra");                // what they did, then the staff member's own account of it
+    before(keys, "extra", "learn_instructions");         // then the ticked skills and how they seemed
+    before(keys, "learn_pride", "task_finish");          // finishing comes after everything that happened during
+    before(keys, "mood_cheerful", "task_finish");
+    before(keys, "task_finish", "out");                  // and just before the outcome
+  }
+});
+
+test("the staff member's own words follow what the person did, before the ticked observations", () => {
+  const s = makeState({ kind: "personal", tasks: [{ id: "wash", level: "ind", opt: "a shower" }], skin: "clear", mood: ["settled"],
+                        extra: "He asked for the radio on while he washed.", outcome: "ready", len: "full" });
+  const keys = order(compose({ s, profile: P.none }, 2).note);
+  before(keys, "task_wash", "extra");
+  before(keys, "extra", "skin");
+  before(keys, "extra", "mood_settled");
+});
+
+test("what they did during an activity is offered for that kind of activity, and each tick is one sentence", () => {
+  const cooking = makeState({ kind: "activity", slot: "cooking", during: ["food-hands", "food-recipe"], len: "full" });
+  const text = compose({ s: cooking, profile: P.none }, 1).note.text;
+  assert.match(text, /washed (his|her|their) hands/i);
+  assert.match(text, /recipe/);
+  assert.ok(G.data.DURING.food.some(d => d[0] === "food-hands"));
+  assert.ok(!G.data.DURING.music.some(d => d[0] === "food-hands"));
+  const walk = makeState({ kind: "activity", slot: "walk", len: "full" });
+  assert.doesNotMatch(compose({ s: walk, profile: P.none }, 1).note.text, /hands|recipe/);
 });

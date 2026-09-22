@@ -51,6 +51,7 @@ function randomInteraction(seed){
     mood: some(ids(D.MOOD), 0.15), well: some(ids(D.WELL), 0.15),
     risk: kind === "activity" ? some(ids(D.RISK), 0.25) : [],
     learn: kind === "activity" ? some(ids(D.LEARN), 0.2) : [],
+    during: kind === "activity" ? some(((D.ACT_INFO[slot] || {}).tags || []).flatMap(t => ids(D.DURING[t] || [])), 0.3) : [],
     dignity: kind === "personal" ? some(ids(D.DIGNITY), 0.3) : [],
     contObs: kind === "personal" ? some(ids(D.CONT_OBS), 0.2) : [],
     sleepObs: kind === "personal" ? some(ids(D.SLEEP_OBS), 0.2) : [],

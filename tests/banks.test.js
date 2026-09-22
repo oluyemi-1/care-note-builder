@@ -16,7 +16,7 @@ function banks(){
   const out = [];
   const addAll = (name, obj) => Object.keys(obj).forEach(k => Array.isArray(obj[k]) && out.push([name + "." + k, obj[k]]));
   ["OPEN_PC", "OPEN", "OPEN_ACT", "COMMBANK", "RESPBANK", "HOWBANK", "CONSENTBANK", "SKINBANK", "MOODBANK", "WELLBANK",
-   "RISKBANK", "OUTBANK", "LEARNBANK", "DIGNITYBANK", "CONTBANK", "SLEEPBANK", "BEHAVIOURBANK", "FOLLOWBANK",
+   "RISKBANK", "OUTBANK", "LEARNBANK", "DIGNITYBANK", "CONTBANK", "SLEEPBANK", "BEHAVIOURBANK", "FOLLOWBANK", "DURINGBANK",
    "GROUPBANK", "LEVELBANK", "OFFERBANK", "INTAKEBANK"].forEach(n => addAll(n, D[n]));
   out.push(["OPEN_COLLEGE", D.OPEN_COLLEGE], ["OPEN_COLLEGE_DECLINED", D.OPEN_COLLEGE_DECLINED], ["SESSIONBANK", D.SESSIONBANK]);
   for(const kind in D.TASKS) D.TASKS[kind].forEach(t => D.LEVELS.forEach(([l]) => l && out.push(["TASKS." + kind + "." + t.id + "." + l, t[l]])));

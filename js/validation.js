@@ -272,7 +272,7 @@ function validateRecord(r){
                                    .map(t => ({ id: t.id, level: t.level })) : [],
     food: isObj(r.food) && PCT_KEYS.includes(r.food.amount) ? { amount: r.food.amount, pct: G.patterns.PCT[r.food.amount] } : null,
     fluid: null,
-    mood: ids(r.mood, 20), wellbeing: ids(r.wellbeing, 20), behaviour: ids(r.behaviour, 20),
+    mood: ids(r.mood, 20), wellbeing: ids(r.wellbeing, 20), behaviour: ids(r.behaviour, 20), during: ids(r.during, 20),
     skin: ["", "clear", "concern", "none"].includes(r.skin) ? r.skin : "",
     sleep: ids(r.sleep, 10), continence: ids(r.continence, 10), prompts: {},
     outcome: idish(r.outcome), followup: ids(r.followup, 10), handover: r.handover === true
