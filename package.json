@@ -1,0 +1,9 @@
+{
+  "name": "gold-standard-notes",
+  "private": true,
+  "description": "Builds a person-centred daily care note from what actually happened on the shift.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test"
+  }
+}
