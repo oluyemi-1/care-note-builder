@@ -2,7 +2,7 @@
    adding itself to the GSN global - so tests exercise the shipped files. */
 const path = require("path");
 
-const ENGINE = ["core", "data"];
+const ENGINE = ["core", "data", "profiles", "rules", "contradictions", "language", "quality", "patterns", "smart-assist", "provenance", "narrative", "provider-config", "validation"];
 
 for (const f of ENGINE) require(path.join(__dirname, "..", "..", "js", f + ".js"));
 

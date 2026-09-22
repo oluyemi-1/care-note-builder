@@ -7,10 +7,14 @@
    ============================================================ */
 "use strict";
 
-const { PRON, cap, hashStr, toMins, durText } = GSN.core;
+const { cap, hashStr, toMins, esc } = GSN.core;
 const {
-  COMM, FLAGS, RESP, HOW, CONSENT, SKIN, MOOD, WELL, RISK, OUTCOME, ACTS, OUT_SCOPE, SLOTS, LEVELS, TASKS, ACT_SETTING, COURSES, RESP_COLLEGE, RESP_SCOPE, LEARN, LEARNBANK, TRAVEL_RISK, OPEN_COLLEGE, OPEN_ACT, OPEN_PC, OPEN, COMMBANK, RESPBANK, HOWBANK, CONSENTBANK, SKINBANK, MOODBANK, WELLBANK, RISKBANK, OUTBANK, MEALWORD, DAYS
+  COMM, FLAGS, RESP, HOW, CONSENT, SKIN, MOOD, WELL, RISK, OUTCOME, OUT_SCOPE, SLOTS, LEVELS, TASKS, ACT_SETTING,
+  COURSES, RESP_COLLEGE, RESP_SCOPE, LEARN, COMMBANK, RESPBANK, HOWBANK, CONSENTBANK, SKINBANK, MOODBANK,
+  WELLBANK, RISKBANK, OUTBANK, DAYS, DIGNITY, CONT_OBS, SLEEP_OBS, BEHAVIOUR, FOLLOWUP, STAFFING, RISK_SCOPE,
+  JOURNEY
 } = GSN.data;
+const { PROFILE_SECTIONS, normalizeProfile, contextSummary } = GSN.profiles;
 
 const $  = id => document.getElementById(id);
 
@@ -21,6 +25,14 @@ const KEY = "gsn.v1";
 let store = {};
 try { store = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e){ store = {}; }
 const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} };
+
+/* The provider's settings, checked again on every load - storage can be
+   edited by hand - then laid over the built-in lists before the page builds
+   a single choice from them. */
+store.config = GSN.validation.validateConfig(store.config || {}).value;
+const CONFIG = GSN.config.apply(store.config);
+const RULES = GSN.rules.CARE_RULES.concat(CONFIG.customRules);
+const careSystem = () => CONFIG.terms.careSystem && CONFIG.terms.careSystem !== "care system" ? CONFIG.terms.careSystem : "your care system";
 
 let chosenIdx = {};            // slot -> index used in the note now on screen
 let onScreen = {};             // what the visible note used, so a reword moves off it
@@ -35,26 +47,11 @@ function reseed(){
   const day = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
   salt = hashStr([store.device, $("initials").value.trim().toUpperCase(),
                   day, $("kind").value, $("slot").value].join("|"));
+  onScreen = {};
 }
 
 function histKey(){ return (state().initials||"_") + "|" + $("kind").value; }
 
-/* pick a phrase, steering away from the ones recently used for this person */
-function pick(bank, slot){
-  if(!bank || !bank.length) return "";
-  let hist = ((store.hist||{})[histKey()]||{})[slot] || [];
-  if(slot in onScreen) hist = [onScreen[slot]].concat(hist.filter(x => x !== onScreen[slot]));
-  let best = [], bestScore = Infinity;
-  bank.forEach((_, i) => {
-    const pos = hist.indexOf(i);
-    const score = pos === -1 ? -1 : (hist.length - pos);
-    if(score < bestScore){ bestScore = score; best = [i]; }
-    else if(score === bestScore) best.push(i);
-  });
-  const i = best[hashStr(salt + "|" + slot) % best.length];
-  chosenIdx[slot] = i;
-  return bank[i];
-}
 function commitHistory(){
   store.hist = store.hist || {};
   const k = histKey();
@@ -75,7 +72,7 @@ const one     = id => (document.querySelector('#'+id+' input:checked')||{}).valu
 
 function state(){
   return {
-    initials: $("initials").value.trim().toUpperCase(),
+    initials: GSN.profiles.cleanInitials($("initials").value.trim()),
     pronoun:  $("pronoun").value,
     ratio:    $("ratio").value,
     comm:     checked("comm"),
@@ -88,6 +85,8 @@ function state(){
     actOther: $("actOther").value.trim(),
     len:      $("len").value,
     time:     $("time").value,
+    staffing: $("staffing").value,
+    commUsed: checked("commUsed"),
     offerA:   $("offerA").value.trim(),
     offerB:   $("offerB").value.trim(),
     resp:     one("resp") || one("respc"),
@@ -107,9 +106,17 @@ function state(){
     mood:     checked("mood"),
     well:     checked("well"),
     risk:     checked("risk"),
+    dignity:  checked("dignity"),
+    contObs:  checked("contObs"),
+    sleepObs: checked("sleepObs"),
+    behaviour: checked("behaviour"),
+    behaviourOther: $("behaviourOther").value.trim(),
+    followup: checked("followup"),
+    prompts:  Object.assign({}, promptAnswers),
     outcome:  one("outcome"),
     extra:    $("extra").value.trim(),
-    handover: $("handover").value.trim()
+    handover: $("handover").value.trim(),
+    attest:   $("attest").checked
   };
 }
 function readTasks(){
@@ -125,164 +132,36 @@ function readTasks(){
   return out;
 }
 
-/* ---------- template fill ---------- */
-function actPhrase(s, i){
-  if(s.kind !== "activity") return i === 3 ? "took part in the activity" : "the activity";
-  if(s.setting === "college"){
-    const c = COURSES.find(x => x[0] === s.slot);
-    return c ? c[i] : (i === 3 ? "attended {p} class" : "{p} class");
-  }
-  if(s.slot === "other"){
-    const n = s.actOther || "the activity";
-    return i === 3 ? "took part in " + n : n;
-  }
-  const a = ACTS.find(x => x[0] === s.slot);
-  return a ? a[i] : (i === 3 ? "took part in the activity" : "the activity");
+/* ============================================================
+   History on this device (optional, off until switched on)
+   ============================================================ */
+let historyCache = {};         // initials -> saved records, loaded when a person is opened
+const newRecordId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+let recordId = newRecordId();  // the next entry to be saved
+let lastSaved = null;          // { id, sig } of what the last copy saved
+const recordSig = rec => JSON.stringify(Object.assign({}, rec, { id: "", savedAt: "" }));
+/* Copying the same entry again updates its record rather than adding a second;
+   anything different - the next drink, say - is a new record of its own. */
+function entryId(s){
+  if(lastSaved && recordSig(GSN.patterns.toRecord(s, { id: "" })) === lastSaved.sig) return lastSaved.id;
+  return recordId;
 }
+const historyOn = () => !!(store.config && store.config.history && store.config.history.enabled);
+const windowDays = () => (store.config && store.config.history && store.config.history.windowDays) || 14;
 
-function T(str, s, extra){
-  if(!str) return "";
-  const pr = PRON[s.pronoun];
-  const map = Object.assign({
-    N: s.initials || "[Initials]",
-    s: pr.s, S: cap(pr.s), o: pr.o, p: pr.p, P: cap(pr.p), r: pr.r,
-    vbe: pr.vbe, vhave: pr.vhave,
-    time: s.time || "the agreed time",
-    chosen: s.chosen || s.offerA || "what was offered",
-    declined: s.declined ? (cap(s.declined).replace(/\.?$/, ".")) : "This was respected.",
-    skinDetail: s.skinDetail || "a change to the skin",
-    ratio: s.ratio && s.ratio !== "shared" ? " with " + s.ratio + " support" : "",
-    meal:  (MEALWORD[s.slot]||["the meal","The meal"])[0],
-    meal2: (MEALWORD[s.slot]||["the meal","The meal"])[1],
-    opt: extra && extra.opt ? extra.opt : "",
-    act: actPhrase(s,2), act2: cap(actPhrase(s,2)), did: actPhrase(s,3),
-    offer: s.offerA || actPhrase(s,2), Offer: cap(s.offerA || actPhrase(s,2))
-  }, extra || {});
-  // resolve nested pronoun tokens inside substituted values (e.g. "{p} teeth")
-  let outStr = str.replace(/\{(\w+)\}/g, (m,k) => (k in map) ? map[k] : m);
-  return outStr.replace(/\{(\w+)\}/g, (m,k) => (k in map) ? map[k] : m);
+function loadHistory(person){
+  if(!historyOn() || !person || historyCache[person]) return;
+  historyCache[person] = [];
+  GSN.storage.history.byPerson(person)
+    .then(rs => { historyCache[person] = rs || []; render(); })
+    .catch(() => { historyCache[person] = []; });
 }
 
 /* ============================================================
-   Building the note
+   Building the note - the wording lives in narrative.js
    ============================================================ */
-function buildNote(s){
-  chosenIdx = {};
-  const L = s.len === "short" ? 1 : s.len === "std" ? 2 : 3;
-  const travelDone = [];
-  const out = [];
-  const add = (pri, text) => { if(pri <= L && text) out.push(text); };
-
-  /* 1 OFFER */
-  let openBank = (s.kind === "personal" && OPEN_PC[s.slot]) ? OPEN_PC[s.slot] : OPEN[s.kind];
-  if(s.kind === "activity")
-    openBank = s.setting === "college" ? OPEN_COLLEGE
-             : (s.offerA && s.offerB) ? OPEN_ACT.choice : OPEN_ACT.single;
-  add(1, T(pick(openBank, "open"), s));
-  if(s.offerA && s.offerB) add(1, T("{S} {vbe} offered a choice of " + s.offerA + " or " + s.offerB + ".", s));
-  else if(s.offerA && s.kind !== "activity") add(2, T("{S} {vbe} offered " + s.offerA + ".", s));
-  /* a college course was chosen at enrolment; nothing is offered on the day */
-  /* a single activity is already named by the opener above */
-  if(s.kind === "activity" && s.setting === "college" && s.time && s.sessionTo && toMins(s.sessionTo) > toMins(s.time))
-    add(2, T(pick([
-      "{S} {vbe} at college from " + s.time + " until " + s.sessionTo + ".",
-      "The session ran from " + s.time + " to " + s.sessionTo + ".",
-      "The class lasted " + durText(s.time, s.sessionTo) + ", from " + s.time + " to " + s.sessionTo + "."
-    ], "session"), s));
-  if(s.comm.length) add(2, T(pick(COMMBANK[s.comm[0]], "comm"), s));
-  if(s.comm.length > 1) add(3, T(pick(COMMBANK[s.comm[1]], "comm2"), s));
-
-  /* 2 CHOICE OR RESPONSE */
-  if(s.resp) add(1, T(pick(RESPBANK[s.resp], "resp"), s));
-  if(s.how.length && s.resp !== "declined") add(2, T(pick(HOWBANK[s.how[0]], "how"), s));
-  if(s.consent) add(1, T(pick(CONSENTBANK[s.consent], "consent"), s));
-
-  /* 3 SUPPORT + 4 INDEPENDENCE */
-  if(s.consent !== "no" && s.resp !== "declined"){
-    if(s.level){
-      const LV = {
-        ind:   ["{S} completed this independently.","No hands-on support was needed.","{S} managed the whole interaction {r}."],
-        prompt:["Support was limited to prompting; no hands-on help was needed.","Only verbal and gestural prompts were used.","{S} needed prompts alone, with no hands-on support."],
-        min:   ["{S} {vbe} minimally supported throughout.","Support was kept to the minimum {s} needed.","Only minimal support was given, so {s} could do as much as possible {r}."],
-        part:  ["{S} did what {s} could {r} and staff supported with the rest.","Support was shared \u2014 {s} led and staff filled the gaps."],
-        full:  ["Staff provided full hands-on support throughout, explaining each step beforehand.","Full support was given by staff, with {p} dignity maintained at every stage."]
-      }[s.level];
-      /* only narrate the overall level when no rows were ticked - otherwise the
-         rows say it more precisely and the two can disagree */
-      if(!s.tasks.some(t => t.level)) add(2, T(pick(LV, "level"), s));
-    }
-    const bank = TASKS[s.kind];
-    s.tasks.forEach((t, n) => {
-      const def = bank.find(d => d.id === t.id);
-      if(!def) return;
-      if(!t.level) return;                 // ticked but not yet said how much support
-      const arr = def[t.level];
-      if(!arr || !arr.length) return;
-      add(n < 2 ? 1 : n < 5 ? 2 : 3, T(pick(arr, "task_" + t.id), s, { opt: t.opt ? T(t.opt, s) : "" }));
-      /* keep the journey and how it was kept safe together */
-      if(s.kind === "activity" && t.id === "travel")
-        s.risk.filter(r => TRAVEL_RISK.includes(r))
-              .forEach((r, i) => { add(i < 3 ? 2 : 3, T(pick(RISKBANK[r], "risk_" + r), s)); travelDone.push(r); });
-    });
-  }
-
-  /* 5 OBSERVATION */
-  if(s.kind === "eating"){
-    if(s.ate && s.whatAte)      add(1, T("{S} ate " + s.ate.toLowerCase() + " of " + s.whatAte + ".", s));
-    else if(s.ate)              add(1, T("{S} ate " + s.ate.toLowerCase() + " of the meal.", s));
-    else if(s.whatAte)          add(1, T("{S} had " + s.whatAte + ".", s));
-    if(s.drunk && s.offered)    add(1, T("{S} {vbe} offered " + s.offered + "ml and drank " + s.drunk + "ml" + (s.drinkChoice ? " of " + s.drinkChoice : "") + ".", s));
-    else if(s.drunk)            add(1, T("{S} drank " + s.drunk + "ml" + (s.drinkChoice ? " of " + s.drinkChoice : "") + ".", s));
-    else if(s.drinkChoice)      add(2, T("{S} chose " + s.drinkChoice + " to drink.", s));
-    if(s.flags.includes("diabetes"))    add(2, T("Portion size and sugar content were discussed with {o} to support {p} Type 2 diabetes.", s));
-    if(s.flags.includes("cholesterol")) add(2, T("A lower-fat option was prepared to support {p} cholesterol management.", s));
-    if(s.flags.includes("choking") || s.flags.includes("softdiet"))
-      add(2, T("Food was prepared to {p} agreed consistency and no coughing or difficulty swallowing was seen.", s));
-  }
-  if(s.kind === "personal" && s.skin && s.skin !== "none")
-    add(s.skin === "concern" ? 1 : 2, T(pick(SKINBANK[s.skin], "skin"), s));
-  if(s.kind === "activity")
-    s.risk.filter(r => !travelDone.includes(r))
-          .forEach((r, i) => add(i < 3 ? 2 : 3, T(pick(RISKBANK[r], "risk_" + r), s)));
-  if(s.kind === "activity" && s.flags.includes("deaf") && !s.risk.includes("road"))
-    add(2, T("Near roads staff gained {p} attention first, as {s} cannot hear approaching vehicles.", s));
-  if(s.kind === "activity") s.learn.forEach((l, i) => add(i < 2 ? 1 : 2, T(pick(LEARNBANK[l], "learn_" + l), s)));
-  if(s.mood.length) add(2, T(pick(MOODBANK[s.mood[0]], "mood"), s));
-  s.well.forEach(w => add(w === "nochange" ? 3 : 2, T(pick(WELLBANK[w], "well_" + w), s)));
-
-  /* free text, word for word */
-  if(s.extra) add(1, s.extra.replace(/\s*$/, "").replace(/([^.!?])$/, "$1."));
-
-  /* 6 OUTCOME */
-  if(s.outcome) add(1, T(pick(OUTBANK[s.outcome], "out"), s));
-  if(s.handover) add(1, T("Handed over: " + s.handover.replace(/\.?$/, "") + ".", s));
-
-  return out.filter(Boolean).join(" ")
-    .replace(/&mdash;/g, "\u2014").replace(/&amp;/g, "&")
-    .replace(/\s+([.,])/g, "$1").replace(/ {2,}/g, " ").trim();
-}
-
-/* ============================================================
-   Audit checks (the org's 7)
-   ============================================================ */
-function audit(s){
-  const declined = s.resp === "declined" || s.resp === "delayed" || s.consent === "no";
-  return [
-    {ok: !!s.kind && !!s.slot,                    t:"Correct interaction selected", need:"the type of interaction", fix:"Pick the type of interaction in step 1."},
-    {ok: !!s.resp && !!s.consent,                 t:"Choice, consent or response recorded", need:"their response and consent", fix:"Record their response and consent in step 2."},
-    {ok: !!s.level && (s.tasks.some(t => t.level) || declined) && s.tasks.every(t => t.level),
-     t:"Independence and support level clear",
-     need: s.tasks.some(t => !t.level) ? "how much support on each task you ticked" : "what you supported in step 3",
-     fix: s.tasks.some(t => !t.level)
-       ? "One or more ticked tasks in step 3 still need a support level."
-       : "Set the overall support level and tick what you supported in step 3."},
-    {ok: s.mood.length > 0 || s.well.length > 0 || (s.kind==="personal" && !!s.skin) || (s.kind==="activity" && (s.risk.length > 0 || s.learn.length > 0)) || (s.kind==="eating" && (!!s.ate || !!s.drunk)),
-                                                  t:"Relevant risk controls and observations included", need:"an observation", fix:"Add at least one observation in step 4."},
-    {ok: !!s.outcome,                             t:"Meaningful outcome recorded", need:"how it ended for them", fix:"Choose an outcome in step 5."},
-    {ok: !declined || !!s.declined,               t:"Refusal or non-engagement respected", need:"how you respected the refusal", fix:"Say what you did to respect the refusal in step 2."},
-    {ok: $("attest").checked,                     t:"Entry reflects what actually happened",     fix:"Tick the confirmation under the note."}
-  ];
-}
+let lastBuild = null;          // sentences + sources of the note on screen
+let lastState = null;          // the state it was built from
 
 /* similarity against the last saved note for this person + interaction */
 function trigrams(t){
@@ -310,7 +189,20 @@ function render(){
   syncVisibility(state());   // unhide this interaction's rows first...
   const s = state();         // ...then read them
 
-  noteText = buildNote(s);
+  const profile = profileFromForm();
+  loadHistory(s.initials);
+  const { sa, s: built, note } = GSN.narrative.compose({ s, profile, explanations,
+      history: historyOn() ? (historyCache[s.initials] || []) : null, recordId: entryId(s), now: new Date(), windowDays: windowDays(),
+      rules: RULES, language: CONFIG.language, auditOptional: CONFIG.audit.optional, auditExtra: CONFIG.audit.extra },
+    { salt, hist: ((store.hist || {})[histKey()]) || {}, avoid: onScreen, terms: CONFIG.terms, layout: CONFIG.noteLayout });
+  /* an answer belongs to the question as it was asked; if the question has
+     since changed (say the profile's mobility aid was edited), the answer goes */
+  const stale = [];
+  sa.rules.forEach(r => r.prompts.forEach(p => { if(p.answer && promptAsked[p.key] && promptAsked[p.key] !== p.text) stale.push(p.key); }));
+  if(stale.length){ stale.forEach(k => { delete promptAnswers[k]; delete promptAsked[k]; }); return render(); }
+  chosenIdx = note.chosen;
+  lastBuild = note; lastState = built;
+  noteText = note.text;
 
   const out = $("out");
   /* Show whatever has been answered so far. Requiring a response before
@@ -318,6 +210,13 @@ function render(){
   const filled = noteText.trim().length > 0;
   out.textContent = filled ? noteText : "Fill in the steps and the note builds itself here.";
   out.classList.toggle("empty", !filled);
+
+  /* the pasted note is the record, so a length that drops something staff
+     ticked says so - with a one-tap way to put it back */
+  const left = note.omitted.length;
+  $("omit").hidden = !left;
+  if(left) setText($("omitText"), "This length leaves out " + left + (left === 1 ? " thing" : " things") +
+    " you recorded (" + note.omitted.map(omittedLabel).join(", ") + ").");
 
   const words = filled ? noteText.trim().split(/\s+/).length : 0;
   $("wc").textContent = words;
@@ -335,7 +234,7 @@ function render(){
   else { fresh.className = "badge miss"; fresh.textContent = "Too close to last — reword"; }
 
   /* audit */
-  const a = audit(s), passed = a.filter(x => x.ok).length;
+  const a = sa.audit, passed = sa.auditPassed;
   const missing = a.slice(0, 6).filter(x => !x.ok).map(x => x.need || x.t.toLowerCase());
   const needs = $("needs");
   if(filled && missing.length){
@@ -350,24 +249,284 @@ function render(){
   ab.className = "badge " + (passed === 7 ? "ok" : passed >= 5 ? "warn" : "miss");
   $("dockScore").textContent = passed + " / 7";
 
+  renderSmartAssist(sa);
+  renderPrompts(sa.rules, s.initials);
+  renderProvenance();
+  renderPatterns(built, profile);
+  renderContext(profile);
+
   /* record field mirror */
   renderFields(s);
 
-  /* copy gate: the five content checks, plus the attestation */
-  const contentOk = a.slice(0,6).every(x => x.ok);
-  const ready = contentOk && $("attest").checked && filled;
+  /* copy gate: the content checks, no unexplained inconsistency, and the attestation */
+  const contentOk = sa.contentOk;
+  const ready = contentOk && !sa.blocking && $("attest").checked && filled;
   $("copy").disabled = !ready;
   $("dockCopy").disabled = !ready;
-  $("why").textContent = ready ? "Ready to paste into the daily note box in your care system."
+  setText($("why"), ready ? "Ready to paste into the daily note box in " + careSystem() + "."
     : !filled ? "The note fills in as you answer the steps."
-    : !contentOk ? "Clear the outstanding audit checks below before copying."
-    : "Tick the confirmation above to unlock the copy button.";
+    : !contentOk ? "Clear the outstanding audit checks in Smart Assist before copying."
+    : sa.requiredMissing ? "Complete what Smart Assist marks as required before copying."
+    : sa.blocking ? "Correct or explain the inconsistency flagged in Smart Assist before copying."
+    : "Tick the confirmation above to unlock the copy button.");
 }
+
+/* ============================================================
+   The person's recent pattern, from this device's history
+   ============================================================ */
+let patSig = "";
+function renderPatterns(s, profile){
+  const P = GSN.patterns, on = historyOn() && !!s.initials;
+  const recs = on ? (historyCache[s.initials] || []) : [];
+  const ft = $("fluidToday");
+  ft.hidden = !(s.kind === "eating" && (on || profile.fluidTarget));
+  if(!ft.hidden){
+    const t = on ? P.fluidToday(recs, P.toRecord(s, { id: entryId(s) })) : null;
+    setText(ft, on ? "Recorded today on this device: " + t.total + " ml" + (profile.fluidTarget ? " of the " + profile.fluidTarget + " ml target" : "") + "."
+                   : "Turn on history in Settings & data to count today\u2019s drinks against the " + profile.fluidTarget + " ml target.");
+  }
+  $("patCard").hidden = !on;
+  if(!on) return;
+  const sig = s.initials + "|" + windowDays() + "|" + recs.map(r => r.id + r.savedAt).join(",");
+  if(sig === patSig) return;
+  patSig = sig;
+  const b = P.baseline(recs, { windowDays: windowDays() });
+  setText($("patWindow"), "Last " + b.windowDays + " days");
+  const lines = [];
+  if(b.food.meals) lines.push("Food: usually about " + b.food.avgPct + "% of a meal (" + b.food.meals + " meals)");
+  if(b.fluid.days) lines.push("Fluids: about " + b.fluid.avgDaily.toLocaleString("en-GB") + " ml a day (" + b.fluid.days + " days)");
+  if(b.participation.activities) lines.push("Activities: took part in " + (b.participation.activities - b.participation.declined) + " of " + b.participation.activities);
+  if(b.sleep.nights) lines.push("Sleep: unsettled or poor on " + b.sleep.unsettled + " of " + b.sleep.nights + " nights");
+  Object.keys(b.support).slice(0, 4).forEach(id => {
+    const m = b.support[id], kind = (recs.find(r => r.tasks.some(t => t.id === id)) || {}).kind;
+    lines.push(GSN.rules.taskLabel(kind, id) + ": usually " + GSN.quality.LEVEL_PHRASE[m.value] + " (" + m.count + " of " + m.of + ")");
+  });
+  const latest = recs.slice().sort((a, c) => (c.date + c.time).localeCompare(a.date + a.time)).slice(0, 12);
+  $("patBody").innerHTML =
+    (b.records < GSN.patterns.MIN_FOR_BASELINE ? '<p>Not enough history yet to show a usual pattern (' + b.records + ' record' + (b.records === 1 ? '' : 's') + ' in this window). Keep copying notes and it will build up.</p>' : "") +
+    (lines.length ? '<ul>' + lines.map(l => '<li>' + esc(l) + '</li>').join("") + '</ul>' : "") +
+    (latest.length ? '<details><summary>Saved records for ' + esc(s.initials) + ' (' + recs.length + ')</summary><ul class="recs">' +
+      latest.map(r => '<li><span>' + esc(r.date + " " + r.time + " \u00b7 " + r.kind + " \u00b7 " + r.slot) + '</span>' +
+        '<button type="button" data-del="' + esc(r.id) + '" aria-label="Delete the record from ' + esc(r.date + " " + r.time) + '">Delete</button></li>').join("") +
+      '</ul></details>' : "");
+}
+$("patBody").addEventListener("click", e => {
+  const b = e.target.closest("[data-del]");
+  if(!b || !confirm("Delete this saved record? This cannot be undone.")) return;
+  const person = state().initials;
+  GSN.storage.history.remove(b.dataset.del).then(() => {
+    historyCache[person] = (historyCache[person] || []).filter(r => r.id !== b.dataset.del);
+    patSig = ""; render();
+  });
+});
+
+/* ============================================================
+   Questions from the person's profile
+   ============================================================ */
+let promptAnswers = {};        // "rule.prompt" -> "yes" | "no"
+let promptAsked = {};          // "rule.prompt" -> the question as it read when answered
+let promptSig = "";
+
+/* Rebuilt only when the set of questions changes, so an answer in progress
+   is never wiped; otherwise just the pressed state is brought up to date. */
+function renderPrompts(rules, initials){
+  const box = $("prompts");
+  const withQs = rules.filter(r => r.prompts.length);
+  const sig = withQs.map(r => r.id + ":" + r.prompts.map(p => p.key + "=" + p.text).join(",")).join("|");
+  if(sig !== promptSig){
+    promptSig = sig;
+    box.innerHTML = withQs.length ? '<h3>Questions for ' + esc(initials || "this person") + '</h3>' +
+      '<p>Raised by ' + (initials ? esc(initials) + "&rsquo;s" : "their") + ' profile. Answer only what you know &mdash; nothing is written until you do, and a question left alone adds nothing.</p>' +
+      withQs.map(r => '<div class="pgroup"><h4>' + esc(r.title) + '</h4><p class="preason">Why: ' + esc(r.reason) + '</p>' +
+        r.prompts.map(p => {
+          const qid = "pq_" + p.key.replace(/\W/g, "_");
+          return '<div class="prow" role="group" aria-labelledby="' + qid + '"><span id="' + qid + '">' + esc(p.text) + '</span>' +
+            '<span class="pbtns">' + ["yes", "no"].map(a =>
+              '<button type="button" class="pbtn" data-key="' + esc(p.key) + '" data-ans="' + a + '" aria-pressed="false">' + (a === "yes" ? "Yes" : "No") + '</button>').join("") +
+            '</span></div>';
+        }).join("") + '</div>').join("") : "";
+  }
+  box.hidden = !withQs.length;
+  box.querySelectorAll(".pbtn").forEach(b => b.setAttribute("aria-pressed", promptAnswers[b.dataset.key] === b.dataset.ans ? "true" : "false"));
+}
+$("prompts").addEventListener("click", e => {
+  const b = e.target.closest(".pbtn");
+  if(!b) return;
+  const k = b.dataset.key;
+  /* pressing the chosen answer again takes it back */
+  promptAnswers[k] = promptAnswers[k] === b.dataset.ans ? "" : b.dataset.ans;
+  promptAsked[k] = b.closest(".prow").querySelector("span").textContent;
+  render();
+});
+
+function renderContext(profile){
+  const items = contextSummary(profile, FLAGS).concat(CONFIG.customProfileFields
+    .filter(f => profile.custom[f.id]).map(f => f.label + ": " + profile.custom[f.id]));
+  const el = $("ctxLine");
+  el.hidden = !items.length || !profile.initials;
+  const html = '<b>From ' + esc(profile.initials) + '&rsquo;s profile</b>' + items.map(t => '<span>' + esc(t) + '</span>').join("");
+  if(el.innerHTML !== html) el.innerHTML = html;
+  /* the person's usual ways of communicating, marked and one tap away */
+  const usual = profile.comm || [];
+  document.querySelectorAll("#commUsed .chip").forEach(ch => {
+    const v = ch.querySelector("input").value, span = ch.querySelector("span");
+    const want = GSN.core.plain((COMM.find(c => c[0] === v) || ["", ""])[1]) + (usual.includes(v) ? " (usual)" : "");
+    setText(span, want);
+  });
+  const btn = $("commUsual");
+  btn.hidden = !usual.length || usual.every(v => $("commUsed_" + v) && $("commUsed_" + v).checked);
+  btn.textContent = "Used " + (profile.initials || "their") + (profile.initials ? "\u2019s" : "") + " usual methods";
+}
+$("commUsual").addEventListener("click", () => {
+  (profileFromForm().comm || []).forEach(v => { const el = $("commUsed_" + v); if(el) el.checked = true; });
+  render();
+});
+
+/* ============================================================
+   Smart Assist panel
+   ============================================================ */
+let explanations = {};         // contradiction id -> what the staff member wrote
+let saOpen = false;            // "show more" expanded
+const SA_VISIBLE = 6;
+
+/* Findings are patched in place by id rather than redrawn, so an open
+   "Why am I seeing this?" or a half-typed explanation survives each keystroke. */
+function renderSmartAssist(sa){
+  const SEV = GSN.smartAssist.SEVERITY;
+  const list = $("saList");
+  const focusInside = list.contains(document.activeElement);
+  const have = new Map([...list.children].map(li => [li.dataset.id, li]));
+  let prev = null;
+  sa.items.forEach((f, i) => {
+    let li = have.get(f.id);
+    if(!li){ li = saItem(f); have.set(f.id, li); }
+    const sev = f.explained ? "explained" : f.severity;
+    li.className = "sa-item sev-" + sev;
+    setText(li.querySelector(".sa-ic"), f.explained ? "\u2713" : SEV[f.severity].icon);
+    setText(li.querySelector(".sa-lab"), f.explained ? "Explained" : SEV[f.severity].label);
+    setText(li.querySelector(".sa-title"), f.title);
+    setText(li.querySelector(".sa-reason"), f.reason);
+    li.querySelector(".sa-go").hidden = !findField((f.fields || [])[0]);
+    li.querySelector(".sa-go").dataset.field = (f.fields || [])[0] || "";
+    li.querySelector(".sa-ho").hidden = !f.handover;
+    li.querySelector(".sa-ho").dataset.text = f.handover || "";
+    li.hidden = !saOpen && i >= SA_VISIBLE;
+    if(!focusInside){
+      const want = prev ? prev.nextSibling : list.firstChild;
+      if(want !== li) list.insertBefore(li, want);
+    } else if(!li.parentNode) list.appendChild(li);
+    prev = li;
+  });
+  const live = new Set(sa.items.map(f => f.id));
+  have.forEach((li, id) => { if(!live.has(id) && !li.contains(document.activeElement)) li.remove(); });
+
+  const extra = sa.items.length - SA_VISIBLE;
+  $("saMore").hidden = extra <= 0;
+  $("saMore").textContent = saOpen ? "Show fewer" : "Show " + extra + " more";
+  $("saMore").setAttribute("aria-expanded", saOpen ? "true" : "false");
+
+  const c = sa.counts, parts = [];
+  if(c.critical) parts.push(c.critical + " critical");
+  if(c.review) parts.push(c.review + " to review");
+  if(c.missing) parts.push(c.missing + " missing");
+  if(c.suggestion) parts.push(c.suggestion + (c.suggestion === 1 ? " suggestion" : " suggestions"));
+  if(c.explained) parts.push(c.explained + " explained");
+  setText($("saSum"), parts.length ? parts.join(" \u00b7 ") : "Nothing needs your attention.");
+  $("dockReview").textContent = c.critical + c.review ? " \u00b7 " + (c.critical + c.review) + " to review" : "";
+
+  /* independence evidence */
+  const ind = sa.independence, box = $("saInd");
+  box.hidden = !ind.total;
+  if(ind.total){
+    const own = ind.by.ind.concat(ind.by.prompt, ind.by.min);
+    box.innerHTML = '<h3>Independence evidence</h3><ul>' + ind.lines.map(l => '<li>' + esc(l) + '</li>').join("") + '</ul>' +
+      (own.length ? '<p>What ' + esc(state().initials || "they") + ' did: <b>' + esc(own.join(", ")) + '</b></p>' : "");
+  }
+
+  $("saPass").innerHTML = sa.passes.map(p => '<li><span aria-hidden="true">\u2713</span> ' + esc(p) + '</li>').join("");
+  $("saStrength").hidden = !sa.strengths;
+  setText($("saStrength"), sa.strengths);
+
+  /* choices a rule points to are marked on the form, with the reason on hover */
+  document.querySelectorAll(".chip.sug").forEach(ch => { ch.classList.remove("sug"); ch.removeAttribute("title"); });
+  sa.rules.forEach(r => r.highlight.forEach(h => {
+    const el = $(h.replace(".", "_"));
+    if(el && el.closest(".chip")){ el.closest(".chip").classList.add("sug"); el.closest(".chip").title = r.reason; }
+  }));
+}
+
+function saItem(f){
+  const li = document.createElement("li");
+  li.dataset.id = f.id;
+  li.innerHTML =
+    '<span class="sa-sev"><span class="sa-ic" aria-hidden="true"></span><span class="sa-lab"></span></span>' +
+    '<div class="sa-body"><p class="sa-title"></p>' +
+    '<details class="sa-why"><summary>Why am I seeing this?</summary><p class="sa-reason"></p></details>' +
+    '<div class="sa-acts"><button type="button" class="sa-go">Show me</button>' +
+    '<button type="button" class="sa-ho" hidden>Add to handover</button>' +
+    (f.explain ? '<button type="button" class="sa-exp-btn" aria-expanded="false">Explain</button>' : "") + '</div>' +
+    (f.explain ? '<div class="sa-explain" hidden><label for="exp_' + f.explain + '">Explain what happened (added to the note word for word)</label>' +
+                 '<textarea id="exp_' + f.explain + '" data-explain="' + f.explain + '" rows="2"></textarea></div>' : "") +
+    '</div>';
+  if(f.explain && explanations[f.explain]){
+    li.querySelector("textarea").value = explanations[f.explain];
+    li.querySelector(".sa-explain").hidden = false;
+  }
+  return li;
+}
+
+const setText = (el, t) => { if(el && el.textContent !== t) el.textContent = t; };
+
+/* the input to jump to for a field name used by the engines */
+function findField(name){
+  if(!name) return null;
+  const k = $("kind").value;
+  const m = /^tasks\.(\w+)\.level$/.exec(name);
+  if(m) return $("lvl_" + k + "_" + m[1]);
+  if(name === "tasks") return document.querySelector('#tasks .task:not([hidden]) input');
+  if(name.startsWith("prompt:")) return document.querySelector('.pbtn[data-key="' + name.slice(7) + '"]');
+  if(name === "resp") return document.querySelector('#resp .chip:not([hidden]) input, #respc .chip:not([hidden]) input');
+  const el = $(name);
+  if(!el) return null;
+  if(/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName)) return el.closest("[hidden]") ? null : el;
+  return el.querySelector('.chip:not([hidden]) input') || el.querySelector("input, select, textarea");
+}
+
+$("saList").addEventListener("input", e => {
+  const id = e.target.dataset && e.target.dataset.explain;
+  if(id) explanations[id] = e.target.value;
+});
+$("saList").addEventListener("click", e => {
+  const go = e.target.closest(".sa-go");
+  if(go){
+    const el = findField(go.dataset.field);
+    if(el){ el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" }); el.focus({ preventScroll: true }); }
+    return;
+  }
+  /* staff choose to add a factual line; nothing is added for them */
+  const ho = e.target.closest(".sa-ho");
+  if(ho){
+    const box = $("handover"), line = ho.dataset.text;
+    box.value = box.value.trim() ? box.value.trim().replace(/([^.!?])$/, "$1.") + " " + line : line;
+    box.dispatchEvent(new Event("input", { bubbles: true }));
+    box.focus();
+    return;
+  }
+  const ex = e.target.closest(".sa-exp-btn");
+  if(ex){
+    const box = ex.closest(".sa-body").querySelector(".sa-explain");
+    box.hidden = !box.hidden;
+    ex.setAttribute("aria-expanded", box.hidden ? "false" : "true");
+    if(!box.hidden) box.querySelector("textarea").focus();
+  }
+});
+$("saMore").addEventListener("click", () => { saOpen = !saOpen; render(); });
 
 function renderFields(s){
   let rows = [];
   const bank = TASKS[s.kind];
-  const LVLTEXT = {ind:"Independent", prompt:"Prompted", part:"Assisted", full:"Full support", declined:"Declined"};
+  const LVLTEXT = {ind:"Independent", prompt:"Prompted", min:"Minimal assistance", part:"Assisted", full:"Full support", declined:"Declined"};
+  Object.keys(LVLTEXT).forEach(l => { LVLTEXT[l] = GSN.config.recordValue(CONFIG, l, LVLTEXT[l]); });
 
   if(s.kind === "personal" && s.consent) rows.push(["Consent to personal care obtained?", s.consent === "no" ? "No" : "Yes"]);
   s.tasks.forEach(t => {
@@ -398,10 +557,14 @@ function renderFields(s){
   });
   rows = [...seen.entries()];
 
+  /* built as text, so nothing typed or configured is ever read as markup */
   const el = $("nf");
-  el.innerHTML = rows.length
-    ? rows.map(r => '<div class="nf-row"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>').join("")
-    : '<div class="nf-empty">Tick the tasks in step 3 and the matching record fields appear here.</div>';
+  el.replaceChildren(...(rows.length ? rows.map(r => {
+    const row = document.createElement("div"), k = document.createElement("span"), v = document.createElement("span");
+    row.className = "nf-row"; k.textContent = GSN.core.plain(r[0]); v.textContent = GSN.core.plain(r[1]);
+    row.append(k, v);
+    return row;
+  }) : [Object.assign(document.createElement("div"), { className: "nf-empty", textContent: "Tick the tasks in step 3 and the matching record fields appear here." })]));
 }
 
 /* show only the fields that belong to this interaction */
@@ -433,6 +596,26 @@ function syncVisibility(s){
   $("declWrap").hidden   = !["declined","delayed","declinedgo","reluctant"].includes(s.resp) && s.consent !== "no";
   $("chosenWrap").hidden = !(s.resp === "choseA" || s.resp === "choseB");
   document.querySelector('#skin').closest('fieldset').hidden = s.kind !== "personal";
+
+  /* safety choices that belong to a journey appear only with that journey;
+     the task rows were only just unhidden, so read them afresh */
+  const tasksNow = readTasks();
+  const f = GSN.rules.facts({ s: Object.assign({}, s, { tasks: tasksNow }), profile: { flags: s.flags } });
+  const travelOpt = (f.task.travel || {}).opt || "";
+  let journeyHidden = false;
+  RISK.forEach(([id]) => {
+    const sc = RISK_SCOPE[id] || "all";
+    const ok = sc === "all" || (sc === "out" ? f.out
+             : (f.travel && JOURNEY[sc].includes(travelOpt)) || (sc === "vehicle" && s.slot === "drive") || ((sc === "stop" || sc === "fare") && s.slot === "bus"));
+    if(!ok && f.out) journeyHidden = true;
+    showChip("risk_" + id, ok);
+  });
+  $("riskHint").hidden = !(s.kind === "activity" && !f.travel && journeyHidden);
+  const tick = id => tasksNow.some(t => t.id === id);
+  showGroup("dignityWrap", s.kind === "personal");
+  showGroup("contObsWrap", s.kind === "personal" && (s.slot === "continence" || tick("continence") || s.flags.includes("continence")));
+  showGroup("sleepObsWrap", s.kind === "personal" && (s.slot === "night" || tick("sleepcheck") || tick("settle")));
+  $("behOtherWrap").hidden = !s.behaviour.includes("other");
   $("taskHint").innerHTML = college
     ? "Tick <b>Travelling there</b> and <b>Taking part</b> \u2014 the journey and the session are what a college note has to evidence."
     : s.kind === "activity"
@@ -446,6 +629,19 @@ function syncVisibility(s){
     input.closest(".chip").hidden = !ok;
     if(!ok && input.checked) input.checked = false;   // never leave a hidden answer selected
   });
+}
+
+/* a hidden choice is never left selected, so it cannot reach the note */
+function showChip(id, ok){
+  const el = $(id);
+  if(!el) return;
+  el.closest(".chip").hidden = !ok;
+  if(!ok && el.checked) el.checked = false;
+}
+function showGroup(id, ok){
+  const el = $(id);
+  el.hidden = !ok;
+  if(!ok) el.querySelectorAll("input:checked").forEach(i => { i.checked = false; });
 }
 
 /* ============================================================
@@ -462,8 +658,8 @@ function ttRow(r){
       '<option value="' + d[0] + '"' + (String(r.d) === d[0] ? ' selected' : '') + '>' + d[1] + '</option>').join("") + '</select>' +
     '<select class="tt-c" aria-label="Course">' + COURSES.map(c =>
       '<option value="' + c[0] + '"' + (r.c === c[0] ? ' selected' : '') + '>' + c[1] + '</option>').join("") + '</select>' +
-    '<input type="time" class="tt-from" aria-label="Starts" value="' + (r.from || "") + '">' +
-    '<input type="time" class="tt-to" aria-label="Ends" value="' + (r.to || "") + '">' +
+    '<input type="time" class="tt-from" aria-label="Starts" value="' + esc(r.from || "") + '">' +
+    '<input type="time" class="tt-to" aria-label="Ends" value="' + esc(r.to || "") + '">' +
     '<button type="button" class="tt-x" aria-label="Remove this session">&times;</button></div>';
 }
 function renderTT(list){
@@ -508,20 +704,42 @@ function applyTodaySession(){
     (cur.to ? "\u2013" + cur.to : "") + ", " + courseLabel(cur.c) + ". Change it if today ran differently.";
 }
 
-const PROFILE_FIELDS = ["initials","pronoun","ratio"];
+/* the "more about this person" fields, built from the profile schema */
+function renderProfileFields(){
+  $("profileFields").innerHTML = PROFILE_SECTIONS.map(sec =>
+    '<fieldset class="pf-sec"><legend>' + esc(sec.title) + '</legend><div class="grid">' + sec.fields.map(fd => {
+      const id = "pf_" + fd.id, lab = '<label for="' + id + '">' + esc(fd.label) + '</label>';
+      const ph = fd.placeholder ? ' placeholder="' + esc(fd.placeholder) + '"' : "";
+      if(fd.type === "select")
+        return '<div class="f">' + lab + '<select id="' + id + '">' + fd.options.map(o => '<option value="' + esc(o[0]) + '">' + esc(o[1]) + '</option>').join("") + '</select></div>';
+      if(fd.type === "textarea")
+        return '<div class="f" style="grid-column:1/-1">' + lab + '<textarea id="' + id + '" rows="2"' + ph + '></textarea></div>';
+      if(fd.type === "number")
+        return '<div class="f">' + lab + '<input type="number" id="' + id + '" min="' + fd.min + '" max="' + fd.max + '" step="' + fd.step + '" inputmode="numeric"' + ph + '></div>';
+      return '<div class="f">' + lab + '<input type="text" id="' + id + '" autocomplete="off"' + ph + '></div>';
+    }).join("") + '</div></fieldset>').join("");
+}
+renderProfileFields();
 
 function profileFromForm(){
-  return { initials: $("initials").value.trim().toUpperCase(), pronoun: $("pronoun").value,
-           ratio: $("ratio").value, comm: checked("comm"), flags: checked("flags"),
-           timetable: readTT() };
+  const raw = { initials: $("initials").value, pronoun: $("pronoun").value,
+                ratio: $("ratio").value, comm: checked("comm"), flags: checked("flags"),
+                timetable: readTT() };
+  GSN.profiles.FIELD_IDS.forEach(id => { raw[id] = $("pf_" + id).value; });
+  raw.custom = {};
+  CONFIG.customProfileFields.forEach(f => { raw.custom[f.id] = $("pf_custom." + f.id).value; });
+  return normalizeProfile(raw, FLAGS, COMM);
 }
 function applyProfile(pr){
-  $("initials").value = pr.initials || "";
-  $("pronoun").value  = pr.pronoun  || "he";
-  $("ratio").value    = pr.ratio    || "";
+  pr = normalizeProfile(Object.assign({ pronoun: "he" }, pr), FLAGS, COMM);
+  $("initials").value = pr.initials;
+  $("pronoun").value  = pr.pronoun;
+  $("ratio").value    = pr.ratio;
   document.querySelectorAll('#comm input, #flags input').forEach(i => { i.checked = false; });
-  (pr.comm  || []).forEach(v => { const el = $("comm_"  + v); if(el) el.checked = true; });
-  (pr.flags || []).forEach(v => { const el = $("flags_" + v); if(el) el.checked = true; });
+  pr.comm.forEach(v => { const el = $("comm_"  + v); if(el) el.checked = true; });
+  pr.flags.forEach(v => { const el = $("flags_" + v); if(el) el.checked = true; });
+  GSN.profiles.FIELD_IDS.forEach(id => { $("pf_" + id).value = pr[id]; });
+  CONFIG.customProfileFields.forEach(f => { $("pf_custom." + f.id).value = pr.custom[f.id] || ""; });
   renderTT(pr.timetable);
 }
 /* keep the store in step with the form, renaming rather than duplicating
@@ -540,15 +758,19 @@ function syncPerson(){
 function loadPerson(name){
   const pr = (store.people || {})[name];
   if(!pr) return;
+  /* tapping the person already open changes nothing; anyone else starts a clean entry */
+  if(name !== store.active) resetInteraction("Switched to " + name + " \u2014 the previous entry was cleared.");
   store.active = name; save();
   applyProfile(pr);
   applyTodaySession();
+  prefillActivity();
   reseed();
   if(!one("setting")) $("setting_community").checked = true;
   renderPeople();
   render();
 }
 function newPerson(){
+  resetInteraction("New person \u2014 the previous entry was cleared.");
   store.active = null; save();
   applyProfile({ pronoun: "he" });
   renderPeople();
@@ -557,20 +779,25 @@ function newPerson(){
 }
 function removePerson(name){
   if(!(store.people || {})[name]) return;
+  if(!confirm("Remove " + name + " from this device? Their profile" + (historyOn() ? " and saved history" : "") + " will be deleted. This cannot be undone.")) return;
+  GSN.storage.history.deletePerson(name).catch(() => {});
+  delete historyCache[name];
   delete store.people[name];
   const left = Object.keys(store.people);
   store.active = left[0] || null;
   save();
+  resetInteraction(name + " was removed \u2014 the entry was cleared.");
   if(store.active) applyProfile(store.people[store.active]); else applyProfile({ pronoun: "he" });
+  applyTodaySession(); prefillActivity();
   reseed(); renderPeople(); render();
 }
 function renderPeople(){
   const names = Object.keys(store.people || {}).sort();
   const el = $("people");
-  el.innerHTML = names.map(n =>
-      '<button type="button" class="pchip' + (n === store.active ? ' on' : '') + '" data-person="' + n + '">' +
-      n + (n === store.active ? '<span class="x" data-remove="' + n + '" role="button" aria-label="Remove ' + n + '">&times;</span>' : '') +
-      '</button>').join("") +
+  el.innerHTML = names.map(n => '<span class="pwrap">' +
+      '<button type="button" class="pchip' + (n === store.active ? ' on' : '') + '" data-person="' + esc(n) + '" aria-pressed="' + (n === store.active) + '">' + esc(n) + '</button>' +
+      (n === store.active ? '<button type="button" class="px" data-remove="' + esc(n) + '" aria-label="Remove ' + esc(n) + ' from this device">&times;</button>' : '') +
+      '</span>').join("") +
     '<button type="button" class="pchip add" data-new="1">+ Add person</button>';
   el.title = names.length ? "Tap a person to load their details" : "";
 }
@@ -604,6 +831,13 @@ chips("outcome", OUTCOME, "radio");
 chips("setting", ACT_SETTING, "radio");
 chips("learn", LEARN, "checkbox");
 chips("respc", RESP_COLLEGE, "radio");
+chips("commUsed", COMM, "checkbox");
+chips("dignity", DIGNITY, "checkbox");
+chips("contObs", CONT_OBS, "checkbox");
+chips("sleepObs", SLEEP_OBS, "checkbox");
+chips("behaviour", BEHAVIOUR, "checkbox");
+chips("followup", FOLLOWUP, "checkbox");
+$("staffing").innerHTML = STAFFING.map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join("");
 
 function buildTasks(){
   let html = "";
@@ -642,20 +876,30 @@ buildTasks();
    produced notes like "offered the cooking ... he chose a shower", so switching
    type clears the entry and says so. */
 const SCOPED_TEXT = ["offerA","offerB","chosen","declined","whatAte","drinkChoice",
-                     "offered","drunk","skinDetail","extra","handover","actOther"];
-const SCOPED_CHIPS = ["resp","how","consent","skin","mood","well","risk","outcome"];
+                     "offered","drunk","skinDetail","extra","handover","actOther","behaviourOther","sessionTo"];
+const SCOPED_CHIPS = ["resp","how","consent","skin","mood","well","risk","outcome","learn",
+                      "commUsed","dignity","contObs","sleepObs","behaviour","followup"];
 
-function resetInteraction(){
+/* Everything below the person belongs to one entry, for one person. It is
+   cleared when the interaction type changes and when staff move on to
+   someone else - the type, meal or activity and time stay, because the next
+   person is often having the same lunch. The confirmation always goes: it
+   vouches for one particular note. */
+function resetInteraction(message){
   SCOPED_TEXT.forEach(id => { $(id).value = ""; });
+  $("attest").checked = false;
   SCOPED_CHIPS.forEach(g => document.querySelectorAll('#'+g+' input').forEach(i => { i.checked = false; }));
-  $("ate").value = ""; $("level").value = "";
+  $("ate").value = ""; $("level").value = ""; $("staffing").value = "";
   document.querySelectorAll('#tasks .task').forEach(row => {
     const box = row.querySelector('input[type=checkbox]');
     box.checked = false; row.classList.remove("on");
     const lvl = row.querySelector('select.lvl'); if(lvl) lvl.value = "";
   });
   lastActPhrase = "";
-  flash("Switched interaction \u2014 the previous entry was cleared.");
+  explanations = {};
+  promptAnswers = {}; promptAsked = {};
+  recordId = newRecordId();
+  flash(message || "Switched interaction \u2014 the previous entry was cleared.");
 }
 
 let flashTimer = null;
@@ -671,7 +915,8 @@ let lastActPhrase = "";
 function prefillActivity(){
   if($("kind").value !== "activity"){ lastActPhrase = ""; return; }
   if((one("setting") || "community") === "college"){ lastActPhrase = ""; return; }
-  const phrase = T(actPhrase(state(), 2), state());
+  const st = state();
+  const phrase = GSN.core.fill(GSN.core.plain(GSN.narrative.actPhrase(st, 2)), GSN.core.personVars(st.initials, st.pronoun));
   const a = $("offerA");
   if(!a.value.trim() || a.value.trim() === lastActPhrase) a.value = phrase;
   const resp = (document.querySelector('#resp input:checked')||{}).value;
@@ -702,7 +947,7 @@ fillSlots();
 const PERSON_INPUTS = new Set(["initials","pronoun","ratio"]);
 function onEdit(e){
   const t = e.target;
-  const isPerson = PERSON_INPUTS.has(t.id) || t.closest("#comm") || t.closest("#flags");
+  const isPerson = PERSON_INPUTS.has(t.id) || t.closest("#comm") || t.closest("#flags") || t.closest("#profileFields");
   if(isPerson){ syncPerson(); renderPeople(); }
   if(isPerson || t.id === "kind" || t.id === "slot") reseed();
   render();
@@ -713,24 +958,60 @@ document.addEventListener("change", e => {
   if(e.target.closest && e.target.closest("#tt")){ syncPerson(); }
   if(e.target.closest && e.target.closest("#setting")){ fillSlots(); prefillActivity(); applyTodaySession(); }
   if(e.target.id === "slot" || e.target.id === "actOther") prefillActivity();
+  if(e.target.id === "slot") recordId = newRecordId();
   onEdit(e);
 });
 
+/* Reword changes the wording and nothing else. The new note's facts are
+   compared with the old one's; a wording that changed any fact is thrown
+   away and another tried, and if none holds the note stays as it was. */
+let rewordCheck = "";
 $("reword").addEventListener("click", () => {
+  const before = lastBuild, oldSalt = salt, oldAvoid = onScreen;
   onScreen = Object.assign({}, chosenIdx);
-  salt = Math.floor(Math.random() * 1e9);
-  render();
-  onScreen = {};
+  let check = { same: true, why: [] };
+  for(let i = 0; i < 8; i++){
+    salt = Math.floor(Math.random() * 1e9);
+    render();
+    check = before ? GSN.provenance.sameFacts(before, lastBuild, lastState) : check;
+    if(check.same) break;
+  }
+  if(!check.same){ salt = oldSalt; onScreen = oldAvoid; render(); }
+  rewordCheck = check.same ? "Reworded: every fact, number and time is unchanged."
+                           : "Rewording was refused because " + check.why.join("; ") + ". The note was left as it was.";
+  /* onScreen stays set, so later edits keep steering away from the old
+     wording instead of drifting back to it; it resets with the next entry */
+  renderProvenance();
 });
+
+/* developer view: each sentence, and the fields it was built from */
+function renderProvenance(){
+  const box = $("prov");
+  box.hidden = !store.dev;
+  $("devToggle").setAttribute("aria-pressed", store.dev ? "true" : "false");
+  if(!store.dev || !lastBuild) return;
+  const P = GSN.provenance, problems = P.verify(lastBuild.sentences, lastState);
+  box.innerHTML = '<h3>Where each sentence came from</h3>' +
+    '<p class="' + (problems.length ? "bad" : "good") + '">' + (problems.length
+      ? esc(problems.length + " sentence(s) cannot be traced: " + problems.map(x => x.problem).join("; "))
+      : "Every sentence traces to something entered on this form.") + '</p>' +
+    (rewordCheck ? '<p class="good">' + esc(rewordCheck) + '</p>' : "") +
+    '<ol>' + lastBuild.sentences.map(x => '<li><span>' + esc(x.text) + '</span><ul>' +
+      x.sources.map(p => '<li><code>' + esc(p) + '</code> ' + esc(P.label(p)) + ' = <b>' + esc(P.resolve(lastState, p)) + '</b></li>').join("") +
+      '</ul></li>').join("") + '</ol>';
+}
+$("devToggle").addEventListener("click", () => { store.dev = !store.dev; save(); renderProvenance(); });
 
 function doCopy(){
   const txt = noteText;
   const done = () => {
     commitHistory();
+    saveRecord();
     store.last = store.last || {};
     store.last[histKey()] = txt;
     syncPerson();
     salt = Math.floor(Math.random() * 1e9);
+    onScreen = {};
     const b = $("copy"), d = $("dockCopy"), old = b.textContent;
     b.textContent = "Copied"; d.textContent = "Copied";
     setTimeout(() => { b.textContent = old; d.textContent = "Copy"; }, 1600);
@@ -747,6 +1028,21 @@ function doCopy(){
     document.body.removeChild(ta); done();
   }
 }
+/* a copied note is a finished one: keep what it observed, if history is on */
+function saveRecord(){
+  if(!historyOn() || !lastState || !lastState.initials) return;
+  const id = entryId(lastState);
+  const rec = GSN.patterns.toRecord(lastState, { id });
+  const person = rec.person;
+  lastSaved = { id, sig: recordSig(rec) };
+  if(id === recordId) recordId = newRecordId();
+  GSN.storage.history.put(rec).then(() => {
+    historyCache[person] = (historyCache[person] || []).filter(r => r.id !== rec.id).concat([rec]);
+    patSig = ""; render();
+    setText($("why"), "Copied, and saved to this device\u2019s history.");
+  }).catch(() => setText($("why"), "Copied. It could not be saved to history on this device."));
+}
+
 $("copy").addEventListener("click", doCopy);
 $("dockCopy").addEventListener("click", doCopy);
 $("dockJump").addEventListener("click", () => $("out").scrollIntoView({behavior:"smooth", block:"center"}));
@@ -757,10 +1053,32 @@ $("theme").addEventListener("click", () => {
   document.documentElement.setAttribute("data-theme", dark ? "light" : "dark");
 });
 
+/* ============================================================
+   What the settings screen (settings.js) needs from the page
+   ============================================================ */
+GSN.app = {
+  key: KEY, store: () => store, save, render, state, config: CONFIG, historyOn,
+  forgetHistory(person){ if(person) historyCache[person] = []; else historyCache = {}; patSig = ""; },
+  renderProvenance
+};
+
+/* what a shorter note leaves out, in the words used on the form */
+function omittedLabel(key){
+  const [g, id] = key.split(/_(.+)/);
+  const from = (list, v) => GSN.core.plain((list.find(x => x[0] === v) || ["", v])[1]).toLowerCase();
+  if(g === "task") return GSN.rules.taskLabel($("kind").value, id).toLowerCase();
+  const lists = { comm: COMM, how: HOW, risk: RISK, dig: DIGNITY, learn: LEARN, mood: MOOD, well: WELL };
+  if(lists[g]) return from(lists[g], id);
+  return { session: "session times", offer: "the option offered", level: "the overall support level", fluid: "the drink chosen",
+           skin: "the skin check", prompt: "an answer to a profile question" }[g] || "a detail";
+}
+$("includeAll").addEventListener("click", () => { $("len").value = "full"; render(); });
+
 /* restore the person from last time, and open on a realistic worked example */
 (function boot(){
   store.device = store.device || (Math.random().toString(36).slice(2) + Date.now().toString(36));
   store.people = store.people || {};
+  store.config = store.config || {};
   /* carry over the single person remembered by earlier versions */
   if(store.person && store.person.initials && !store.people[store.person.initials]){
     store.people[store.person.initials] = store.person;
@@ -785,6 +1103,8 @@ $("theme").addEventListener("click", () => {
     $("resp_choseA").checked = true;
     $("chosen").value = "a shower";
     $("how_said").checked = true;
+    $("commUsed_verbal").checked = true;
+    $("dignity_door").checked = true;
     $("consent_yes").checked = true;
     $("level").value = "min";
     ["wash","oral","shave","dress"].forEach(id => {
@@ -826,7 +1146,7 @@ $("theme").addEventListener("click", () => {
     if(!bank[o[0]] || !bank[o[0]].length) console.warn("No wording for " + name + "." + o[0]);
   }));
   TASKS.personal.concat(TASKS.eating, TASKS.activity).forEach(t =>
-    LEVELS.forEach(l => { if(!t[l[0]] || !t[l[0]].length) console.warn("No wording for task " + t.id + "." + l[0]); }));
+    LEVELS.forEach(l => { if(l[0] && (!t[l[0]] || !t[l[0]].length)) console.warn("No wording for task " + t.id + "." + l[0]); }));
 
   if("serviceWorker" in navigator && location.protocol === "https:")
     navigator.serviceWorker.register("sw.js").catch(() => {});

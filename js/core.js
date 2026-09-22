@@ -21,16 +21,32 @@ function hashStr(str){
 
 const toMins = t => { const [h,m] = (t || "0:0").split(":").map(Number); return (h||0)*60 + (m||0); };
 
-function durText(a, b){
-  const d = toMins(b) - toMins(a);
-  if(d <= 0) return "";
-  const h = Math.floor(d / 60), m = d % 60;
-  const words = ["","one hour","two hours","three hours","four hours","five hours","six hours"];
-  const H = words[h] || (h + " hours");
-  if(h && m) return H + " and " + m + " minutes";
-  if(h) return H;
-  return m + " minutes";
+/* {token} substitution, twice over so a value can itself carry a pronoun
+   token (e.g. an option of "{p} teeth"). Unknown tokens are left visible
+   rather than silently dropped. */
+function fill(str, map){
+  if(!str) return "";
+  const once = t => t.replace(/\{(\w+)\}/g, (m, k) => (k in map) ? map[k] : m);
+  return once(once(str));
 }
 
-G.core = { PRON, cap, hashStr, toMins, durText };
+/* the tokens that refer to the person: {N} initials, {s}/{S} he, {o} him,
+   {p}/{P} his, {r} himself, and the verbs that change with they/them */
+function personVars(initials, pronoun){
+  const pr = PRON[pronoun] || PRON.they;
+  return { N: initials || "[Initials]", s: pr.s, S: cap(pr.s), o: pr.o, p: pr.p, P: cap(pr.p), r: pr.r,
+           vbe: pr.vbe, vhave: pr.vhave };
+}
+
+/* labels in the data carry HTML entities; text built for reading must not */
+const plain = s => String(s == null ? "" : s).replace(/&mdash;/g, "\u2014").replace(/&ndash;/g, "\u2013")
+  .replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+
+/* anything that did not come from our own source goes through this before innerHTML */
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+
+const present = v => Array.isArray(v) ? v.length > 0 : v !== undefined && v !== null && String(v).trim() !== "";
+
+G.core = { PRON, cap, hashStr, toMins, fill, personVars, plain, esc, present };
 })(globalThis.GSN = globalThis.GSN || {});

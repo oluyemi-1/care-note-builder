@@ -4,18 +4,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Gold Standard Notes</title>
 <link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#0E5A63">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="css/app.css">
 
+<a class="skip" href="#noteCard">Skip to the note</a>
 <div class="wrap">
   <header class="mast">
     <div>
+      <p class="org" id="orgLine" hidden></p>
       <h1>Gold Standard Notes</h1>
       <p class="sub">Answer what actually happened on the shift. The builder writes a fresh, person-centred daily care note — worded differently every time, so no two entries read like a paste of the last one.</p>
     </div>
+    <div class="mast-r">
+    <button type="button" class="tog" id="openSettings">Settings &amp; data</button>
     <div class="spine" aria-label="Recording spine">
       <span>Offer</span><i>&rarr;</i><span>Choice</span><i>&rarr;</i><span>Support</span><i>&rarr;</i><span>Independence</span><i>&rarr;</i><span>Observation</span><i>&rarr;</i><span>Outcome</span>
+    </div>
     </div>
   </header>
 
@@ -23,16 +29,17 @@
 
   <div class="cols">
     <!-- ================= FORM ================= -->
-    <div>
+    <main id="main">
       <section class="step">
-        <header><span class="num">&#9679;</span><h2>The person</h2><span class="hint">Saved on this device only</span></header>
+        <header><span class="num">&#9679;</span><h2 id="personHead">The person</h2><span class="hint">Saved on this device only</span></header>
         <div class="body">
           <div class="people" id="people"></div>
+          <div class="context" id="ctxLine" hidden></div>
           <div class="grid">
             <div class="f"><label for="initials">Initials</label><input type="text" id="initials" maxlength="4" placeholder="e.g. MA" autocomplete="off"></div>
             <div class="f"><label for="pronoun">Pronouns</label>
               <select id="pronoun"><option value="he">He / him</option><option value="she">She / her</option><option value="they">They / them</option></select></div>
-            <div class="f"><label for="ratio">Staffing</label>
+            <div class="f"><label for="ratio">Usual staffing</label>
               <select id="ratio"><option value="">Not stated</option><option value="1:1">1:1 support</option><option value="2:1">2:1 support</option><option value="shared">Shared staffing</option></select></div>
           </div>
           <div class="rule"></div>
@@ -40,9 +47,15 @@
             <div class="chips" id="comm"></div>
           </fieldset>
           <div class="rule"></div>
-          <fieldset><legend>Standing health &amp; risk notes (shape the wording)</legend>
+          <fieldset><legend>Standing needs &amp; risks (shape the questions asked)</legend>
             <div class="chips" id="flags"></div>
           </fieldset>
+          <div class="rule"></div>
+          <details class="more" id="profileMore">
+            <summary>More about this person <span>needs, routines, preferences</span></summary>
+            <p class="note-inline">Context for the questions the builder asks. Nothing here is ever written into a note.</p>
+            <div id="profileFields"></div>
+          </details>
           <div class="rule"></div>
           <fieldset>
             <legend>College timetable</legend>
@@ -71,9 +84,14 @@
               </select></div>
             <div class="f" id="slotWrap"><label for="slot">Which one</label><select id="slot"></select></div>
             <div class="f"><label for="time">Time</label><input type="time" id="time"></div>
+            <div class="f"><label for="staffing">Staffing this time</label><select id="staffing"></select></div>
             <div class="f" id="sessionToWrap" hidden><label for="sessionTo">Session ended</label><input type="time" id="sessionTo"></div>
             <div class="f" id="actOtherWrap" hidden><label for="actOther">Name the activity</label><input type="text" id="actOther" placeholder="e.g. a trip to the library" autocomplete="off"></div>
           </div>
+          <fieldset style="margin-top:14px"><legend>How staff communicated this time</legend>
+            <div class="chips" id="commUsed"></div>
+            <button type="button" class="pchip add" id="commUsual" hidden style="margin-top:8px"></button>
+          </fieldset>
           <div class="rule"></div>
           <div id="offerWrap">
           <div class="f"><label for="offerA">Option offered</label><input type="text" id="offerA" placeholder="e.g. a shower" autocomplete="off"></div>
@@ -115,6 +133,7 @@
       <section class="step">
         <header><span class="num">4</span><h2>Observation</h2><span class="hint">Only what you actually saw</span></header>
         <div class="body stack">
+          <div class="prompts" id="prompts" hidden></div>
           <div class="grid" id="intakeWrap" hidden>
             <div class="f"><label for="ate">Amount eaten (%)</label>
               <select id="ate"><option value="">&mdash;</option><option>All</option><option>Most</option><option>About half</option><option>A small amount</option><option>None</option></select></div>
@@ -125,13 +144,24 @@
             <div class="f"><label for="offered">Offered (mls)</label><input type="number" id="offered" min="0" step="10" inputmode="numeric"></div>
             <div class="f"><label for="drunk">Drunk (mls)</label><input type="number" id="drunk" min="0" step="10" inputmode="numeric"></div>
           </div>
+          <p class="note-inline" id="fluidToday" hidden style="margin-top:-4px"></p>
           <fieldset><legend>Skin (personal care)</legend><div class="chips" id="skin"></div></fieldset>
           <div class="f" id="skinWrap" hidden><label for="skinDetail">What you saw and where</label>
             <input type="text" id="skinDetail" placeholder="e.g. a small red area on his left heel" autocomplete="off"></div>
+          <fieldset id="dignityWrap" hidden><legend>Privacy &amp; dignity &mdash; what you did</legend><div class="chips" id="dignity"></div></fieldset>
+          <fieldset id="contObsWrap" hidden><legend>Continence &mdash; what you observed</legend><div class="chips" id="contObs"></div></fieldset>
+          <fieldset id="sleepObsWrap" hidden><legend>Sleep &mdash; at the check</legend><div class="chips" id="sleepObs"></div></fieldset>
           <fieldset><legend>How they presented</legend><div class="chips" id="mood"></div></fieldset>
           <fieldset><legend>Wellbeing</legend><div class="chips" id="well"></div></fieldset>
-          <fieldset id="riskWrap" hidden><legend>Keeping them safe &mdash; what you did</legend><div class="chips" id="risk"></div></fieldset>
+          <fieldset id="riskWrap" hidden><legend>Keeping them safe &mdash; what you did</legend><div class="chips" id="risk"></div>
+            <p class="note-inline" id="riskHint" hidden>Journey safety choices appear when you tick <b>Travelling there</b> in step 3.</p></fieldset>
           <fieldset id="learnWrap" hidden><legend>What they got out of it &mdash; skills and social</legend><div class="chips" id="learn"></div></fieldset>
+          <details class="more" id="behWrap">
+            <summary>Behaviour you observed <span>optional &mdash; describe, don&rsquo;t label</span></summary>
+            <div class="chips" id="behaviour" style="margin-top:10px"></div>
+            <div class="f" id="behOtherWrap" hidden style="margin-top:10px"><label for="behaviourOther">Describe what you observed</label>
+              <input type="text" id="behaviourOther" placeholder="e.g. walked to the door and waited there" autocomplete="off"></div>
+          </details>
         </div>
       </section>
 
@@ -142,18 +172,20 @@
           <div class="f"><label for="extra">Anything else that actually happened</label>
             <textarea id="extra" placeholder="Added to the note word for word. Leave blank if there is nothing."></textarea></div>
           <div class="f"><label for="handover">Handover / follow-up needed</label><input type="text" id="handover" placeholder="e.g. GP to review the red area on Monday" autocomplete="off"></div>
+          <fieldset><legend>What was done about it &mdash; only what actually happened</legend><div class="chips" id="followup"></div></fieldset>
         </div>
       </section>
-    </div>
+    </main>
 
     <!-- ================= RAIL ================= -->
-    <div class="rail">
-      <div class="card" style="margin-bottom:18px">
+    <aside class="rail" aria-label="Your note and checks">
+      <section class="card" style="margin-bottom:18px" id="noteCard" tabindex="-1" aria-label="Daily note">
         <header><h2>Daily note</h2><div class="r">
           <select id="len" class="mini" aria-label="Note length"><option value="short">Short</option><option value="std" selected>Gold standard</option><option value="full">Full detail</option></select>
           <span class="badge ok" id="fresh">Fresh wording</span></div></header>
         <div class="out empty" id="out">Fill in the steps and the note builds itself here.</div>
         <p class="needs" id="needs" hidden></p>
+        <p class="omit" id="omit" hidden><span id="omitText"></span> <button type="button" class="tog" id="includeAll">Include everything</button></p>
         <div class="metrics"><span>Words <b id="wc">0</b></span><span>Sentences <b id="sc">0</b></span><span>Overlap with last note <b id="ov">&mdash;</b></span></div>
         <label class="confirm" for="attest"><input type="checkbox" id="attest">
           <span>I confirm this note reflects <b>what actually happened</b> on my shift.</span></label>
@@ -161,34 +193,108 @@
           <button class="btn primary" id="copy" disabled>Copy note</button>
           <button class="btn" id="reword">Reword it</button>
         </div>
-        <div class="why" id="why"></div>
-      </div>
+        <div class="why" id="why" role="status"></div>
+        <div class="prov" id="prov" hidden></div>
+      </section>
 
-      <div class="card" style="margin-bottom:18px">
-        <header><h2>Set these in your care system</h2></header>
-        <div class="nf-list" id="nf"><div class="nf-empty">Tick the tasks in step 3 and the matching record fields appear here.</div></div>
-      </div>
+      <section class="card sa" style="margin-bottom:18px" aria-labelledby="saHead">
+        <header><h2 id="saHead">Smart Assist</h2><div class="r"><span class="badge" id="auditBadge" title="Organisation audit checks passed">0 / 7</span></div></header>
+        <p class="sa-sum" id="saSum" aria-live="polite"></p>
+        <ul class="sa-list" id="saList"></ul>
+        <button type="button" class="sa-more" id="saMore" hidden aria-controls="saList"></button>
+        <div class="sa-ind" id="saInd" hidden></div>
+        <ul class="sa-pass" id="saPass" aria-label="Already evidenced"></ul>
+        <p class="sa-strength" id="saStrength" hidden></p>
+        <details class="sa-audit"><summary>Organisation audit checks</summary><ul class="audit" id="audit"></ul></details>
+      </section>
+
+      <section class="card" id="patCard" hidden style="margin-bottom:18px" aria-labelledby="patHead">
+        <header><h2 id="patHead">Recent pattern</h2><div class="r"><span class="badge" id="patWindow"></span></div></header>
+        <div class="pat" id="patBody"></div>
+      </section>
 
       <div class="card">
-        <header><h2>Audit check</h2><div class="r"><span class="badge" id="auditBadge">0 / 7</span></div></header>
-        <ul class="audit" id="audit"></ul>
+        <header><h2 id="nfHead">Set these in your care system</h2></header>
+        <div class="nf-list" id="nf"><div class="nf-empty">Tick the tasks in step 3 and the matching record fields appear here.</div></div>
       </div>
-    </div>
+    </aside>
   </div>
 
   <footer class="foot">
     <span>Offer &rarr; choice &rarr; support &rarr; independence &rarr; observation &rarr; outcome. Record only what actually happened.</span>
-    <button class="tog" id="theme">Switch theme</button>
+    <span class="foot-r"><button class="tog" id="devToggle" aria-pressed="false" title="Show which answers each sentence came from">Developer view</button>
+    <button class="tog" id="theme">Switch theme</button></span>
   </footer>
 </div>
 
+<dialog id="settings" aria-labelledby="setHead">
+  <div class="set">
+    <header><h2 id="setHead">Settings &amp; data</h2><button type="button" class="tog" id="closeSettings">Close</button></header>
+    <form id="cfgForm" novalidate>
+      <section class="set-sec">
+        <h3>Your service</h3>
+        <p class="note-inline">Adapt the builder to your organisation. Everything is kept on this device only; use <b>Backup and restore</b> below to copy a setup to other tablets. Saving reloads the page.</p>
+        <div id="cfgBody"></div>
+        <div id="cfgErrors" class="cfg-errors" role="alert" hidden></div>
+        <div class="set-acts">
+          <button type="submit" class="btn primary">Save settings</button>
+          <button type="button" class="btn" id="cfgReset">Reset to the built-in settings</button>
+        </div>
+      </section>
+    </form>
+    <section class="set-sec" aria-labelledby="histHead">
+      <h3 id="histHead">History and patterns</h3>
+      <p class="warn-box" role="note"><b>Kept only in this browser, on this device.</b> Clearing the browser&rsquo;s site data, resetting the tablet or using a different browser loses it. Export a backup regularly.</p>
+      <label class="switch"><input type="checkbox" id="histOn"> <span>Keep structured history on this device</span></label>
+      <p class="note-inline">When a note is copied, what it observed is saved &mdash; amounts, support levels and the choices ticked. The written note and anything typed freehand are never kept. History lets the builder notice changes from each person&rsquo;s own usual pattern.</p>
+      <div class="f" style="max-width:240px"><label for="histWindow">Compare with the last</label>
+        <select id="histWindow"><option value="7">7 days</option><option value="14">14 days</option><option value="28">28 days</option><option value="56">8 weeks</option></select></div>
+      <p class="note-inline" id="histCount" aria-live="polite"></p>
+      <div class="set-acts">
+        <button type="button" class="btn" id="delPersonHist">Delete this person&rsquo;s history</button>
+        <button type="button" class="btn" id="delAllHist">Delete all history</button>
+        <button type="button" class="btn danger" id="clearAll">Clear all data on this device</button>
+      </div>
+    </section>
+    <section class="set-sec" aria-labelledby="bakHead">
+      <h3 id="bakHead">Backup and restore</h3>
+      <p class="warn-box" role="note"><b>A backup file contains profiles and history.</b> Store it only where your organisation allows personal information to be kept. It is created on this device and is not sent anywhere.</p>
+      <div class="set-acts">
+        <div class="f" style="min-width:220px"><label for="expWhat">What to back up</label>
+          <select id="expWhat"><option value="all">Everything</option><option value="config">Provider settings only</option>
+            <option value="people">Profiles only</option><option value="history">History only</option></select></div>
+        <button type="button" class="btn" id="expGo" style="align-self:flex-end">Download backup file</button>
+      </div>
+      <div class="f"><label for="impFile">Restore from a backup file</label><input type="file" id="impFile" accept="application/json,.json"></div>
+      <div id="impResult" class="imp" aria-live="polite" hidden></div>
+    </section>
+    <section class="set-sec">
+      <h3>For developers</h3>
+      <label class="switch"><input type="checkbox" id="devOn"> <span>Show where each sentence came from, under the note</span></label>
+    </section>
+  </div>
+</dialog>
+
 <div class="dock">
-  <span class="t"><b id="dockScore">0 / 7</b> audit checks &middot; <span id="dockWords">0</span> words</span>
+  <span class="t"><b id="dockScore">0 / 7</b> audit checks<span id="dockReview"></span> &middot; <span id="dockWords">0</span> words</span>
   <button class="btn" id="dockJump">See note</button>
   <button class="btn primary" id="dockCopy" disabled>Copy</button>
 </div>
 
 <script src="js/core.js"></script>
 <script src="js/data.js"></script>
+<script src="js/profiles.js"></script>
+<script src="js/rules.js"></script>
+<script src="js/contradictions.js"></script>
+<script src="js/language.js"></script>
+<script src="js/quality.js"></script>
+<script src="js/patterns.js"></script>
+<script src="js/smart-assist.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/provenance.js"></script>
+<script src="js/narrative.js"></script>
+<script src="js/provider-config.js"></script>
+<script src="js/validation.js"></script>
 <script src="js/app.js"></script>
+<script src="js/settings.js"></script>
 </html>
