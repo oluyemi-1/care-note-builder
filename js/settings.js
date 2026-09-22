@@ -14,7 +14,9 @@ const store = A.store;
 
 /* ---------- the service's own words on the page ---------- */
 (function terms(){
-  const org = [CFG.org.name, (G.config.SERVICE_TYPES.find(t => t[0] === CFG.org.service) || ["", ""])[1]].filter(Boolean).join(" · ");
+  /* only what the service actually set - "Not stated" is a choice in the list, not something to show */
+  const type = CFG.org.service ? (G.config.SERVICE_TYPES.find(t => t[0] === CFG.org.service) || ["", ""])[1] : "";
+  const org = [CFG.org.name, type].filter(Boolean).join(" · ");
   $("orgLine").hidden = !org;
   $("orgLine").textContent = org;
   if(CFG.terms.person && CFG.terms.person !== "person") $("personHead").textContent = "The " + CFG.terms.person;
