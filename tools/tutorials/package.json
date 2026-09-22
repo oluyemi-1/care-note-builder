@@ -1,0 +1,8 @@
+{
+  "name": "gold-standard-notes-tutorials",
+  "private": true,
+  "description": "Records the narrated video guide. Not part of the app, which has no dependencies.",
+  "dependencies": {
+    "playwright-core": "1.55.1"
+  }
+}

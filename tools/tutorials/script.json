@@ -1,0 +1,140 @@
+{
+  "tutorials": [
+    {
+      "id": "tour",
+      "title": "Find your way around",
+      "summary": "What is on the screen, and how your answers become a note for your care record.",
+      "steps": [
+        { "id": "welcome", "title": "Answer what happened",
+          "say": "Gold Standard Notes writes a complete, person-centred care note from what actually happened on your shift. There is no account and no internet connection, and nothing you type leaves the device." },
+        { "id": "person", "title": "Start with the person",
+          "say": "At the top is the person you are writing about. Their profile is saved on this tablet, so you only set it up once." },
+        { "id": "steps", "title": "Five short steps",
+          "say": "Below that, five steps follow the order of a good care record: what was offered, their choice, the support you gave, what you observed, and how it ended." },
+        { "id": "note", "title": "The note writes itself",
+          "say": "On the right, the note builds as you answer. It only ever says what you recorded, never anything you did not." },
+        { "id": "assist", "title": "Smart Assist checks it",
+          "say": "Underneath, Smart Assist points out anything missing or inconsistent, and always tells you why." },
+        { "id": "copy", "title": "Copy it into Nourish",
+          "say": "When the note is complete, tick the confirmation and copy it. Then paste it into the daily note box in Nourish." }
+      ]
+    },
+    {
+      "id": "person",
+      "title": "Add a person",
+      "summary": "Set up someone's profile once, so the app asks the right questions about them.",
+      "steps": [
+        { "id": "add", "title": "Add a person",
+          "say": "Tap Add person. Type their initials only, never a full name, and choose their pronouns." },
+        { "id": "comm", "title": "How they communicate",
+          "say": "Tick how they usually communicate. When you write a note, these are marked as their usual methods." },
+        { "id": "needs", "title": "Needs and risks",
+          "say": "Tick any standing needs or risks, such as a choking risk. They decide which questions you are asked. On their own, they never write anything into a note." },
+        { "id": "more", "title": "More about them",
+          "say": "Open More about this person to add details, like a prescribed diet texture or a daily fluid target." },
+        { "id": "context", "title": "A reminder at the top",
+          "say": "Their profile now shows as a reminder at the top of the page, every time you write about them." }
+      ]
+    },
+    {
+      "id": "personal",
+      "title": "Write a personal care note",
+      "summary": "Record a morning routine, from the offer to the outcome, and copy the finished note.",
+      "steps": [
+        { "id": "kind", "title": "Choose the interaction",
+          "say": "Choose the type of interaction, which one it was, and the time." },
+        { "id": "offer", "title": "What was offered",
+          "say": "Record what was offered. Offering two real options is what shows they had a choice." },
+        { "id": "comm", "title": "How you communicated",
+          "say": "Tick how you communicated with them this time. Their usual methods are one tap away." },
+        { "id": "choice", "title": "Their choice and consent",
+          "say": "Record what they chose, how they let you know, and their consent." },
+        { "id": "tasks", "title": "Support and independence",
+          "say": "In step three, tick each task and choose how much help was needed. What they did for themselves is written first." },
+        { "id": "observe", "title": "What you observed",
+          "say": "In step four, record only what you saw. Here, the door was closed for privacy, and nothing new was seen on their skin." },
+        { "id": "outcome", "title": "How it ended",
+          "say": "Then choose how it ended for them." },
+        { "id": "copy", "title": "Confirm and copy",
+          "say": "Read the note, tick the confirmation, and copy it. It pastes into Nourish as one block of text." }
+      ]
+    },
+    {
+      "id": "questions",
+      "title": "Questions from the profile",
+      "summary": "How someone's needs bring up the right questions, and how a safety event is recorded.",
+      "steps": [
+        { "id": "lunch", "title": "A meal for someone at risk",
+          "say": "This person's profile records a choking risk. When you record their lunch, questions appear at the top of step four." },
+        { "id": "why", "title": "Why am I seeing this?",
+          "say": "Each group says why it is there. Nothing goes into the note until you answer." },
+        { "id": "answer", "title": "Answer what you know",
+          "say": "Answer only what you know. Each answer adds exactly one sentence to the note, and a question you leave alone adds nothing." },
+        { "id": "critical", "title": "A safety event",
+          "say": "If you record that choking was observed, Smart Assist marks it as critical, and offers a factual line for the handover. It never says anyone was told, unless you record that yourself." },
+        { "id": "describe", "title": "Describe it in your own words",
+          "say": "The note cannot be copied until you describe what happened, in your own words." }
+      ]
+    },
+    {
+      "id": "review",
+      "title": "When answers don't agree",
+      "summary": "Smart Assist spots answers that cannot both be true, and words that judge rather than describe.",
+      "steps": [
+        { "id": "flag", "title": "Two answers that disagree",
+          "say": "If two answers cannot both be true, Smart Assist flags them for review. Here, the overall support says fully independent, but the wash was done by staff." },
+        { "id": "why", "title": "See the reason",
+          "say": "Open Why am I seeing this, to see the reason." },
+        { "id": "explain", "title": "Correct or explain",
+          "say": "Correct whichever answer is wrong, or tap Explain and say what happened. Your explanation goes into the note word for word, and copying unlocks." },
+        { "id": "words", "title": "Describe, don't label",
+          "say": "Smart Assist also questions vague or judgemental words, like fine, or difficult. It never changes what you typed. It asks what you actually saw." }
+      ]
+    },
+    {
+      "id": "activities",
+      "title": "Activities and college",
+      "summary": "Community activities, the journey there, and college sessions from a weekly timetable.",
+      "steps": [
+        { "id": "walk", "title": "A community activity",
+          "say": "For activities, choose the activity. For someone with a visual impairment, a walk in the community brings up questions about orientation." },
+        { "id": "journey", "title": "The journey",
+          "say": "Tick Travelling there to record the journey. Safety choices for that kind of journey, like waiting together at the stop, then appear." },
+        { "id": "timetable", "title": "A weekly timetable",
+          "say": "For college, add their weekly sessions to their profile, just once." },
+        { "id": "college", "title": "College fills itself in",
+          "say": "Then choose College. Today's course and times fill in from the timetable." },
+        { "id": "skills", "title": "What they gained",
+          "say": "Record the skills they practised, and how they got on with others. That is where a college note shows its value." }
+      ]
+    },
+    {
+      "id": "wording",
+      "title": "Reword, length and sources",
+      "summary": "Fresh wording every time, the right length, and where each sentence came from.",
+      "steps": [
+        { "id": "reword", "title": "Fresh wording",
+          "say": "Reword it gives the same note in fresh wording. It checks that every fact, number and time stays exactly the same." },
+        { "id": "length", "title": "Choose a length",
+          "say": "Short, Gold standard and Full detail change how much is said. If a length leaves something out, the note tells you, and Include everything puts it back." },
+        { "id": "sources", "title": "Where each sentence came from",
+          "say": "Developer view, at the foot of the page, shows which answer each sentence came from. It is there for managers who want to check." }
+      ]
+    },
+    {
+      "id": "data",
+      "title": "Settings, history and backups",
+      "summary": "Set up your service, notice changes in someone's usual pattern, and keep a backup.",
+      "steps": [
+        { "id": "settings", "title": "Your service's settings",
+          "say": "Settings and data lets your service use its own wording. Here, the care-record system is set to Nourish." },
+        { "id": "history", "title": "Keep a history",
+          "say": "Switch on Keep structured history, and each copied note saves what it observed: amounts, levels and choices, never the written note." },
+        { "id": "pattern", "title": "Changes in someone's pattern",
+          "say": "Over time, Recent pattern shows what is usual for each person, and Smart Assist points out a change, like three low meals in a row. It never suggests a diagnosis." },
+        { "id": "backup", "title": "Keep a backup",
+          "say": "Everything stays on this device, so download a backup regularly. Restore it on another tablet to copy the same setup." }
+      ]
+    }
+  ]
+}
