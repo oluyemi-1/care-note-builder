@@ -255,6 +255,7 @@ function render(){
   renderProvenance();
   renderPatterns(built, profile);
   renderSuggest(s);
+  renderCollegeHint(s, profile);
   renderContext(profile);
 
   /* record field mirror */
@@ -519,6 +520,26 @@ function saItem(f){
 
 const setText = (el, t) => { if(el && el.textContent !== t) el.textContent = t; };
 
+/* which numbered step a field lives in, so a finding can point staff there */
+const STEP_OF = { kind: 1, slot: 1, time: 1, staffing: 1, commUsed: 1, offerA: 1, offerB: 1, setting: 1, sessionTo: 1, actOther: 1,
+  resp: 2, how: 2, consent: 2, chosen: 2, declined: 2, level: 3, tasks: 3,
+  mood: 4, well: 4, risk: 4, dignity: 4, contObs: 4, sleepObs: 4, skin: 4, skinDetail: 4, learn: 4, during: 4, behaviour: 4, behaviourOther: 4,
+  ate: 4, whatAte: 4, drunk: 4, offered: 4, drinkChoice: 4, prompt: 4, outcome: 5, extra: 5, handover: 5, followup: 5 };
+function stepOf(field){
+  if(!field) return 0;
+  return STEP_OF[field.split(/[.:]/)[0]] || 0;
+}
+let hlTimer = null;
+function goToStep(n){
+  const step = document.querySelectorAll("main .step")[n];   // the person's card is index 0
+  if(!step) return;
+  step.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  document.querySelectorAll(".step.hl").forEach(x => x.classList.remove("hl"));
+  step.classList.add("hl");
+  clearTimeout(hlTimer);
+  hlTimer = setTimeout(() => step.classList.remove("hl"), 2200);
+}
+
 /* the input to jump to for a field name used by the engines */
 function findField(name){
   if(!name) return null;
@@ -534,6 +555,14 @@ function findField(name){
   return el.querySelector('.chip:not([hidden]) input') || el.querySelector("input, select, textarea");
 }
 
+/* opening "Why am I seeing this?" also takes staff to the step it is about */
+$("saList").addEventListener("toggle", e => {
+  const d = e.target;
+  if(!d.classList || !d.classList.contains("sa-why") || !d.open) return;
+  const go = d.closest("li").querySelector(".sa-go");
+  const n = stepOf(go && go.dataset.field);
+  if(n) goToStep(n);
+}, true);
 $("saList").addEventListener("input", e => {
   const id = e.target.dataset && e.target.dataset.explain;
   if(id) explanations[id] = e.target.value;
@@ -630,6 +659,7 @@ function syncVisibility(s){
   $("skinWrap").hidden   = s.skin !== "concern";
   const college = s.kind === "activity" && s.setting === "college";
   $("settingWrap").hidden = s.kind !== "activity";
+  if(s.kind === "activity" && !one("setting")) $("setting_community").checked = true;
   $("settingHint").textContent = !s.kind ? "" : college
     ? "Already arranged, so nothing is offered today \u2014 record the journey, the support and what they gained."
     : "Offered today and chosen from the options \u2014 record the choice, the support and how it went.";
@@ -776,6 +806,37 @@ function applyTodaySession(){
   hint.textContent = "From the timetable: " + dayLabel(today) + " " + cur.from +
     (cur.to ? "\u2013" + cur.to : "") + ", " + courseLabel(cur.c) + ". Change it if today ran differently.";
 }
+
+/* When the activity chosen is a course on the person's timetable, say so and
+   offer the switch. If it is that course TODAY, the switch is made for them
+   the moment they pick it (see the slot handler) - a form default they can
+   see and change, never a fact in the note. */
+function renderCollegeHint(s, profile){
+  const el = $("collegeHint");
+  const tt = GSN.rules.timetabled(s, profile);
+  el.hidden = !tt;
+  if(!tt) return;
+  const when = tt.today ? "today" : "on " + tt.dayName + "s";
+  const times = tt.from ? " " + tt.from + (tt.to ? "\u2013" + tt.to : "") : "";
+  const text = tt.sameActivity
+    ? (profile.initials || "This person") + "\u2019s timetable has " + tt.courseLabel + " at college " + when + times + "."
+    : (profile.initials || "This person") + " has " + tt.courseLabel + " at college today" + times + ".";
+  const html = esc(text) + ' <button type="button" class="tog" data-college="' + esc(tt.course) + '">This was the college session</button>';
+  if(el.innerHTML !== html) el.innerHTML = html;
+}
+function switchToCollege(course){
+  $("setting_college").checked = true;
+  fillSlots();
+  $("slot").value = course;
+  applyTodaySession();
+  prefillActivity();
+  reseed();
+  render();
+}
+$("collegeHint").addEventListener("click", e => {
+  const b = e.target.closest("[data-college]");
+  if(b) switchToCollege(b.dataset.college);
+});
 
 /* the "more about this person" fields, built from the profile schema */
 function renderProfileFields(){
@@ -1031,7 +1092,15 @@ document.addEventListener("change", e => {
   if(e.target.closest && e.target.closest("#tt")){ syncPerson(); }
   if(e.target.closest && e.target.closest("#setting")){ fillSlots(); prefillActivity(); applyTodaySession(); }
   if(e.target.id === "slot" || e.target.id === "actOther") prefillActivity();
-  if(e.target.id === "slot") recordId = newRecordId();
+  if(e.target.id === "slot"){
+    recordId = newRecordId();
+    const tt = GSN.rules.timetabled(state(), profileFromForm());
+    if(tt && tt.sameActivity && tt.today){
+      switchToCollege(tt.course);
+      flash("Set to College course from the timetable \u2014 " + tt.courseLabel + " " + tt.from + (tt.to ? "\u2013" + tt.to : "") + ". Change it if this was something else.");
+      return;
+    }
+  }
   onEdit(e);
 });
 

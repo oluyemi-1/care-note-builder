@@ -71,3 +71,19 @@ test("every built-in rule is well formed", () => {
     for(const k of Object.keys(r.appliesWhen)) assert.ok(G.rules.CONDITIONS[k], r.id + " uses a known condition " + k);
   }
 });
+
+test("an activity that is a course on the person's timetable is recognised", () => {
+  const tt = [{ d: "2", c: "music", from: "10:00", to: "12:00" }, { d: "4", c: "cooking", from: "13:00", to: "15:00" }];
+  const tuesday = new Date(2026, 8, 22, 11, 0), thursday = new Date(2026, 8, 24, 9, 0), saturday = new Date(2026, 8, 26, 9, 0);
+  const s = slot => makeState({ kind: "activity", setting: "community", slot });
+  const music = G.rules.timetabled(s("music"), { timetable: tt }, tuesday);
+  assert.deepEqual([music.course, music.today, music.sameActivity, music.dayName], ["music", true, true, "Tuesday"]);
+  const other = G.rules.timetabled(s("music"), { timetable: tt }, saturday);
+  assert.deepEqual([other.course, other.today, other.sameActivity], ["music", false, true], "same course on another day - suggest, never switch");
+  const thu = G.rules.timetabled(s("walk"), { timetable: tt }, thursday);
+  assert.deepEqual([thu.course, thu.today, thu.sameActivity], ["cooking", true, false], "a different activity on a college day asks the question");
+  assert.equal(G.rules.timetabled(s("walk"), { timetable: tt }, saturday), null);
+  assert.equal(G.rules.timetabled(makeState({ kind: "activity", setting: "college", slot: "music" }), { timetable: tt }, tuesday), null, "already college");
+  assert.equal(G.rules.timetabled(s("music"), { timetable: [] }, tuesday), null);
+  assert.equal(G.rules.timetabled(makeState({ kind: "eating", slot: "lunch" }), { timetable: tt }, tuesday), null);
+});

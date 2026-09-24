@@ -16,19 +16,19 @@ function orgAudit(f, extra){
      level would force staff to record one that did not happen */
   const noSupport = f.declinedAll && !s.tasks.some(t => t.level && t.level !== "declined");
   return [
-    {id:"interaction", ok: !!s.kind && !!s.slot, t:"Correct interaction selected", need:"the type of interaction", fix:"Pick the type of interaction in step 1."},
-    {id:"response", ok: !!s.resp && !!s.consent, t:"Choice, consent or response recorded", need:"their response and consent", fix:"Record their response and consent in step 2."},
-    {id:"support", ok: noSupport || (!!s.level && (s.tasks.some(t => t.level) || declined) && s.tasks.every(t => t.level)),
+    {id:"interaction", field:"kind", ok: !!s.kind && !!s.slot, t:"Correct interaction selected", need:"the type of interaction", fix:"Pick the type of interaction in step 1."},
+    {id:"response", field: s.resp ? "consent" : "resp", ok: !!s.resp && !!s.consent, t:"Choice, consent or response recorded", need:"their response and consent", fix:"Record their response and consent in step 2."},
+    {id:"support", field: s.tasks.some(t => !t.level) ? "tasks." + s.tasks.find(t => !t.level).id + ".level" : s.level ? "tasks" : "level", ok: noSupport || (!!s.level && (s.tasks.some(t => t.level) || declined) && s.tasks.every(t => t.level)),
      t:"Independence and support level clear",
      need: s.tasks.some(t => !t.level) ? "how much support on each task you ticked" : "what you supported in step 3",
      fix: s.tasks.some(t => !t.level)
        ? "One or more ticked tasks in step 3 still need a support level."
        : "Set the overall support level and tick what you supported in step 3."},
-    {id:"observation", ok: s.mood.length > 0 || s.well.length > 0 || (s.kind==="personal" && !!s.skin) || (s.kind==="activity" && (s.risk.length > 0 || s.learn.length > 0 || (s.during || []).length > 0)) || (s.kind==="eating" && (!!s.ate || !!s.drunk)) ||
+    {id:"observation", field:"mood", ok: s.mood.length > 0 || s.well.length > 0 || (s.kind==="personal" && !!s.skin) || (s.kind==="activity" && (s.risk.length > 0 || s.learn.length > 0 || (s.during || []).length > 0)) || (s.kind==="eating" && (!!s.ate || !!s.drunk)) ||
                            answered || (s.behaviour || []).length > 0 || (s.contObs || []).length > 0 || (s.sleepObs || []).length > 0,
      t:"Relevant risk controls and observations included", need:"an observation", fix:"Add at least one observation in step 4."},
-    {id:"outcome", ok: !!s.outcome, t:"Meaningful outcome recorded", need:"how it ended for them", fix:"Choose an outcome in step 5."},
-    {id:"refusal", ok: !declined || !!s.declined, t:"Refusal or non-engagement respected", need:"how you respected the refusal", fix:"Say what you did to respect the refusal in step 2."},
+    {id:"outcome", field:"outcome", ok: !!s.outcome, t:"Meaningful outcome recorded", need:"how it ended for them", fix:"Choose an outcome in step 5."},
+    {id:"refusal", field:"declined", ok: !declined || !!s.declined, t:"Refusal or non-engagement respected", need:"how you respected the refusal", fix:"Say what you did to respect the refusal in step 2."},
     {id:"attest", ok: !!s.attest, t:"Entry reflects what actually happened", fix:"Tick the confirmation under the note."}
   ];
 }

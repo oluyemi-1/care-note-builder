@@ -105,6 +105,19 @@ function collect(ctx){
     });
   }
 
+  /* ---- an activity that is on the person's college timetable ---- */
+  const tt = G.rules.timetabled(f.s, ctx.profile, ctx.now);
+  if(tt){
+    const when = tt.today ? "today" : "on " + tt.dayName + "s";
+    const times = tt.from ? " (" + tt.from + (tt.to ? "\u2013" + tt.to : "") + ")" : "";
+    push({ id: "tt:college", severity: "suggestion", group: "context", rank: -1,
+           title: tt.sameActivity ? V.N + "'s timetable has " + tt.courseLabel + " as a college course " + when + times + ". Was this the college session?"
+                                  : V.N + " has " + tt.courseLabel + " at college today" + times + ". Is this note about that session?",
+           reason: "Choosing College course records it as the arranged session - the journey there, the class and what " + V.s +
+                   " gained - rather than as an activity offered at home today. Nothing changes unless you choose it.",
+           fields: ["setting"] });
+  }
+
   /* ---- contradictions ---- */
   const contra = G.contradictions.detect(ctx);
   contra.forEach(c => {
@@ -159,7 +172,8 @@ function collect(ctx){
     if(a.ok || a.id === "attest") return;
     const opt = optional.includes(a.id);
     push({ id: "a:" + a.id, severity: opt ? "suggestion" : "missing", group: "audit", title: a.fix,
-           reason: "One of your organisation's audit checks: " + quote(a.t) + "." + (opt ? " Your organisation has made this one optional." : ""), fields: [] });
+           reason: "One of your organisation's audit checks: " + quote(a.t) + "." + (opt ? " Your organisation has made this one optional." : ""),
+           fields: a.field ? [a.field] : [] });
   });
   /* the checks that must pass before the note can be copied */
   const contentOk = audit.every(a => a.ok || a.id === "attest" || optional.includes(a.id));

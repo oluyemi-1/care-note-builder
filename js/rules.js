@@ -11,7 +11,7 @@
 "use strict";
 
 const { fill, personVars, present, plain } = G.core;
-const { TASKS, ACTS, ACT_INFO, COURSES, MEALWORD, OVERALL_LEVELS } = G.data;
+const { TASKS, ACTS, ACT_INFO, COURSES, MEALWORD, OVERALL_LEVELS, DAYS } = G.data;
 
 /* ---------- facts every rule and check leans on, worked out once ---------- */
 const RANK = { ind:0, prompt:1, min:2, part:3, full:4 };
@@ -406,6 +406,25 @@ function sourcesOf(template, key, f){
   return [...out];
 }
 
+/* The college course, if any, that a chosen activity is on this person's
+   timetable: picking "Music" for someone whose Tuesday is a music class is
+   most likely that class. Returns null when college is already chosen, there
+   is no timetable, or nothing fits. `today` says the session is timetabled for
+   today; `sameActivity` that the activity chosen is that course. */
+const ACT_COURSE = { music: "music", cooking: "cooking", baking: "baking", exercise: "exercise", arts: "art", gardening: "allotment" };
+function timetabled(s, profile, now){
+  const tt = ((profile && profile.timetable) || []).filter(r => r && r.c);
+  if(!s || s.kind !== "activity" || s.setting === "college" || !tt.length) return null;
+  const course = ACT_COURSE[s.slot] || null;
+  const today = String((now || new Date()).getDay());
+  const same = course ? tt.filter(r => r.c === course) : [];
+  const pick = same.find(r => r.d === today) || same[0] || tt.find(r => r.d === today);
+  if(!pick) return null;
+  return { course: pick.c, courseLabel: plain((COURSES.find(c => c[0] === pick.c) || ["", "the class"])[1]),
+           day: pick.d, dayName: (DAYS.find(d => d[0] === String(pick.d)) || ["", "that day"])[1], from: pick.from || "", to: pick.to || "",
+           today: pick.d === today, sameActivity: !!course && pick.c === course };
+}
+
 /* which rules apply now, with their text filled in for this person */
 function evaluate(ctx, rules){
   const f = ctx.f || facts(ctx);
@@ -436,5 +455,5 @@ function evaluate(ctx, rules){
   }));
 }
 
-G.rules = { CARE_RULES, CONDITIONS, RANK, HANDS_ON, DECLINED_RESP, ESCALATE, facts, matches, evaluate, taskLabel, activityName };
+G.rules = { CARE_RULES, CONDITIONS, RANK, HANDS_ON, DECLINED_RESP, ESCALATE, ACT_COURSE, facts, matches, evaluate, taskLabel, activityName, timetabled };
 })(globalThis.GSN = globalThis.GSN || {});

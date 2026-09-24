@@ -311,6 +311,11 @@ summary:focus-visible,a:focus-visible{outline:2px solid var(--accent-2);outline-
   .task .tl input{width:24px;height:24px}
 }
 
+/* a step pointed at from Smart Assist */
+.step>header{transition:box-shadow .25s}
+.step.hl>header{box-shadow:inset 0 0 0 3px var(--accent-2)}
+.switch-note .tog{margin-left:8px;vertical-align:middle;background:var(--surface)}
+
 /* sticky bar (narrow) */
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);
   padding:10px 16px calc(10px + env(safe-area-inset-bottom, 0px));display:flex;gap:11px;align-items:center;box-shadow:0 -6px 22px -16px rgba(0,0,0,.5)}

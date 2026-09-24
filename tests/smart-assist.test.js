@@ -101,3 +101,17 @@ test("free text that says what an option says brings a 'tick it' suggestion, unt
   s.during = ["music-danced"];
   assert.ok(!collect(s, P.none).items.some(i => i.id === "m:during.music-danced"));
 });
+
+test("a timetabled course chosen as a home activity is questioned, and audit items point at their step", () => {
+  const profile = Object.assign({}, P.none, { timetable: [{ d: "2", c: "music", from: "10:00", to: "12:00" }] });
+  const s = makeState({ kind: "activity", setting: "community", slot: "music" });
+  const sa = G.smartAssist.collect(Object.assign(makeCtx(s, profile), { now: new Date(2026, 8, 26) }));
+  const q = sa.items.find(i => i.id === "tt:college");
+  assert.ok(q && q.severity === "suggestion");
+  assert.match(q.title, /Music as a college course on Tuesdays \(10:00–12:00\)\. Was this the college session\?/);
+  assert.deepEqual(q.fields, ["setting"]);
+  for(const id of ["a:response", "a:support", "a:outcome"]){
+    const it = sa.items.find(i => i.id === id);
+    assert.ok(it && it.fields.length === 1, id + " points somewhere");
+  }
+});
