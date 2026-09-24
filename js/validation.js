@@ -22,8 +22,10 @@ const INITIALS_RE = /^[A-Z0-9'-]{1,4}$/;
    lists, so re-checking saved settings never trips over its own entries */
 const BUILT_IN = {
   acts: D.ACTS.map(a => a[0]), comm: D.COMM.map(x => x[0]), flags: D.FLAGS.map(x => x[0]),
-  obs: [].concat(D.MOOD, D.WELL, D.BEHAVIOUR).map(x => x[0])
+  obs: [].concat(D.MOOD, D.WELL, D.BEHAVIOUR, D.LEARN, Object.values(D.DURING).flat()).map(x => x[0]),
+  tags: Object.keys(D.DURING)
 };
+const OBS_GROUPS = ["mood", "well", "behaviour", "learn", "during"];
 
 const slug = s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 36);
 const isObj = v => v && typeof v === "object" && !Array.isArray(v);
@@ -216,10 +218,12 @@ function validateConfig(raw){
     if(!isObj(o)) return null;
     const label = c.text(o.label, 60, w + " name", true);
     if(!label) return null;
-    if(!["mood", "well", "behaviour"].includes(o.group)){ c.err(w, "group must be mood, well or behaviour"); return null; }
+    if(!OBS_GROUPS.includes(o.group)){ c.err(w, "group must be one of " + OBS_GROUPS.join(", ")); return null; }
     const sentences = c.list(o.sentences, 3, w + " wording").map((t, n) => c.template(t, PERSON_TOKENS, w + " wording " + (n + 1), true)).filter(Boolean);
     if(!sentences.length){ c.err(w, "needs at least one sentence for the note"); return null; }
-    return { id: c.id(o.id || "c-" + slug(label), w + " id", obsTaken), label, group: o.group, sentences };
+    const tags = o.group === "during" ? c.list(o.tags, 3, w + " activities").filter(t => BUILT_IN.tags.includes(t)) : [];
+    if(o.group === "during" && !tags.length){ c.err(w, "needs the kind of activity it belongs to"); return null; }
+    return { id: c.id(o.id || "c-" + slug(label), w + " id", obsTaken), label, group: o.group, tags, sentences };
   })).filter(o => o && o.id);
 
   const pfTaken = new Set();
@@ -241,6 +245,20 @@ function validateConfig(raw){
       phrase: c.text(p.phrase, 60, "Phrase " + (i + 1), true), guidance: c.text(p.guidance, 200, "Guidance " + (i + 1)) } : null)
       .filter(p => p && p.phrase);
   }
+
+  /* sentences staff offered as tick options - templates only, never the person's initials */
+  const sgTaken = new Set();
+  cfg.suggestions = c.list(raw.suggestions, 200, "Suggestions").map((x, i) => c.clean(() => {
+    const w = "Suggestion " + (i + 1);
+    if (!isObj(x)){ c.err(w, "must be an object"); return null; }
+    const template = c.template(x.template, PERSON_TOKENS, w, true);
+    if(!template) return null;
+    return { id: c.id(x.id, w + " id", sgTaken), template, label: c.text(x.label, 60, w + " label") || G.match.toLabel(template),
+             group: OBS_GROUPS.includes(x.group) ? x.group : "behaviour",
+             tags: c.list(x.tags, 3, w + " activities").filter(t => BUILT_IN.tags.includes(t)),
+             kind: ["personal", "eating", "activity"].includes(x.kind) ? x.kind : "",
+             at: /^\d{4}-\d{2}-\d{2}$/.test(x.at || "") ? x.at : "" };
+  })).filter(Boolean);
 
   const ruleTaken = new Set(G.rules.CARE_RULES.map(r => r.id));
   cfg.customRules = c.list(raw.customRules, 100, "Custom rules").map((r, i) => c.clean(() => validateRule(r, "Rule " + (i + 1), c, ruleTaken))).filter(r => r && r.id);

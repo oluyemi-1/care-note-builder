@@ -245,3 +245,23 @@ test("what they did during an activity is offered for that kind of activity, and
   const walk = makeState({ kind: "activity", slot: "walk", len: "full" });
   assert.doesNotMatch(compose({ s: walk, profile: P.none }, 1).note.text, /hands|recipe/);
 });
+
+test("a tick the staff member's own words already say is not said twice, and stays traceable", () => {
+  const s = makeState({ kind: "activity", setting: "college", slot: "music", during: ["music-danced", "music-sang"], mood: ["cheerful"],
+                        extra: "He danced with everyone and was in good spirits all afternoon.", len: "full" });
+  const r = compose({ s, profile: P.none }, 4);
+  const keys = order(r.note);
+  assert.ok(!keys.includes("during_music-danced"), "danced is already in the staff member's sentence");
+  assert.ok(!keys.includes("mood_cheerful"), "so is good spirits");
+  assert.ok(keys.includes("during_music-sang"), "singing is not, so it gets its sentence");
+  const own = r.note.sentences.find(x => x.key === "extra");
+  assert.deepEqual(own.sources.sort(), ["during.music-danced", "extra", "mood.cheerful"]);
+  assert.deepEqual(G.provenance.verify(r.note.sentences, r.s), []);
+  assert.equal((r.note.text.match(/danc/gi) || []).length, 1);
+});
+
+test("a negated sentence does not swallow a tick", () => {
+  const s = makeState({ kind: "activity", slot: "music", during: ["music-danced"], extra: "He did not want to dance at first.", len: "full" });
+  const keys = order(compose({ s, profile: P.none }, 1).note);
+  assert.ok(keys.includes("during_music-danced"));
+});

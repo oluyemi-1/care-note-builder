@@ -20,7 +20,8 @@ const DEFAULT_CONFIG = {
   customActivities: [],     // { id, label, noun, did, where, tags }
   customComm: [],           // { id, label, sentences: [..] }
   customFlags: [],          // { id, label }
-  customObservations: [],   // { id, label, group: mood|well|behaviour, sentences: [..] }
+  customObservations: [],   // { id, label, group: mood|well|behaviour|learn|during, tags (during only), sentences: [..] }
+  suggestions: [],          // sentences staff offered as tick options: { id, template, label, group, tags, kind, at }
   customProfileFields: [],  // { id, label }
   audit: { optional: [], extra: [] },   // org checks that do not block copying; extra checks that do
   language: { vague: [], judgement: [], phrases: [] },
@@ -62,6 +63,12 @@ function apply(cfg){
   cfg.customFlags.forEach(f => D.FLAGS.push([f.id, E(f.label)]));
   const groups = { mood: [D.MOOD, D.MOODBANK], well: [D.WELL, D.WELLBANK], behaviour: [D.BEHAVIOUR, D.BEHAVIOURBANK] };
   cfg.customObservations.forEach(o => {
+    if(o.group === "learn"){ D.LEARN.push([o.id, E(o.label)]); D.LEARNBANK[o.id] = o.sentences.map(E); return; }
+    if(o.group === "during"){
+      (o.tags || []).forEach(t => { (D.DURING[t] = D.DURING[t] || []).push([o.id, E(o.label)]); });
+      D.DURINGBANK[o.id] = o.sentences.map(E);
+      return;
+    }
     const [list, bank] = groups[o.group];
     if(o.group === "behaviour") list.splice(list.length - 1, 0, [o.id, E(o.label)]);   // keep "Other - describe" last
     else list.push([o.id, E(o.label)]);

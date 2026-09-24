@@ -77,6 +77,23 @@ communication and standing needs, a profile can hold texture, fluid target,
 mobility aid, triggers, preferences, routines and usual level of independence -
 all context for the questions asked, none of it ever written into a note.
 
+### It learns from your service, without a model
+
+When something staff write in their own words already has a tick option -
+"he danced" at a music class, "washed her hands" while cooking - Smart Assist
+offers to tick it, so the fact is counted in the person's history and record
+fields. The staff member's own sentence stays in the note and the note does
+not say the same thing twice. Matching is a fixed list of phrases
+(`MATCH` in `js/data.js`); a sentence with a negation in it never matches.
+
+Under "Anything else", **Suggest as a tick option** offers a sentence to the
+service. It is kept on the device as a template with the person's initials and
+pronouns replaced ("{S} wiped the table down.") until a manager adds it as a
+real tick option under Settings & data, or removes it. Nothing is stored unless
+the button is pressed, and suggestions travel with settings backups so one
+tablet's learning can be given to the others. No model is trained and no text
+leaves the device.
+
 ### Smart Assist
 
 The panel beside the note lists, in order of importance: safety events staff

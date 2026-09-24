@@ -91,3 +91,13 @@ test("an explanation for an inconsistency that has gone is not checked for wordi
   const sa = collect(s, null, { explanations: { "overall-independent-vs-hands-on": "He was a bit difficult" } });
   assert.ok(!sa.items.some(i => i.id.startsWith("l:explain:")));
 });
+
+test("free text that says what an option says brings a 'tick it' suggestion, until it is ticked", () => {
+  const s = makeState({ kind: "activity", setting: "college", slot: "music", extra: "He danced with other attendees." });
+  const sa = collect(s, P.none);
+  const m = sa.items.find(i => i.id === "m:during.music-danced");
+  assert.ok(m && m.severity === "suggestion" && m.tick === "during.music-danced");
+  assert.match(m.reason, /Your own words stay in the note/);
+  s.during = ["music-danced"];
+  assert.ok(!collect(s, P.none).items.some(i => i.id === "m:during.music-danced"));
+});

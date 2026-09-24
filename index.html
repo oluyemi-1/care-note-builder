@@ -171,7 +171,9 @@
         <div class="body stack">
           <fieldset><legend>Outcome</legend><div class="chips" id="outcome"></div></fieldset>
           <div class="f"><label for="extra">Anything else that actually happened</label>
-            <textarea id="extra" placeholder="Added to the note word for word. Leave blank if there is nothing."></textarea></div>
+            <textarea id="extra" placeholder="Added to the note word for word. Leave blank if there is nothing."></textarea>
+            <div class="suggest" id="suggestBox" hidden></div>
+            <p class="note-inline" id="suggestMsg" role="status" hidden></p></div>
           <div class="f"><label for="handover">Handover / follow-up needed</label><input type="text" id="handover" placeholder="e.g. GP to review the red area on Monday" autocomplete="off"></div>
           <fieldset><legend>What was done about it &mdash; only what actually happened</legend><div class="chips" id="followup"></div></fieldset>
         </div>
@@ -290,6 +292,7 @@
 <script src="js/language.js"></script>
 <script src="js/quality.js"></script>
 <script src="js/patterns.js"></script>
+<script src="js/match.js"></script>
 <script src="js/smart-assist.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/provenance.js"></script>

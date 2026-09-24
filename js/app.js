@@ -254,6 +254,7 @@ function render(){
   renderPrompts(sa.rules, s.initials);
   renderProvenance();
   renderPatterns(built, profile);
+  renderSuggest(s);
   renderContext(profile);
 
   /* record field mirror */
@@ -319,6 +320,43 @@ $("patBody").addEventListener("click", e => {
     historyCache[person] = (historyCache[person] || []).filter(r => r.id !== b.dataset.del);
     patSig = ""; render();
   });
+});
+
+/* ============================================================
+   "Suggest this as a tick option" - how the tick options grow from real use.
+   A staff member offers one of their own sentences; it is kept on this device,
+   as a template with the person's initials and pronouns replaced, until a
+   manager adds it under Settings & data or removes it. Nothing is stored
+   unless the button is pressed.
+   ============================================================ */
+let suggestSig = "";
+function renderSuggest(s){
+  const box = $("suggestBox");
+  const sents = GSN.match.sentences(s.extra).filter(t => t.split(/\s+/).length >= 3);
+  const sig = sents.join("\u0001");
+  if(sig !== suggestSig){
+    suggestSig = sig;
+    const short = t => t.length > 48 ? t.slice(0, 45).replace(/\s+\S*$/, "") + "\u2026" : t;
+    box.innerHTML = sents.length ? '<span>Useful as a tick option next time?</span>' +
+      sents.map((t, i) => '<button type="button" class="tog" data-suggest="' + i + '">Suggest \u201c' + esc(short(t)) + '\u201d</button>').join("") : "";
+    $("suggestMsg").hidden = true;
+  }
+  box.hidden = !sents.length;
+}
+$("suggestBox").addEventListener("click", e => {
+  const b = e.target.closest("[data-suggest]");
+  if(!b) return;
+  const s = state();
+  const sents = GSN.match.sentences(s.extra).filter(t => t.split(/\s+/).length >= 3);
+  const text = sents[Number(b.dataset.suggest)];
+  if(!text) return;
+  const sg = GSN.match.suggestion(text, GSN.rules.facts({ s, profile: profileFromForm() }));
+  store.config.suggestions = (store.config.suggestions || []).concat([sg]);
+  save();
+  b.disabled = true; b.textContent = "Suggested";
+  const msg = $("suggestMsg");
+  msg.hidden = false;
+  setText(msg, "Thank you. A manager can add \u201c" + sg.label + "\u201d as a tick option under Settings & data \u2192 Observations. Your note is unchanged.");
 });
 
 /* ============================================================
@@ -411,6 +449,8 @@ function renderSmartAssist(sa){
     li.querySelector(".sa-go").dataset.field = (f.fields || [])[0] || "";
     li.querySelector(".sa-ho").hidden = !f.handover;
     li.querySelector(".sa-ho").dataset.text = f.handover || "";
+    li.querySelector(".sa-tick").hidden = !f.tick;
+    li.querySelector(".sa-tick").dataset.tick = f.tick || "";
     li.hidden = !saOpen && i >= SA_VISIBLE;
     if(!focusInside){
       const want = prev ? prev.nextSibling : list.firstChild;
@@ -465,6 +505,7 @@ function saItem(f){
     '<details class="sa-why"><summary>Why am I seeing this?</summary><p class="sa-reason"></p></details>' +
     '<div class="sa-acts"><button type="button" class="sa-go">Show me</button>' +
     '<button type="button" class="sa-ho" hidden>Add to handover</button>' +
+    '<button type="button" class="sa-tick" hidden>Tick it</button>' +
     (f.explain ? '<button type="button" class="sa-exp-btn" aria-expanded="false">Explain</button>' : "") + '</div>' +
     (f.explain ? '<div class="sa-explain" hidden><label for="exp_' + f.explain + '">Explain what happened (added to the note word for word)</label>' +
                  '<textarea id="exp_' + f.explain + '" data-explain="' + f.explain + '" rows="2"></textarea></div>' : "") +
@@ -511,6 +552,18 @@ $("saList").addEventListener("click", e => {
     box.value = box.value.trim() ? box.value.trim().replace(/([^.!?])$/, "$1.") + " " + line : line;
     box.dispatchEvent(new Event("input", { bubbles: true }));
     box.focus();
+    return;
+  }
+  /* staff tick the option themselves; the button only saves them the scroll */
+  const tk = e.target.closest(".sa-tick");
+  if(tk){
+    const [g, id] = tk.dataset.tick.split(".");
+    const el = $(g + "_" + id);
+    if(el && !el.checked){
+      el.checked = true;
+      el.focus({ preventScroll: true });          // focus goes with the tick, so the finding can leave the list
+      el.dispatchEvent(new Event("change", { bubbles: true }));
+    }
     return;
   }
   const ex = e.target.closest(".sa-exp-btn");
@@ -640,7 +693,8 @@ function syncVisibility(s){
 let duringSig = "";
 function syncDuring(s){
   const tags = s.kind === "activity" ? ((ACT_INFO[s.slot] || {}).tags || []) : [];
-  const list = tags.flatMap(t => DURING[t] || []);
+  const seen = new Set();
+  const list = tags.flatMap(t => DURING[t] || []).filter(o => !seen.has(o[0]) && seen.add(o[0]));
   const sig = list.map(o => o[0]).join(",");
   if(sig !== duringSig){
     duringSig = sig;

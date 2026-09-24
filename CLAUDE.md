@@ -113,6 +113,15 @@ language, auditOptional, auditExtra, recordId, now, windowDays }` → returns `{
   `{ message, reason, fields }` or null. Never auto-correct.
 - **An activity**: `ACTS` + `ACT_INFO` (where it happens, tags) and, for its events,
   `DURING`/`DURINGBANK` keyed by tag. College courses share `ACT_INFO` keys.
+- **Matching free text to options**: `MATCH` in `data.js` (regex fragments per option id) and
+  `js/match.js`. `candidates(f)` must mirror what the form shows (it duplicates the
+  `RISK_SCOPE`/continence/sleep visibility logic in `app.js` `syncVisibility`; keep them in
+  step). A ticked option that `covered()` says the free text already states adds no sentence;
+  it becomes a source of the staff member's sentence instead. Negated sentences never match.
+- **Staff suggestions** (`config.suggestions`) are templates made by `match.toTemplate`
+  (initials and pronouns replaced) and are only ever created by the button under
+  "Anything else"; managers adopt them in Settings → Observations as custom options, which
+  may now also go under `learn` or `during` (with `tags`).
 - **A new tickable observation group** touches: `state()` and `SCOPED_CHIPS` in `app.js`,
   `plan()` in `narrative.js`, `GROUPS` in `provenance.js`, the `observed` checks in
   `quality.js`, `toRecord` in `patterns.js`, `validateRecord` in `validation.js`, and the

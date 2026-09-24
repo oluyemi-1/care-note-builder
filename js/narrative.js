@@ -96,6 +96,18 @@ function plan(s, opts, pre){
   const college = s.kind === "activity" && s.setting === "college";
   const notGoing = college && s.resp === "declinedgo";
 
+  /* ticks the staff member's own words already say add no sentence of their
+     own; they become sources of that sentence instead, so nothing is lost */
+  const said = G.match.covered(s, G.rules.facts({ s, profile: s.profile || {} }));
+  const extraSrc = ["extra"], behSrc = ["behaviour.other", "behaviourOther"];
+  const saidBy = key => {
+    const field = said[key];
+    if(!field) return false;
+    const arr = field === "extra" ? extraSrc : behSrc;
+    if(!arr.includes(key)) arr.push(key);
+    return true;
+  };
+
   /* context */
   let open = s.kind === "personal" && D.OPEN_PC[s.slot] ? D.OPEN_PC[s.slot] : D.OPEN[s.kind];
   if(s.kind === "activity")
@@ -146,22 +158,22 @@ function plan(s, opts, pre){
           task: { id: t.id, level: t.level, verb: def.verb, noun: def.opts ? "" : def.noun } });
     /* the journey and how it was kept safe stay together */
     if(s.kind === "activity" && t.id === "travel")
-      (s.risk || []).filter(r => D.TRAVEL_RISK.includes(r) && D.RISKBANK[r]).forEach((r, i) =>
+      (s.risk || []).filter(r => D.TRAVEL_RISK.includes(r) && D.RISKBANK[r] && !saidBy("risk." + r)).forEach((r, i) =>
         add({ key: "risk_" + r, section: items[items.length - 1].section, pri: i < 3 ? 2 : 3, bank: D.RISKBANK[r],
               src: ["risk." + r], attach: "task_travel" }));
   });
   if(s.level && !(s.tasks || []).some(t => t.level) && D.LEVELBANK[s.level])
     add({ key: "level", section: "support", pri: 2, bank: D.LEVELBANK[s.level], src: ["level"] });
   if(s.kind === "personal")
-    (s.dignity || []).forEach((d, i) => add({ key: "dig_" + d, section: "support", pri: i < 2 ? 2 : 3, bank: D.DIGNITYBANK[d], src: ["dignity." + d] }));
+    (s.dignity || []).filter(d => !saidBy("dignity." + d)).forEach((d, i) => add({ key: "dig_" + d, section: "support", pri: i < 2 ? 2 : 3, bank: D.DIGNITYBANK[d], src: ["dignity." + d] }));
 
   /* observation: first the particular things they did during an activity and
      the staff member's own account of what happened, then what was measured
      and seen, then how they seemed */
   if(s.kind === "activity")
-    (s.during || []).filter(d => D.DURINGBANK[d]).forEach((d, i) =>
+    (s.during || []).filter(d => D.DURINGBANK[d] && !saidBy("during." + d)).forEach((d, i) =>
       add({ key: "during_" + d, section: "observation", pri: i < 2 ? 1 : 2, bank: D.DURINGBANK[d], src: ["during." + d] }));
-  if(s.extra) add({ key: "extra", section: "observation", pri: 1, text: verbatim(s.extra), src: ["extra"] });
+  if(s.extra) add({ key: "extra", section: "observation", pri: 1, text: verbatim(s.extra), src: extraSrc });
   if(s.kind === "eating"){
     if(s.ate && s.whatAte) add({ key: "intake", section: "observation", pri: 1, bank: D.INTAKEBANK.ateWhat });
     else if(s.ate)         add({ key: "intake", section: "observation", pri: 1, bank: D.INTAKEBANK.ate });
@@ -175,21 +187,21 @@ function plan(s, opts, pre){
     if(s.skin === "concern")
       add({ key: "skin", section: "observation", pri: 1, src: ["skin"],
             bank: s.skinDetail ? D.SKINBANK.concern : ["Something new was observed on {p} skin during care.", "Staff noticed something new on {p} skin during care."] });
-    (s.contObs || []).forEach(c => add({ key: "cont_" + c, section: "observation", pri: 1, bank: D.CONTBANK[c], src: ["contObs." + c] }));
-    (s.sleepObs || []).forEach(c => add({ key: "sleep_" + c, section: "observation", pri: 1, bank: D.SLEEPBANK[c], src: ["sleepObs." + c] }));
+    (s.contObs || []).filter(c => !saidBy("contObs." + c)).forEach(c => add({ key: "cont_" + c, section: "observation", pri: 1, bank: D.CONTBANK[c], src: ["contObs." + c] }));
+    (s.sleepObs || []).filter(c => !saidBy("sleepObs." + c)).forEach(c => add({ key: "sleep_" + c, section: "observation", pri: 1, bank: D.SLEEPBANK[c], src: ["sleepObs." + c] }));
   }
   if(s.kind === "activity")
-    (s.learn || []).forEach((l, i) => add({ key: "learn_" + l, section: "observation", pri: i < 2 ? 1 : 2, bank: D.LEARNBANK[l], src: ["learn." + l] }));
-  (s.mood || []).forEach((m, i) => add({ key: "mood_" + m, section: "observation", pri: i ? 3 : 2, bank: D.MOODBANK[m], src: ["mood." + m] }));
-  (s.well || []).forEach(w => add({ key: "well_" + w, section: "observation", pri: w === "nochange" ? 3 : 2, bank: D.WELLBANK[w], src: ["well." + w] }));
-  (s.behaviour || []).filter(b => D.BEHAVIOURBANK[b]).forEach(b =>
+    (s.learn || []).filter(l => !saidBy("learn." + l)).forEach((l, i) => add({ key: "learn_" + l, section: "observation", pri: i < 2 ? 1 : 2, bank: D.LEARNBANK[l], src: ["learn." + l] }));
+  (s.mood || []).filter(m => !saidBy("mood." + m)).forEach((m, i) => add({ key: "mood_" + m, section: "observation", pri: i ? 3 : 2, bank: D.MOODBANK[m], src: ["mood." + m] }));
+  (s.well || []).filter(w => !saidBy("well." + w)).forEach(w => add({ key: "well_" + w, section: "observation", pri: w === "nochange" ? 3 : 2, bank: D.WELLBANK[w], src: ["well." + w] }));
+  (s.behaviour || []).filter(b => D.BEHAVIOURBANK[b] && !saidBy("behaviour." + b)).forEach(b =>
     add({ key: "beh_" + b, section: "observation", pri: 1, bank: D.BEHAVIOURBANK[b], src: ["behaviour." + b] }));
   if((s.behaviour || []).includes("other") && s.behaviourOther)
-    add({ key: "behOther", section: "observation", pri: 1, text: verbatim(s.behaviourOther), src: ["behaviour.other", "behaviourOther"] });
+    add({ key: "behOther", section: "observation", pri: 1, text: verbatim(s.behaviourOther), src: behSrc });
 
   /* risk management staff confirmed: safety choices, then answers to the profile's questions */
   if(s.kind === "activity")
-    (s.risk || []).filter(r => D.RISKBANK[r] && !items.some(it => it.key === "risk_" + r)).forEach((r, i) =>
+    (s.risk || []).filter(r => D.RISKBANK[r] && !items.some(it => it.key === "risk_" + r) && !saidBy("risk." + r)).forEach((r, i) =>
       add({ key: "risk_" + r, section: "risk", pri: i < 3 ? 2 : 3, bank: D.RISKBANK[r], src: ["risk." + r] }));
   (s.promptLines || []).forEach(l => add({ key: "prompt_" + l.key, section: "risk", pri: l.pri, text: l.text, ours: true, src: l.sources }));
 
@@ -199,7 +211,7 @@ function plan(s, opts, pre){
   /* outcome, then what was actually done about anything */
   if(s.outcome && D.OUTBANK[s.outcome]) add({ key: "out", section: "outcome", pri: 1, bank: D.OUTBANK[s.outcome], src: ["outcome"], lead: true });
   if(s.handover) add({ key: "handover", section: "followup", pri: 1, text: "Handed over: " + s.handover.replace(/\.?\s*$/, "") + ".", src: ["handover"] });
-  (s.followup || []).forEach(k => add({ key: "fu_" + k, section: "followup", pri: 1, bank: D.FOLLOWBANK[k], src: ["followup." + k] }));
+  (s.followup || []).filter(k => !saidBy("followup." + k)).forEach(k => add({ key: "fu_" + k, section: "followup", pri: 1, bank: D.FOLLOWBANK[k], src: ["followup." + k] }));
 
   return items.map((it, i) => Object.assign(it, { order: i }))
     .sort((a, b) => (SECTIONS.indexOf(a.section) - SECTIONS.indexOf(b.section)) || (a.order - b.order));

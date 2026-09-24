@@ -6,7 +6,7 @@ const CACHE = "care-note-builder-v10";
 const ASSETS = [
   "./", "./index.html", "./manifest.json", "./icon.svg", "./css/app.css",
   "./js/core.js", "./js/data.js", "./js/profiles.js", "./js/rules.js", "./js/contradictions.js",
-  "./js/language.js", "./js/quality.js", "./js/patterns.js", "./js/smart-assist.js", "./js/storage.js",
+  "./js/language.js", "./js/quality.js", "./js/patterns.js", "./js/match.js", "./js/smart-assist.js", "./js/storage.js",
   "./js/provenance.js", "./js/narrative.js", "./js/provider-config.js", "./js/validation.js",
   "./js/app.js", "./js/settings.js"
 ];

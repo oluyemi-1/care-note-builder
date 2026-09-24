@@ -62,7 +62,7 @@ test("custom activities, methods and observations need wording that uses known p
   assert.ok(r.errors.some(e => /\u201cwalk\u201d is already used/.test(e)), "a custom activity may not clash with a built-in id");
   assert.equal(V.validateConfig({ customActivities: [{ label: "Walk" }] }).value.customActivities[0].id, "c-walk", "generated ids never clash");
   assert.ok(r.errors.some(e => /unknown placeholder \{weapon\}/.test(e)));
-  assert.ok(r.errors.some(e => /group must be mood, well or behaviour/.test(e)));
+  assert.ok(r.errors.some(e => /group must be one of mood, well, behaviour, learn, during/.test(e)));
   assert.deepEqual(r.value.customComm.map(m => m.label), ["BSL"]);
 });
 
@@ -143,4 +143,25 @@ test("initials with an apostrophe or hyphen survive a backup and restore", () =>
     history: [{ id: "a1", person: "O'B", date: "2026-09-20", kind: "eating" }] }));
   assert.deepEqual(Object.keys(r.value.people), ["O'B"]);
   assert.equal(r.value.history.length, 1);
+});
+
+test("custom options can go under 'what they did during' an activity, and need to say which", () => {
+  const ok = V.validateConfig({ customObservations: [
+    { label: "Wiped the table", group: "during", tags: ["food"], sentences: ["{S} wiped the table down."] },
+    { label: "Helped set up", group: "learn", sentences: ["{S} helped set up the room."] }] });
+  assert.deepEqual(ok.errors, []);
+  assert.deepEqual(ok.value.customObservations.map(o => [o.group, o.tags]), [["during", ["food"]], ["learn", []]]);
+  const bad = V.validateConfig({ customObservations: [{ label: "Wiped the table", group: "during", sentences: ["{S} wiped the table down."] }] });
+  assert.ok(bad.errors.some(e => /needs the kind of activity/.test(e)));
+  assert.deepEqual(bad.value.customObservations, []);
+});
+
+test("staff suggestions are kept as templates and checked like any other setting", () => {
+  const r = V.validateConfig({ suggestions: [
+    { id: "abc1", template: "{S} wiped the table down after {s} had finished.", label: "", group: "during", tags: ["food"], kind: "activity", at: "2026-09-24" },
+    { id: "abc2", template: "MA <b>did</b> a thing.", group: "during" },
+    { id: "abc3", template: "{S} used {weapon}.", group: "mood" }] });
+  assert.equal(r.value.suggestions.length, 1);
+  assert.equal(r.value.suggestions[0].label, "Wiped the table down after they had finished");
+  assert.ok(r.errors.length >= 2);
 });

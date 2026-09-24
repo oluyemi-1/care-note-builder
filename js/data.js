@@ -702,6 +702,60 @@ const FOLLOWBANK = {
  incident:["An incident form was completed.","Staff completed an incident form."]
 };
 
+/* Phrases in a staff member's own words that mean the same as a tick option,
+   so the app can suggest the tick (and not say the same thing twice once it is
+   ticked). Regular-expression fragments, matched case-insensitively within one
+   sentence. Kept conservative: a missed suggestion costs nothing, a wrong one
+   annoys. A sentence with a negation in it never matches anything. */
+const MATCH = {
+ /* what they did during an activity */
+ "food-hands":["wash(?:ed|ing)? (?:his|her|their) hands","hand ?wash"], "food-ingredients":["(?:chose|picked(?: out)?) (?:the )?ingredients"],
+ "food-recipe":["recipe"], "food-hob":["\\bhob\\b","\\boven\\b"], "food-served":["served (?:up )?(?:the )?(?:food|meal|dinner|lunch)","dished up"],
+ "food-tasted":["tasted"], "music-chose":["(?:chose|picked) (?:the |a )?(?:song|music|track)"], "music-sang":["\\bsang\\b","singing","karaoke"],
+ "music-instrument":["drum","guitar","keyboard","piano","tambourine","instrument","shaker"], "music-danced":["danc(?:e|ed|ing)"],
+ "music-listened":["kept time","clapp(?:ed|ing) along"], "arts-materials":["(?:chose|picked) (?:the )?(?:paint|colour|material|paper)"],
+ "arts-made":["own design","made (?:a|his|her|their) own"], "arts-showed":["showed (?:his|her|their) (?:work|painting|picture|drawing)"],
+ "physical-warmup":["warm[- ]?up"], "physical-pace":["own pace"], "physical-rest":["took a (?:rest|break)","sat down to rest","rested"],
+ "water-changed":["got changed","changed into (?:his|her|their) (?:swim|trunks|costume)"], "water-swam":["\\bswam\\b","swimming","in the water","\\blengths?\\b"],
+ "walking-route":["(?:chose|picked) (?:the|which) (?:route|way)","which way to go"], "walking-stopped":["stopped to look","looked at the"],
+ "shopping-list":["shopping list","\\blist\\b"], "shopping-items":["(?:chose|picked(?: out)?) (?:the |what |which )?(?:items|things)"],
+ "shopping-bags":["carried (?:the )?(?:bags|shopping)","\\bbags?\\b"], "garden-planted":["plant(?:ed|ing)","water(?:ed|ing) the","seeds"],
+ "garden-tools":["trowel","spade","rake","secateurs","garden tools"], "laundry-sorted":["sorted (?:the )?(?:washing|laundry|clothes)"],
+ "laundry-machine":["machine"], "laundry-folded":["folded"], "chores-room":["(?:his|her|their) (?:own )?room"], "chores-hoover":["hoover","vacuum","dust(?:ed|ing)"],
+ /* skills and social */
+ skill:["practi[sc]ed","working on"], instructions:["followed (?:the )?(?:tutor|instructions|directions)","listened to the tutor"],
+ alongside:["alongside","with (?:the )?others","with other (?:learners|attendees|people|residents|students|members)"],
+ conversation:["chatted","talked (?:with|to)","conversation","spoke (?:with|to)"], turn:["took turns","waited (?:his|her|their) turn","\\bshared\\b"],
+ askedhelp:["asked for help","asked (?:staff|the tutor) (?:for|to)"], safe:["safely"],
+ finished:["(?:finished|completed) (?:a|the|his|her|their) (?:piece|work|painting|model|project|card|picture)"], pride:["proud","pleased with"],
+ change:["change of plan","plan changed","ran differently"],
+ /* privacy and dignity */
+ knocked:["knocked"], door:["closed the door","door (?:was )?(?:closed|shut)","shut the door"], covered:["kept (?:him|her|them) covered","towel over"],
+ explained:["explained (?:each|every|the) step","talked (?:him|her|them) through"],
+ /* keeping them safe */
+ sight:["within sight","in sight","line of sight"], road:["traffic side","roadside"], toilet:["toilet before"], accessible:["accessible toilet","disabled toilet"],
+ space:["path clear","walking path"], plan:["(?:explained|went through|talked through) the plan"], seatbelt:["seat ?belt"], doortodoor:["door to door"],
+ stop:["at the (?:bus )?stop"], fare:["\\bfare\\b","ticket"], crossing:["crossing","crossed the road"],
+ /* how they presented and wellbeing */
+ settled:["\\bsettled\\b","\\bcalm\\b"], cheerful:["cheerful","good spirits","\\bhappy\\b","good mood"], quiet:["\\bquiet\\b"],
+ chatty:["chatty","talkative"], tired:["\\btired\\b","sleepy","yawn"], anxious:["anxious","worried","nervous"],
+ unsettled:["unsettled","agitated","distressed","\\bupset\\b"],
+ appetite:["appetite"], pain:["\\bpain\\b","discomfort","\\bsore\\b","winc(?:ed|ing)","hurting"], cough:["cough"],
+ sleep:["slept (?:poorly|badly)","didn'?t sleep","did not sleep","up in the night"],
+ /* behaviour, described */
+ raised:["raised (?:his|her|their) voice","shout","loud voice"], movedaway:["moved away","walked away","left the room"],
+ pushed:["pushed (?:it|the|his|her|their|them|away)"], askedleave:["asked to leave","wanted to leave","asked to go"], smiled:["smil","laugh"],
+ /* what was done about it */
+ handover:["handed over","hand over","handover"], senior:["manager","\\bsenior\\b","team leader"],
+ health:["\\bgp\\b","\\bnurse\\b","doctor","\\b111\\b","paramedic","ambulance","pharmac"],
+ family:["family","\\bmum\\b","\\bdad\\b","mother","father","brother","sister","next of kin","advocate"],
+ bodymap:["body map"], mar:["\\bmar\\b","mar chart"], incident:["incident (?:form|report)","datix"],
+ /* continence and sleep */
+ urine:["passed urine","\\bwee\\b","urinated","pass(?:ed)? water"], bowels:["bowels","\\bstool\\b"], dry:["\\b(?:was|were) dry\\b"],
+ episode:["incontinen","\\bwet (?:the|his|her|their|himself|herself|themselves)","soiled"],
+ asleep:["asleep","sleeping"], awakesettled:["awake (?:and|but) settled"], awakeunsettled:["awake and (?:unsettled|upset|agitated|distressed)"]
+};
+
 /* how staff communicated this time; the profile only says which are usual */
 const STAFFING = [["","Not stated"],["1:1","1:1"],["2:1","2:1"],["shared","Shared staffing"]];
 
@@ -756,6 +810,6 @@ G.data = {
   COMM, FLAGS, RESP, HOW, CONSENT, SKIN, MOOD, WELL, RISK, OUTCOME, ACTS, ACT_INFO, OVERALL_LEVELS, OUT_SCOPE, SLOTS, LEVELS, TASKS, ACT_SETTING, COURSES, RESP_COLLEGE, RESP_SCOPE, LEARN, LEARNBANK, TRAVEL_RISK, OPEN_COLLEGE, OPEN_ACT, OPEN_PC, OPEN, COMMBANK, RESPBANK, HOWBANK, CONSENTBANK, SKINBANK, MOODBANK, WELLBANK, RISKBANK, OUTBANK, MEALWORD, DAYS, OUT_LEAD,
   GROUPBANK, LEVELBANK, OFFERBANK, SESSIONBANK, INTAKEBANK, HOW_JOIN, OPEN_COLLEGE_DECLINED,
   DIGNITY, DIGNITYBANK, CONT_OBS, CONTBANK, SLEEP_OBS, SLEEPBANK, BEHAVIOUR, BEHAVIOURBANK, FOLLOWUP, FOLLOWBANK,
-  STAFFING, RISK_SCOPE, JOURNEY, DURING, DURINGBANK
+  STAFFING, RISK_SCOPE, JOURNEY, DURING, DURINGBANK, MATCH
 };
 })(globalThis.GSN = globalThis.GSN || {});

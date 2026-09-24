@@ -134,6 +134,24 @@ function collect(ctx){
              fields: field ? [field] : [] });
   });
 
+  /* ---- what the free text already says that could be a tick ---- */
+  const cands = G.match.candidates(f);
+  const saidIn = {};
+  [["extra", f.s.extra], ["behaviourOther", (f.s.behaviour || []).includes("other") ? f.s.behaviourOther : ""]].forEach(([field, text]) => {
+    if(!text) return;
+    G.match.find(text, cands).forEach(m => {
+      const key = m.group + "." + m.id;
+      if(saidIn[key]) return;
+      saidIn[key] = field;
+      if((f.s[m.group] || []).includes(m.id)) return;          // already ticked; the note says it once, in the staff member's words
+      push({ id: "m:" + key, severity: "suggestion", group: "match", rank: 1,
+             title: "Your words say this - tick " + quote(m.label) + " to record it as a fact?",
+             reason: "You wrote " + quote(m.sentence) + ". Ticking " + quote(m.label) + " records the same thing in a form that counts in " +
+                     V.N + "'s history and record fields. Your own words stay in the note, and it will not say this twice.",
+             fields: [m.group], tick: key });
+    });
+  });
+
   /* ---- the organisation's audit ---- */
   const audit = G.quality.orgAudit(f, { answered: rules.some(r => r.prompts.some(p => p.answer)) });
   const optional = ctx.auditOptional || [], extra = ctx.auditExtra || [];

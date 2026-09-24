@@ -85,3 +85,17 @@ test("an apostrophe in a provider's wording reads as an apostrophe in the note",
   assert.match(text, /Mary's garden club/);
   assert.doesNotMatch(text, /&#39;|&amp;/);
 });
+
+test("a custom 'during' option appears for its kind of activity and reads in the note", () => {
+  const extra = G.validation.validateConfig({ customObservations: [
+    { label: "Wiped the table down", group: "during", tags: ["food"], sentences: ["{S} wiped the table down."] },
+    { label: "Helped set up the room", group: "learn", sentences: ["{S} helped set up the room."] }] }).value;
+  G.config.apply(extra);
+  assert.ok(G.data.DURING.food.some(o => o[0] === "c-wiped-the-table-down"));
+  assert.ok(G.data.LEARN.some(o => o[0] === "c-helped-set-up-the-room"));
+  const s = makeState({ initials: "TL", pronoun: "she", kind: "activity", slot: "cooking", during: ["c-wiped-the-table-down"], learn: ["c-helped-set-up-the-room"], len: "full" });
+  const r = G.narrative.compose({ s, profile: { initials: "TL", pronoun: "she" } }, { salt: 1 });
+  assert.match(r.note.text, /She wiped the table down\./);
+  assert.match(r.note.text, /She helped set up the room\./);
+  assert.deepEqual(G.provenance.verify(r.note.sentences, r.s), []);
+});

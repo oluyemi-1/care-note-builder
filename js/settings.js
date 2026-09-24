@@ -31,6 +31,10 @@ const select = (id, v, opts) => '<select id="' + id + '">' + opts.map(o => '<opt
 const section = (title, help, body, open) => '<details class="cfg"' + (open ? ' open' : '') + '><summary>' + esc(title) + '</summary>' +
   (help ? '<p class="note-inline">' + help + '</p>' : '') + body + '</details>';
 
+const TAG_NAMES = { food: "cooking and baking", music: "music", arts: "arts and crafts", physical: "exercise", water: "swimming",
+                    walking: "walks", shopping: "shopping", garden: "gardening", laundry: "laundry", chores: "housework" };
+const groupValue = o => o.group === "during" ? "during:" + ((o.tags || [])[0] || "food") : o.group;
+
 /* a list the provider can add to and remove from; each column is one input */
 const LISTS = {
   customActivities: { title: "Activities", noun: "activity", cols: [
@@ -43,7 +47,8 @@ const LISTS = {
   customFlags: { title: "Needs and risks", noun: "need", cols: [{ k: "label", label: "Name", ph: "e.g. Falls risk" }] },
   customObservations: { title: "Observations", noun: "observation", cols: [
     { k: "label", label: "Name", ph: "e.g. Humming" },
-    { k: "group", label: "Where it goes", options: [["mood", "How they presented"], ["well", "Wellbeing"], ["behaviour", "Behaviour observed"]] },
+    { k: "group", label: "Where it goes", options: [["mood", "How they presented"], ["well", "Wellbeing"], ["behaviour", "Behaviour observed"], ["learn", "Skills and social"]]
+        .concat(Object.keys(G.data.DURING).map(t => ["during:" + t, "During: " + (TAG_NAMES[t] || t)])) },
     { k: "sentence", label: "Sentence for the note", ph: "e.g. {S} hummed while {s} worked." }] },
   customProfileFields: { title: "Profile fields", noun: "field", cols: [{ k: "label", label: "Name", ph: "e.g. Key worker" }] },
   phrases: { title: "Phrases to question", noun: "phrase", cols: [
@@ -90,7 +95,8 @@ function buildForm(){
     section("Needs and risks", "Added to the standing needs a profile can record. They shape which questions are asked when you add a rule for them; on their own they never write anything.",
       rowsBlock("customFlags", c.customFlags)),
     section("Observations", "Extra choices for how someone presented, their wellbeing, or what they did. Each needs one sentence for the note; use {S}, {s}, {o}, {p} and {vbe} (was/were).",
-      rowsBlock("customObservations", c.customObservations.map(o => ({ id: o.id, label: o.label, group: o.group, sentence: o.sentences[0] })))),
+      rowsBlock("customObservations", c.customObservations.map(o => ({ id: o.id, label: o.label, group: groupValue(o), sentence: o.sentences[0] }))) +
+      '<div class="cfg-sugg" id="cfgSugg"></div>'),
     section("Profile fields", "Extra things a profile can hold. They are shown as context and never written into a note.",
       rowsBlock("customProfileFields", c.customProfileFields)),
     section("Audit requirements", "Your organisation's seven checks are always shown. Untick one to stop it blocking the Copy button.",
@@ -134,7 +140,11 @@ function readForm(){
     customActivities: readRows("customActivities"),
     customComm: readRows("customComm").map(m => ({ id: m.id, label: m.label, sentences: [m.sentence] })),
     customFlags: readRows("customFlags"),
-    customObservations: readRows("customObservations").map(o => ({ id: o.id, label: o.label, group: o.group, sentences: [o.sentence] })),
+    customObservations: readRows("customObservations").map(o => {
+      const [group, tag] = o.group.split(":");
+      return { id: o.id, label: o.label, group, tags: tag ? [tag] : [], sentences: [o.sentence] };
+    }),
+    suggestions: pendingSuggestions,
     customProfileFields: readRows("customProfileFields"),
     audit: { optional: [...document.querySelectorAll("[data-audit-req]")].filter(x => !x.checked).map(x => x.dataset.auditReq),
              extra: [...document.querySelectorAll("[data-audit-extra]")].filter(x => x.checked).map(x => x.dataset.auditExtra) },
@@ -144,6 +154,17 @@ function readForm(){
   }};
 }
 
+/* sentences staff offered as tick options, waiting for a manager */
+let pendingSuggestions = [];
+function renderSuggestions(){
+  const box = $("cfgSugg");
+  if(!box) return;
+  box.hidden = !pendingSuggestions.length;
+  box.innerHTML = '<h4>Suggested by staff</h4>' + pendingSuggestions.map(sg =>
+    '<div class="srow"><code>' + esc(sg.template) + '</code><span class="where">' + esc(sg.at || "") + '</span>' +
+    '<button type="button" class="tog" data-sugg-add="' + esc(sg.id) + '">Add as a tick option</button>' +
+    '<button type="button" class="tog" data-sugg-remove="' + esc(sg.id) + '">Remove</button></div>').join("");
+}
 function showErrors(list){
   const box = $("cfgErrors");
   box.hidden = !list.length;
@@ -152,6 +173,19 @@ function showErrors(list){
 }
 
 $("cfgBody").addEventListener("click", e => {
+  const sa = e.target.closest("[data-sugg-add]");
+  if(sa){
+    const sg = pendingSuggestions.find(x => x.id === sa.dataset.suggAdd);
+    if(!sg) return;
+    const box = document.querySelector('[data-list="customObservations"]');
+    box.insertAdjacentHTML("beforeend", row("customObservations", { label: sg.label, group: groupValue(sg), sentence: sg.template }));
+    pendingSuggestions = pendingSuggestions.filter(x => x !== sg);
+    renderSuggestions();
+    box.lastElementChild.querySelector("input").focus();
+    return;
+  }
+  const sr = e.target.closest("[data-sugg-remove]");
+  if(sr){ pendingSuggestions = pendingSuggestions.filter(x => x.id !== sr.dataset.suggRemove); renderSuggestions(); return; }
   const add = e.target.closest("[data-add]");
   if(add){
     const list = add.dataset.add, box = document.querySelector('[data-list="' + list + '"]');
@@ -206,7 +240,10 @@ function setHistory(change){
   store().config.history = Object.assign({}, store().config.history, change);
   A.save(); A.forgetHistory(); A.render();
 }
-$("openSettings").addEventListener("click", () => { buildForm(); showErrors([]); refreshDataPanel(); $("settings").showModal(); });
+$("openSettings").addEventListener("click", () => {
+  pendingSuggestions = (store().config.suggestions || []).slice();
+  buildForm(); renderSuggestions(); showErrors([]); refreshDataPanel(); $("settings").showModal();
+});
 $("closeSettings").addEventListener("click", () => $("settings").close());
 $("histOn").addEventListener("change", e => { setHistory({ enabled: e.target.checked }); if(e.target.checked) G.storage.persist(); });
 $("histWindow").addEventListener("change", e => setHistory({ windowDays: Number(e.target.value) || 14 }));
