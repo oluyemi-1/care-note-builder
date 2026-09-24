@@ -1,5 +1,5 @@
 {
-  "name": "gold-standard-notes-tutorials",
+  "name": "care-note-builder-tutorials",
   "private": true,
   "description": "Records the narrated video guide. Not part of the app, which has no dependencies.",
   "dependencies": {

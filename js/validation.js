@@ -292,9 +292,10 @@ function validateBackup(text){
   const errors = [];
   if(typeof text !== "string" || text.length > MAX_IMPORT) return { ok: false, errors: ["The file is empty or larger than 20 MB."] };
   let raw;
-  try { raw = JSON.parse(text); } catch(e){ return { ok: false, errors: ["This is not a Gold Standard Notes file (it is not valid JSON)."] }; }
-  if(!isObj(raw) || raw.app !== "gold-standard-notes" || raw.format !== 1 || !isObj(raw.data))
-    return { ok: false, errors: ["This is not a Gold Standard Notes backup, or it came from a newer version."] };
+  try { raw = JSON.parse(text); } catch(e){ return { ok: false, errors: ["This is not a Care Note Builder file (it is not valid JSON)."] }; }
+  /* backups made under the app's earlier name still restore */
+  if(!isObj(raw) || !["care-note-builder", "gold-standard-notes"].includes(raw.app) || raw.format !== 1 || !isObj(raw.data))
+    return { ok: false, errors: ["This is not a Care Note Builder backup, or it came from a newer version."] };
   const value = {}, summary = [];
   if("config" in raw.data){
     const r = validateConfig(raw.data.config);

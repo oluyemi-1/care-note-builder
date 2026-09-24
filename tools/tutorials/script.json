@@ -6,7 +6,7 @@
       "summary": "What is on the screen, and how your answers become a note for your care record.",
       "steps": [
         { "id": "welcome", "title": "Answer what happened",
-          "say": "Gold Standard Notes writes a complete, person-centred care note from what actually happened on your shift. There is no account and no internet connection, and nothing you type leaves the device." },
+          "say": "Care Note Builder writes a complete, person-centred care note from what actually happened on your shift. There is no account and no internet connection, and nothing you type leaves the device." },
         { "id": "person", "title": "Start with the person",
           "say": "At the top is the person you are writing about. Their profile is saved on this tablet, so you only set it up once." },
         { "id": "steps", "title": "Five short steps",
@@ -116,7 +116,7 @@
         { "id": "reword", "title": "Fresh wording",
           "say": "Reword it gives the same note in fresh wording. It checks that every fact, number and time stays exactly the same." },
         { "id": "length", "title": "Choose a length",
-          "say": "Short, Gold standard and Full detail change how much is said. If a length leaves something out, the note tells you, and Include everything puts it back." },
+          "say": "Short, Benchmark and Full detail change how much is said. If a length leaves something out, the note tells you, and Include everything puts it back." },
         { "id": "sources", "title": "Where each sentence came from",
           "say": "Developer view, at the foot of the page, shows which answer each sentence came from. It is there for managers who want to check." }
       ]

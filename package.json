@@ -1,5 +1,5 @@
 {
-  "name": "gold-standard-notes",
+  "name": "care-note-builder",
   "private": true,
   "description": "Builds a person-centred daily care note from what actually happened on the shift.",
   "license": "MIT",

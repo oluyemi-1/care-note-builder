@@ -1,5 +1,5 @@
 {
-  "name": "Gold Standard Notes",
+  "name": "Care Note Builder",
   "short_name": "Care Notes",
   "description": "Builds a person-centred daily care note from what actually happened on the shift.",
   "start_url": "./",

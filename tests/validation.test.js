@@ -5,13 +5,15 @@ const assert = require("node:assert/strict");
 const G = require("./helpers/load");
 const V = G.validation;
 
-const backup = data => JSON.stringify({ app: "gold-standard-notes", format: 1, kind: "all", data });
+const backup = data => JSON.stringify({ app: "care-note-builder", format: 1, kind: "all", data });
 
 test("a file that is not a backup is refused with a plain reason", () => {
   assert.equal(V.validateBackup("not json {").ok, false);
   assert.match(V.validateBackup("not json {").errors[0], /not valid JSON/);
   assert.equal(V.validateBackup(JSON.stringify({ app: "something-else", format: 1, data: {} })).ok, false);
-  assert.equal(V.validateBackup(JSON.stringify({ app: "gold-standard-notes", format: 99, data: {} })).ok, false, "a newer format is not guessed at");
+  assert.equal(V.validateBackup(JSON.stringify({ app: "care-note-builder", format: 99, data: {} })).ok, false, "a newer format is not guessed at");
+  assert.equal(V.validateBackup(JSON.stringify({ app: "gold-standard-notes", format: 1, data: { people: { AB: { initials: "AB" } } } })).ok, true,
+    "a backup made under the app's earlier name still restores");
   assert.equal(V.validateBackup(backup({})).ok, false, "an empty backup has nothing to import");
   assert.equal(V.validateBackup("x".repeat(21 * 1024 * 1024)).ok, false, "oversized files are refused");
 });

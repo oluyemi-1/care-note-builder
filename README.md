@@ -1,4 +1,4 @@
-# Gold Standard Notes
+# Care Note Builder
 
 A daily care-note builder for adult social care - residential homes, supported
 living, home care, learning-disability, autism, elderly, day and respite services.
@@ -60,7 +60,7 @@ requests at all** — it uses fonts already on the device.
 
 The copied note is one block of text, so it pastes cleanly into any care-record
 system's note box, including ones that strip line breaks. If a length setting
-(Short or Gold standard) would leave out something staff recorded, the note says
+(Short or Benchmark) would leave out something staff recorded, the note says
 so and offers to include everything.
 
 On a work tablet, open the site once and add it to the home screen. A service

@@ -236,10 +236,10 @@ $("expGo").addEventListener("click", () => {
   const withHistory = what === "all" || what === "history"
     ? G.storage.history.all().then(h => { data.history = h || []; }).catch(() => { data.history = []; }) : Promise.resolve();
   withHistory.then(() => {
-    const file = { app: "gold-standard-notes", format: 1, kind: what, exportedAt: new Date().toISOString(), data };
+    const file = { app: "care-note-builder", format: 1, kind: what, exportedAt: new Date().toISOString(), data };
     const url = URL.createObjectURL(new Blob([JSON.stringify(file, null, 2)], { type: "application/json" }));
     const a = document.createElement("a");
-    a.href = url; a.download = "gold-standard-notes-" + what + "-" + G.patterns.iso(new Date()) + ".json";
+    a.href = url; a.download = "care-note-builder-" + what + "-" + G.patterns.iso(new Date()) + ".json";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   });

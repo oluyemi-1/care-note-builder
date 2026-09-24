@@ -1,5 +1,5 @@
 /* ============================================================
-   Gold Standard Notes
+   Care Note Builder
    A phrase-bank daily-note builder for any care setting. No network,
    no model, no storage beyond this browser. Every sentence traces to
    a ticked input. The field names in TASKS[].nf match the dropdowns

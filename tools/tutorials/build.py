@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds the narrated video guide to Gold Standard Notes.
+"""Builds the narrated video guide to Care Note Builder.
 
     python3 tools/tutorials/build.py                     # narrate, record, compose, film
     python3 tools/tutorials/build.py --only tour,person  # just these tutorials, then the film
@@ -33,8 +33,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 SCRIPT = HERE / 'script.json'
 OUT = ROOT / 'build' / 'tutorials'
-FILM = 'gold-standard-notes-guide.mp4'
-DESKTOP = Path.home() / 'Desktop' / 'Gold Standard Notes — video guide.mp4'
+FILM = 'care-note-builder-guide.mp4'
+DESKTOP = Path.home() / 'Desktop' / 'Care Note Builder — video guide.mp4'
 
 W, H = 1920, 1200          # final video: a 96 px step header over 1920 x 1104 of app
 HEADER_H = 96
@@ -198,7 +198,7 @@ def title_card(number, total, tut, path):
     d = ImageDraw.Draw(card)
     mark = icon(200)
     card.paste(mark, (160, 330), mark)
-    d.text((160, 580), f'GOLD STANDARD NOTES  ·  TUTORIAL {number} OF {total}', font=font(34, 'demi'), fill=(178, 222, 222))
+    d.text((160, 580), f'CARE NOTE BUILDER  ·  TUTORIAL {number} OF {total}', font=font(34, 'demi'), fill=(178, 222, 222))
     y = 640
     for line in wrap(d, tut['title'], font(92, 'bold'), W - 320):
         d.text((160, y), line, font=font(92, 'bold'), fill='white')
@@ -333,7 +333,7 @@ def film(tutorials):
         return
     listing = OUT / 'film.txt'
     listing.write_text(''.join(f"file '{v}'\n" for v in videos))
-    chapters, start = [';FFMETADATA1', 'title=Gold Standard Notes — video guide'], 0
+    chapters, start = [';FFMETADATA1', 'title=Care Note Builder — video guide'], 0
     for tut, v in zip(tutorials, videos):
         end = start + duration_ms(v)
         chapters += ['[CHAPTER]', 'TIMEBASE=1/1000', f'START={start}', f'END={end}', f"title={tut['title']}"]
