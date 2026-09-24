@@ -62,15 +62,16 @@ function sameFacts(a, b, s){
   if(sa !== sb) why.push("the set of facts differs");
   if(numbers(a.text).join() !== numbers(b.text).join()) why.push("a number or time differs");
   ["extra", "declined", "behaviourOther", "handover", "whatAte", "chosen"].forEach(k => {
-    const v = String(s[k] || "").trim().replace(/[.!?]$/, "");
-    if(v && a.text.includes(v) !== b.text.includes(v)) why.push("staff's own words in " + k + " differ");
+    /* case-blind: an opener may start "A shower was offered" where another says "offered a shower" */
+    const v = String(s[k] || "").trim().replace(/[.!?]$/, "").toLowerCase();
+    if(v && a.text.toLowerCase().includes(v) !== b.text.toLowerCase().includes(v)) why.push("staff's own words in " + k + " differ");
   });
   return { same: !why.length, why };
 }
 
 /* plain-English names for the developer view */
 const LABELS = {
-  initials: "Initials", pronoun: "Pronouns", time: "Time", staffing: "Staffing this time", kind: "Type of interaction",
+  initials: "Initials", pronoun: "Pronouns", time: "Time", date: "Date", staffing: "Staffing this time", kind: "Type of interaction",
   slot: "Which one", setting: "Activity setting", actOther: "Activity name", sessionTo: "Session ended",
   offerA: "Option offered", offerB: "Second option", resp: "Choice or response", chosen: "What they chose",
   declined: "How the refusal was respected", consent: "Consent", level: "Overall support", ate: "Amount eaten",
