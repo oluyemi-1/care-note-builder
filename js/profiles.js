@@ -34,7 +34,9 @@ const PROFILE_SECTIONS = [
   { title: "Independence and community", fields: [
     { id: "usualLevel", label: "Usual level of independence", type: "select", options: [["", "Not recorded"]].concat(OVERALL_LEVELS) },
     { id: "communitySupport", label: "Community support requirements", type: "textarea", placeholder: "e.g. Needs support to cross roads; staff hold bank card" },
-    { id: "interests", label: "Activities and interests", type: "text", placeholder: "e.g. Swimming, music, buses" }] },
+    { id: "interests", label: "Activities and interests", type: "text", placeholder: "e.g. Swimming, music, buses" },
+    { id: "goals", label: "Outcomes they are working towards (from their support plan)", type: "textarea",
+      placeholder: "e.g. To travel to college by bus with less support; to cook a meal each week" }] },
   { title: "Individual risks", fields: [
     { id: "risks", label: "Individual risks (one per line)", type: "textarea", placeholder: "e.g. Tries to leave the building when anxious" }] }
 ];
@@ -59,7 +61,8 @@ function normalizeProfile(p, knownFlags, knownComm){
     comm: Array.isArray(p.comm) ? p.comm.filter(c => okComm.has(c)) : [],
     flags: Array.isArray(p.flags) ? p.flags.filter(f => okFlag.has(f)) : [],
     timetable: Array.isArray(p.timetable) ? p.timetable.filter(r => r && typeof r === "object").slice(0, 30).map(r => ({
-      d: String(r.d || "").slice(0, 1), c: str(r.c).slice(0, 40), from: str(r.from).slice(0, 5), to: str(r.to).slice(0, 5) })) : [],
+      d: String(r.d || "").slice(0, 1), c: str(r.c).slice(0, 40), from: str(r.from).slice(0, 5), to: str(r.to).slice(0, 5),
+      chosen: r.chosen === true })) : [],
     custom: {}
   };
   FIELD_IDS.forEach(id => { out[id] = str(p[id]); });
@@ -86,6 +89,7 @@ function contextSummary(p, flagList){
   else if(p.mobilityAid) out.push("Mobility aid: " + p.mobilityAid);
   if(p.usualLevel) out.push("Usually: " + label(OVERALL_LEVELS, p.usualLevel).toLowerCase());
   if(p.commApproach) out.push("Communication: " + p.commApproach);
+  if(p.goals) out.push("Working towards: " + p.goals);
   if(p.triggers) out.push("Triggers: " + p.triggers);
   return out;
 }

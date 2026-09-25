@@ -24,7 +24,7 @@ const D = G.data;
    what the person did and the support given, what happened and was seen,
    then clearing up and coming home ("closing") just before the outcome. */
 const SECTIONS = ["context", "offer", "choice", "consent", "start", "independence", "support", "declinedTasks",
-                  "observation", "risk", "explain", "closing", "outcome", "followup"];
+                  "observation", "risk", "explain", "closing", "outcome", "benefit", "followup"];
 /* sections that open a new paragraph when the note is split into paragraphs */
 const PARA_START = { independence: 1, observation: 1 };
 
@@ -123,6 +123,10 @@ function plan(s, opts, pre){
     if(s.offerA && s.offerB) add({ key: "offer", section: "offer", pri: 1, bank: D.OFFERBANK.two });
     else if(s.offerA && s.kind !== "activity") add({ key: "offer", section: "offer", pri: 2, bank: D.OFFERBANK.one });
   }
+  /* a college course the person chose for the year is a choice worth saying */
+  if(college && !notGoing && ((s.profile || {}).timetable || []).some(r => r.c === s.slot && r.chosen))
+    add({ key: "enrol", section: "choice", pri: 1, bank: D.ENROLBANK, src: ["setting", "slot", "profile.timetable." + s.slot + ".chosen"] });
+
   /* how staff communicated this time */
   (s.commUsed || []).forEach((c, i) => {
     if(D.COMMBANK[c]) add({ key: "comm_" + c, section: "offer", pri: i ? 3 : 2, bank: D.COMMBANK[c], src: ["commUsed." + c] });
@@ -209,7 +213,15 @@ function plan(s, opts, pre){
   (s.explained || []).forEach((t, i) => add({ key: "explain_" + i, section: "explain", pri: 1, text: verbatim(t), src: ["explained." + i] }));
 
   /* outcome, then what was actually done about anything */
-  if(s.outcome && D.OUTBANK[s.outcome]) add({ key: "out", section: "outcome", pri: 1, bank: D.OUTBANK[s.outcome], src: ["outcome"], lead: true });
+  const outSrc = ["outcome"];
+  if(s.kind === "activity" && s.enjoy && D.ENJOYBANK[s.enjoy]){
+    if(s.enjoy === "throughout" && s.outcome === "enjoyed") outSrc.push("enjoy");      // the outcome already says so
+    else if(!saidBy("enjoy." + s.enjoy)) add({ key: "enjoy", section: "outcome", pri: 1, bank: D.ENJOYBANK[s.enjoy], src: ["enjoy"] });
+  }
+  if(s.outcome && D.OUTBANK[s.outcome]) add({ key: "out", section: "outcome", pri: 1, bank: D.OUTBANK[s.outcome], src: outSrc, lead: true });
+  if(s.kind === "activity")
+    (s.benefit || []).filter(b => D.BENEFITBANK[b] && !saidBy("benefit." + b)).forEach((b, i) =>
+      add({ key: "ben_" + b, section: "benefit", pri: i < 2 ? 1 : 2, bank: D.BENEFITBANK[b], src: ["benefit." + b] }));
   if(s.handover) add({ key: "handover", section: "followup", pri: 1, text: "Handed over: " + s.handover.replace(/\.?\s*$/, "") + ".", src: ["handover"] });
   (s.followup || []).filter(k => !saidBy("followup." + k)).forEach(k => add({ key: "fu_" + k, section: "followup", pri: 1, bank: D.FOLLOWBANK[k], src: ["followup." + k] }));
 

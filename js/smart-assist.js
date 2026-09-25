@@ -156,7 +156,8 @@ function collect(ctx){
       const key = m.group + "." + m.id;
       if(saidIn[key]) return;
       saidIn[key] = field;
-      if((f.s[m.group] || []).includes(m.id)) return;          // already ticked; the note says it once, in the staff member's words
+      const cur = f.s[m.group];
+      if(Array.isArray(cur) ? cur.includes(m.id) : cur === m.id) return;   // already ticked; the note says it once, in the staff member's words
       push({ id: "m:" + key, severity: "suggestion", group: "match", rank: 1,
              title: "Your words say this - tick " + quote(m.label) + " to record it as a fact?",
              reason: "You wrote " + quote(m.sentence) + ". Ticking " + quote(m.label) + " records the same thing in a form that counts in " +
@@ -202,6 +203,15 @@ function collect(ctx){
     if(d.id === "choice" && f.s.resp === "noresp")
       push({ id: "q:choice", severity: "suggestion", group: "quality", rank: 1, title: d.message,
              reason: "Even small signs - looking toward something, pushing it away - show the person's response.", fields: ["resp"] });
+    if(d.id === "enjoyment")
+      push({ id: "q:enjoyment", severity: "suggestion", group: "quality", rank: 2, title: d.message,
+             reason: "The care record asks for the level of enjoyment. One tick under How much they enjoyed it covers it; the behaviour options say what showed it.", fields: ["enjoy"] });
+    if(d.id === "benefit")
+      push({ id: "q:benefit", severity: "suggestion", group: "quality", rank: 2, title: d.message,
+             reason: "The care record asks how the activity benefited the person in meeting their wishes and outcomes.", fields: ["benefit"] });
+    if(d.id === "enrolment")
+      push({ id: "q:enrolment", severity: "suggestion", group: "quality", rank: 1, title: d.message,
+             reason: "The care record asks how the person chose the activity. A college course is chosen once, at the start of the year; ticking it on the timetable says so in every note for that course.", fields: ["tt"] });
     if(d.id === "offer")
       push({ id: "q:offer", severity: "suggestion", group: "quality", rank: 1, title: d.message,
              reason: "Recording what was offered shows the person had a choice.", fields: ["offerA"] });
@@ -214,6 +224,7 @@ function collect(ctx){
   const passFor = { choice: d => d.status === "strong" ? "Choice evidenced between two options" : f.college ? "Response recorded" : "Choice or response recorded",
                     communication: () => "Their communication recorded", staffComm: () => "Staff communication recorded",
                     consent: () => "Consent recorded", dignity: () => "Dignity and privacy evidenced", followup: () => "Follow-up recorded",
+                    enjoyment: () => "Enjoyment recorded", benefit: () => "Benefit to them recorded", enrolment: () => "How they chose the course recorded",
                     independence: () => "Independence evidenced", observation: () => "Observation recorded",
                     outcome: () => "Outcome recorded", refusal: () => "Refusal respected" };
   dims.forEach(d => { if((d.status === "ok" || d.status === "strong") && passFor[d.id]) passes.push(passFor[d.id](d)); });

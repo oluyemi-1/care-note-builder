@@ -131,6 +131,17 @@ const CONTRADICTIONS = [
     }
   },
   {
+    id: "not-enjoyed-but-enjoyed",
+    test: f => {
+      if(f.s.enjoy !== "notmuch" || !["enjoyed", "proud"].includes(f.s.outcome)) return null;
+      return {
+        message: "\u201cDid not appear to enjoy it\u201d is recorded, but the outcome is " + quote(outName(f.s.outcome)) + ".",
+        reason: "The note cannot say both. If they enjoyed part of it, choose \u201cEnjoyed parts of it\u201d.",
+        fields: ["enjoy", "outcome"]
+      };
+    }
+  },
+  {
     id: "home-activity-with-travel",
     test: f => {
       if(f.kind !== "activity" || f.college || f.where !== "home" || !f.travel) return null;

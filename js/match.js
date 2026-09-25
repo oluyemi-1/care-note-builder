@@ -30,6 +30,8 @@ function candidates(f, extra){
   if(f.kind === "activity"){
     (f.tags || []).forEach(t => add("during", D.DURING[t] || []));
     add("learn", D.LEARN);
+    add("enjoy", D.ENJOY, id => id !== "notmuch" && id !== "unclear");   // negations never match, so only the positive ones
+    add("benefit", D.BENEFIT);
     const opt = (f.task.travel || {}).opt || "";
     add("risk", D.RISK, id => {
       const sc = D.RISK_SCOPE[id] || "all";
@@ -74,7 +76,9 @@ function covered(s, f){
   [["extra", s.extra], ["behaviourOther", (s.behaviour || []).includes("other") ? s.behaviourOther : ""]].forEach(([field, text]) => {
     if(!text) return;
     find(text, cands).forEach(m => {
-      if((s[m.group] || []).includes(m.id) && !out[m.group + "." + m.id]) out[m.group + "." + m.id] = field;
+      const cur = s[m.group];
+      const ticked = Array.isArray(cur) ? cur.includes(m.id) : cur === m.id;
+      if(ticked && !out[m.group + "." + m.id]) out[m.group + "." + m.id] = field;
     });
   });
   return out;

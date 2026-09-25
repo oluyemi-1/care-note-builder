@@ -119,14 +119,22 @@ download a backup regularly.
 
 Activities are not one thing, and recording them as one produced poor notes.
 
-- **College courses** are already arranged, so nothing is offered on the day.
-  The record covers whether the person was ready to go, the journey and how it
-  was kept safe, the support given in the session, and what they gained from it.
-  The app asks about readiness rather than choice, and never writes up a choice
-  that was not offered. Enrolment is start-of-term paperwork and stays out of
-  the daily note.
+- **College courses** were chosen by the person at the start of the college
+  year, from the courses on offer, and run until the summer. Nothing is offered
+  on the day, so the app asks about readiness rather than a fresh choice; but
+  when a course is ticked **Chose it** on the person's timetable, every note
+  for it says they chose it themselves at enrolment, which is what a care
+  record's "how the person chose the activity" asks for. The record then covers
+  the journey and how it was kept safe, the support given in the session, and
+  what they gained from it.
 - **In-house and community activities** are genuinely offered and chosen on the
   day, so the choice, the support and the safeguarding are what the note carries.
+
+Every activity note can also record **how much they enjoyed it** (one tick) and
+**how it met their wishes and outcomes** - something they had asked to do, a goal
+in their support plan, a valued routine, time with people who matter to them,
+time out in the community, choice and control. A profile can hold what the
+person is working towards, and Smart Assist reminds staff of it.
 
 Both record **what the person did during it** - the particular events of that
 kind of activity, such as washing hands before handling food, following the

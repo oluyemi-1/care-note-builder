@@ -16,15 +16,19 @@
 
 const { present } = G.core;
 
-const GROUPS = ["risk", "mood", "well", "how", "commUsed", "dignity", "contObs", "sleepObs", "behaviour", "followup", "learn", "during"];
+const GROUPS = ["risk", "mood", "well", "how", "commUsed", "dignity", "contObs", "sleepObs", "behaviour", "followup", "learn", "during", "benefit"];
+const CHOICES = ["enjoy"];          // one-of fields addressed as field.value
 
 function resolve(s, path){
   if(path.startsWith("prompts.")) return String((s.prompts || {})[path.slice(8)] || "");
   if(path.startsWith("explained.")) return String((s.explained || [])[Number(path.slice(10))] || "");
+  const tt = /^profile\.timetable\.([\w-]+)\.chosen$/.exec(path);
+  if(tt) return ((s.profile || {}).timetable || []).some(r => r.c === tt[1] && r.chosen) ? "yes" : "";
   if(path.startsWith("profile.")) return String((s.profile || {})[path.slice(8)] || "");
   const t = /^tasks\.([\w-]+)\.(level|opt)$/.exec(path);
   if(t){ const row = (s.tasks || []).find(x => x.id === t[1]); return row ? String(row[t[2]] || "") : ""; }
   const dot = path.indexOf(".");
+  if(dot > 0 && CHOICES.includes(path.slice(0, dot))) return s[path.slice(0, dot)] === path.slice(dot + 1) ? path.slice(dot + 1) : "";
   if(dot > 0 && GROUPS.includes(path.slice(0, dot))){
     const v = path.slice(dot + 1);
     return (s[path.slice(0, dot)] || []).includes(v) ? v : "";
@@ -76,7 +80,7 @@ const LABELS = {
   offerA: "Option offered", offerB: "Second option", resp: "Choice or response", chosen: "What they chose",
   declined: "How the refusal was respected", consent: "Consent", level: "Overall support", ate: "Amount eaten",
   whatAte: "What was eaten", offered: "Offered (ml)", drunk: "Drunk (ml)", drinkChoice: "Drink", skin: "Skin",
-  skinDetail: "Skin detail", behaviourOther: "Behaviour (described)", extra: "Anything else", handover: "Handover", outcome: "Outcome"
+  skinDetail: "Skin detail", enjoy: "How much they enjoyed it", behaviourOther: "Behaviour (described)", extra: "Anything else", handover: "Handover", outcome: "Outcome"
 };
 const label = path => LABELS[path] || path;
 

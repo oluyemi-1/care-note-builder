@@ -25,7 +25,7 @@ function orgAudit(f, extra){
        ? "One or more ticked tasks in step 3 still need a support level."
        : "Set the overall support level and tick what you supported in step 3."},
     {id:"observation", field:"mood", ok: s.mood.length > 0 || s.well.length > 0 || (s.kind==="personal" && !!s.skin) || (s.kind==="activity" && (s.risk.length > 0 || s.learn.length > 0 || (s.during || []).length > 0)) || (s.kind==="eating" && (!!s.ate || !!s.drunk)) ||
-                           answered || (s.behaviour || []).length > 0 || (s.contObs || []).length > 0 || (s.sleepObs || []).length > 0,
+                           answered || (s.behaviour || []).length > 0 || (s.contObs || []).length > 0 || (s.sleepObs || []).length > 0 || !!s.enjoy,
      t:"Relevant risk controls and observations included", need:"an observation", fix:"Add at least one observation in step 4."},
     {id:"outcome", field:"outcome", ok: !!s.outcome, t:"Meaningful outcome recorded", need:"how it ended for them", fix:"Choose an outcome in step 5."},
     {id:"refusal", field:"declined", ok: !declined || !!s.declined, t:"Refusal or non-engagement respected", need:"how you respected the refusal", fix:"Say what you did to respect the refusal in step 2."},
@@ -75,6 +75,10 @@ function dimensions(f, extra){
         : "No clear response was recorded. If " + V.N + " responded in any way, record how.");
   } else {
     add("choice", "Response", s.resp ? "ok" : "gap", "How " + V.N + " felt about going has not been recorded.");
+    if(!["declinedgo"].includes(s.resp))
+      add("enrolment", "How they chose the course",
+          ((f.profile || {}).timetable || []).some(r => r.c === s.slot && r.chosen) ? "ok" : "gap",
+          "How " + V.N + " chose this course has not been recorded. If " + V.s + " chose it at enrolment, tick \u201cChose it\u201d on " + V.p + " timetable.");
   }
 
   add("staffComm", "Staff communication", (s.commUsed || []).length ? "ok" : "gap",
@@ -103,6 +107,10 @@ function dimensions(f, extra){
                    (s.kind === "activity" && (s.risk.length || s.learn.length || (s.during || []).length)) || (s.kind === "eating" && (s.ate || s.drunk));
   add("observation", "Observation", observed ? "ok" : "gap", "Nothing observed has been recorded yet.");
   add("outcome", "Outcome", s.outcome ? "ok" : "gap", "An outcome has not yet been documented.");
+  if(s.kind === "activity" && !f.declinedAll){
+    add("enjoyment", "Enjoyment", s.enjoy || s.outcome === "enjoyed" ? "ok" : "gap", "How much " + V.N + " enjoyed it has not been recorded.");
+    add("benefit", "Benefit", (s.benefit || []).length ? "ok" : "gap", "How this met " + V.N + "'s wishes and outcomes has not been recorded.");
+  }
   if(extra.handoverNeeded)
     add("followup", "Follow-up", s.handover || (s.followup || []).length ? "ok" : "gap",
         "Something worth handing over was recorded, and no follow-up has been recorded yet.");

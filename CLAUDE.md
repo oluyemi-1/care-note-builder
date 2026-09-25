@@ -63,6 +63,10 @@ Other rules the tests and the owner hold to:
   note card must say when a shorter length leaves out something recorded.
 - Activity notes read in time order (task `phase` start/during/end); staff's own words go
   straight after what the person did.
+- An activity note should cover what the care record's note box asks: how the person chose
+  it (for college, the timetable's per-course `chosen` tick → `ENROLBANK`), the support, how
+  much they enjoyed it (`enjoy`) and how it met their wishes and outcomes (`benefit`).
+  Smart Assist raises gaps in these as suggestions, never as blockers.
 - British English. Fictional people only in tests, fixtures and recordings.
 
 ## Architecture

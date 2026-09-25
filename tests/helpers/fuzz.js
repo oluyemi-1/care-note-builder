@@ -28,7 +28,9 @@ function randomInteraction(seed){
     initials: one(["TA", "TB", "XY", "QZ"]), pronoun: one(["he", "she", "they"]),
     flags: some(ids(D.FLAGS), 0.3), comm: some(ids(D.COMM), 0.3), ratio: one(["", "1:1", "2:1"]),
     texture: maybe("IDDSI Level 6 soft and bite-sized", 0.3), fluidTarget: maybe("1500", 0.3),
-    mobilityAid: maybe("long cane", 0.3), usualLevel: maybe(one(["ind", "prompt"]), 0.3)
+    mobilityAid: maybe("long cane", 0.3), usualLevel: maybe(one(["ind", "prompt"]), 0.3),
+    goals: maybe("to travel to college by bus with less support", 0.3),
+    timetable: setting === "college" && r() < 0.6 ? [{ d: String(new Date().getDay()), c: slot, from: "10:00", to: "12:00", chosen: r() < 0.7 }] : []
   };
   const s = makeState({
     initials: profile.initials, pronoun: profile.pronoun, flags: profile.flags, comm: profile.comm,
@@ -52,6 +54,7 @@ function randomInteraction(seed){
     risk: kind === "activity" ? some(ids(D.RISK), 0.25) : [],
     learn: kind === "activity" ? some(ids(D.LEARN), 0.2) : [],
     during: kind === "activity" ? some(((D.ACT_INFO[slot] || {}).tags || []).flatMap(t => ids(D.DURING[t] || [])), 0.3) : [],
+    enjoy: kind === "activity" ? maybe(one(ids(D.ENJOY)), 0.5) : "", benefit: kind === "activity" ? some(ids(D.BENEFIT), 0.2) : [],
     dignity: kind === "personal" ? some(ids(D.DIGNITY), 0.3) : [],
     contObs: kind === "personal" ? some(ids(D.CONT_OBS), 0.2) : [],
     sleepObs: kind === "personal" ? some(ids(D.SLEEP_OBS), 0.2) : [],

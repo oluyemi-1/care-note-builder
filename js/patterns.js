@@ -36,7 +36,7 @@ function toRecord(s, meta){
     food: s.kind === "eating" && s.ate ? { amount: s.ate, pct: PCT[s.ate] } : null,
     fluid: s.kind === "eating" && (num(s.drunk) !== null || num(s.offered) !== null) ? { offered: num(s.offered), drunk: num(s.drunk) } : null,
     mood: (s.mood || []).slice(), wellbeing: (s.well || []).slice(), behaviour: (s.behaviour || []).filter(b => b !== "other"),
-    during: (s.during || []).slice(),
+    during: (s.during || []).slice(), enjoy: s.kind === "activity" ? (s.enjoy || "") : "", benefit: (s.benefit || []).slice(),
     skin: s.kind === "personal" ? (s.skin || "") : "",
     sleep: (s.sleepObs || []).slice(), continence: (s.contObs || []).slice(),
     prompts: Object.assign({}, s.prompts || {}),

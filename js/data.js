@@ -750,11 +750,48 @@ const MATCH = {
  health:["\\bgp\\b","\\bnurse\\b","doctor","\\b111\\b","paramedic","ambulance","pharmac"],
  family:["family","\\bmum\\b","\\bdad\\b","mother","father","brother","sister","next of kin","advocate"],
  bodymap:["body map"], mar:["\\bmar\\b","mar chart"], incident:["incident (?:form|report)","datix"],
+ /* enjoyment, and how it met their wishes */
+ throughout:["enjoyed (?:it|himself|herself|themselves|every)","loved (?:it|every)","had a (?:great|lovely|good|wonderful|fantastic) time"],
+ parts:["enjoyed (?:some|parts|the first|the second)"],
+ asked:["had asked (?:to|for)","asked to (?:go|do) this"], social:["with (?:his|her|their) friends","people (?:he|she|they) likes?"],
+ out:["out in the community","out and about"], routine:["(?:his|her|their) (?:usual|weekly|regular) routine"],
+ control:["(?:his|her|their) own choice","chose (?:for|to) (?:himself|herself|themselves)"],
  /* continence and sleep */
  urine:["passed urine","\\bwee\\b","urinated","pass(?:ed)? water"], bowels:["bowels","\\bstool\\b"], dry:["\\b(?:was|were) dry\\b"],
  episode:["incontinen","\\bwet (?:the|his|her|their|himself|herself|themselves)","soiled"],
  asleep:["asleep","sleeping"], awakesettled:["awake (?:and|but) settled"], awakeunsettled:["awake and (?:unsettled|upset|agitated|distressed)"]
 };
+
+/* What the care record asks of an activity note, beyond what was done: how
+   much the person enjoyed it, and how it met their wishes and outcomes. Each
+   is a tick with exactly its own sentence. */
+const ENJOY = [["throughout","Enjoyed it throughout"],["parts","Enjoyed parts of it"],
+               ["notmuch","Did not appear to enjoy it"],["unclear","Hard to tell how much they enjoyed it"]];
+const ENJOYBANK = {
+ throughout:["{S} appeared to enjoy it throughout.","{S} clearly enjoyed {r} throughout."],
+ parts:["{S} appeared to enjoy parts of it.","{S} enjoyed some parts more than others."],
+ notmuch:["{S} did not appear to enjoy it.","{S} showed little sign of enjoying it."],
+ unclear:["It was hard to tell how much {s} enjoyed it.","How much {s} enjoyed it was hard to tell."]
+};
+const BENEFIT = [["asked","Something they had asked to do"],["goal","Works towards a goal in their support plan"],
+                 ["routine","Part of a routine they value"],["social","Time with people they like being with"],
+                 ["out","Time out and about in the community"],["control","Gave them choice and control over their day"],
+                 ["confidence","Built their confidence"]];
+const BENEFITBANK = {
+ asked:["This was something {s} had asked to do.","{S} had asked to do this."],
+ goal:["This works towards a goal in {p} support plan.","It is part of working towards a goal in {p} support plan."],
+ routine:["It is part of a routine that matters to {o}.","This is one of the routines {s} {vhave} kept up."],
+ social:["It gave {o} time with people who matter to {o}.","{S} spent time with people who matter to {o}."],
+ out:["It gave {o} time out and about in the community.","{S} had time out and about in the community."],
+ control:["It gave {o} choice and control over {p} day.","{S} had choice and control over how {s} spent the time."],
+ confidence:["It built {p} confidence.","{S} grew in confidence doing it."]
+};
+/* a college course the person chose for the year, as ticked on their timetable */
+const ENROLBANK = [
+ "{S} chose {act} {r} at the start of the college year, from the courses on offer.",
+ "{act2} is a course {s} picked {r} when the year's options were offered.",
+ "{S} picked {act} from the courses offered at the start of the year."
+];
 
 /* how staff communicated this time; the profile only says which are usual */
 const STAFFING = [["","Not stated"],["1:1","1:1"],["2:1","2:1"],["shared","Shared staffing"]];
@@ -810,6 +847,6 @@ G.data = {
   COMM, FLAGS, RESP, HOW, CONSENT, SKIN, MOOD, WELL, RISK, OUTCOME, ACTS, ACT_INFO, OVERALL_LEVELS, OUT_SCOPE, SLOTS, LEVELS, TASKS, ACT_SETTING, COURSES, RESP_COLLEGE, RESP_SCOPE, LEARN, LEARNBANK, TRAVEL_RISK, OPEN_COLLEGE, OPEN_ACT, OPEN_PC, OPEN, COMMBANK, RESPBANK, HOWBANK, CONSENTBANK, SKINBANK, MOODBANK, WELLBANK, RISKBANK, OUTBANK, MEALWORD, DAYS, OUT_LEAD,
   GROUPBANK, LEVELBANK, OFFERBANK, SESSIONBANK, INTAKEBANK, HOW_JOIN, OPEN_COLLEGE_DECLINED,
   DIGNITY, DIGNITYBANK, CONT_OBS, CONTBANK, SLEEP_OBS, SLEEPBANK, BEHAVIOUR, BEHAVIOURBANK, FOLLOWUP, FOLLOWBANK,
-  STAFFING, RISK_SCOPE, JOURNEY, DURING, DURINGBANK, MATCH
+  STAFFING, RISK_SCOPE, JOURNEY, DURING, DURINGBANK, MATCH, ENJOY, ENJOYBANK, BENEFIT, BENEFITBANK, ENROLBANK
 };
 })(globalThis.GSN = globalThis.GSN || {});

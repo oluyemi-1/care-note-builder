@@ -7,7 +7,7 @@ const BASE = {
   declined: "", level: "", tasks: [], ate: "", whatAte: "", drinkChoice: "", offered: "", drunk: "",
   skin: "", skinDetail: "", mood: [], well: [], risk: [], outcome: "", extra: "", handover: "",
   attest: false, staffing: "", commUsed: [], dignity: [], contObs: [], sleepObs: [], behaviour: [],
-  behaviourOther: "", followup: [], prompts: {}, during: []
+  behaviourOther: "", followup: [], prompts: {}, during: [], enjoy: "", benefit: []
 };
 
 function makeState(over){

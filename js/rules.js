@@ -75,6 +75,7 @@ function facts(ctx){
       targetNote: profile.fluidTarget ? " of " + profile.fluidTarget + " ml" : "",
       triggersNote: profile.triggers ? ". Recorded triggers: " + profile.triggers.replace(/[.\s]+$/, "") : "",
       usualLevel: usual.toLowerCase() || "not recorded",
+      goals: (profile.goals || "").replace(/[.\s]+$/, ""),
       ateLower: String(s.ate || "").toLowerCase(),
       drunk: s.drunk || "", offered: s.offered || "",
       skinDetail: s.skinDetail || "a new mark"
@@ -335,6 +336,14 @@ const CARE_RULES = [
     suggest: "Anxiety is recorded in {N}'s profile. Consider recording how the plan was shared and how {N} presented.",
     highlight: ["risk.plan"],
     watch: ["mood"]
+  },
+
+  {
+    id: "goals-activity", title: "What they are working towards",
+    appliesWhen: { profileHas: "goals", kind: "activity" },
+    reason: "{N}'s profile records what {s} is working towards: {goals}.",
+    suggest: "{N} is working towards: {goals}. Did this activity work towards it? If so, tick it under How it met their wishes and outcomes.",
+    highlight: ["benefit.goal"], watch: ["benefit"]
   },
 
   /* ---- communication ---- */

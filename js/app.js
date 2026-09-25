@@ -12,7 +12,7 @@ const {
   COMM, FLAGS, RESP, HOW, CONSENT, SKIN, MOOD, WELL, RISK, OUTCOME, OUT_SCOPE, SLOTS, LEVELS, TASKS, ACT_SETTING,
   COURSES, RESP_COLLEGE, RESP_SCOPE, LEARN, COMMBANK, RESPBANK, HOWBANK, CONSENTBANK, SKINBANK, MOODBANK,
   WELLBANK, RISKBANK, OUTBANK, DAYS, DIGNITY, CONT_OBS, SLEEP_OBS, BEHAVIOUR, FOLLOWUP, STAFFING, RISK_SCOPE,
-  JOURNEY, DURING, ACT_INFO
+  JOURNEY, DURING, ACT_INFO, ENJOY, BENEFIT
 } = GSN.data;
 const { PROFILE_SECTIONS, normalizeProfile, contextSummary } = GSN.profiles;
 
@@ -83,6 +83,8 @@ function state(){
     sessionTo: $("sessionTo").value,
     learn:    checked("learn"),
     during:   checked("during"),
+    enjoy:    one("enjoy"),
+    benefit:  checked("benefit"),
     actOther: $("actOther").value.trim(),
     len:      $("len").value,
     time:     $("time").value,
@@ -524,10 +526,12 @@ const setText = (el, t) => { if(el && el.textContent !== t) el.textContent = t; 
 const STEP_OF = { kind: 1, slot: 1, time: 1, staffing: 1, commUsed: 1, offerA: 1, offerB: 1, setting: 1, sessionTo: 1, actOther: 1,
   resp: 2, how: 2, consent: 2, chosen: 2, declined: 2, level: 3, tasks: 3,
   mood: 4, well: 4, risk: 4, dignity: 4, contObs: 4, sleepObs: 4, skin: 4, skinDetail: 4, learn: 4, during: 4, behaviour: 4, behaviourOther: 4,
-  ate: 4, whatAte: 4, drunk: 4, offered: 4, drinkChoice: 4, prompt: 4, outcome: 5, extra: 5, handover: 5, followup: 5 };
+  ate: 4, whatAte: 4, drunk: 4, offered: 4, drinkChoice: 4, prompt: 4, outcome: 5, extra: 5, handover: 5, followup: 5, enjoy: 5, benefit: 5,
+  tt: 0, comm: 0, flags: 0, initials: 0 };
 function stepOf(field){
-  if(!field) return 0;
-  return STEP_OF[field.split(/[.:]/)[0]] || 0;
+  if(!field) return -1;
+  const k = field.split(/[.:]/)[0];
+  return k in STEP_OF ? STEP_OF[k] : -1;
 }
 let hlTimer = null;
 function goToStep(n){
@@ -561,7 +565,7 @@ $("saList").addEventListener("toggle", e => {
   if(!d.classList || !d.classList.contains("sa-why") || !d.open) return;
   const go = d.closest("li").querySelector(".sa-go");
   const n = stepOf(go && go.dataset.field);
-  if(n) goToStep(n);
+  if(n >= 0) goToStep(n);
 }, true);
 $("saList").addEventListener("input", e => {
   const id = e.target.dataset && e.target.dataset.explain;
@@ -628,6 +632,11 @@ function renderFields(s){
     if(s.drunk){ rows.push(["Fluid intake (mls)", s.drunk]); rows.push(["Amount drunk (Mls)", s.drunk]); }
     if(s.drinkChoice) rows.push(["Drink choice", s.drinkChoice]);
   }
+  if(s.kind === "activity"){
+    const where = s.setting === "college" ? "College" : ((ACT_INFO[s.slot] || {}).where || "either");
+    rows.push(["Location activity took place", where === "College" ? "College" : where === "home" ? "At home"
+             : where === "out" || s.tasks.some(t => t.id === "travel" && t.level && t.level !== "declined") ? "In the community" : "At home"]);
+  }
   if(s.kind === "personal" && s.skin === "concern") rows.push(["Body Map", "Record the new mark"]);
   if(s.handover) rows.push(["Handover", "Tick the handover box"]);
 
@@ -666,6 +675,8 @@ function syncVisibility(s){
   $("offerWrap").hidden = college;
   $("sessionToWrap").hidden = !college;
   $("learnWrap").hidden = s.kind !== "activity";
+  showGroup("enjoyWrap", s.kind === "activity");
+  showGroup("benefitWrap", s.kind === "activity");
   syncDuring(s);
   $("actOtherWrap").hidden = !(s.kind === "activity" && s.slot === "other" && !college);
   /* only offer responses that make sense here */
@@ -763,6 +774,7 @@ function ttRow(r){
       '<option value="' + c[0] + '"' + (r.c === c[0] ? ' selected' : '') + '>' + c[1] + '</option>').join("") + '</select>' +
     '<input type="time" class="tt-from" aria-label="Starts" value="' + esc(r.from || "") + '">' +
     '<input type="time" class="tt-to" aria-label="Ends" value="' + esc(r.to || "") + '">' +
+    '<label class="tt-ch" title="They chose this course themselves at the start of the college year"><input type="checkbox" class="tt-chosen"' + (r.chosen ? ' checked' : '') + '> Chose it</label>' +
     '<button type="button" class="tt-x" aria-label="Remove this session">&times;</button></div>';
 }
 function renderTT(list){
@@ -771,11 +783,12 @@ function renderTT(list){
 function readTT(){
   return [...document.querySelectorAll("#tt .ttrow")].map(row => ({
     d: row.querySelector(".tt-d").value, c: row.querySelector(".tt-c").value,
-    from: row.querySelector(".tt-from").value, to: row.querySelector(".tt-to").value
+    from: row.querySelector(".tt-from").value, to: row.querySelector(".tt-to").value,
+    chosen: row.querySelector(".tt-chosen").checked
   })).filter(r => r.from);
 }
 $("ttAdd").addEventListener("click", () => {
-  $("tt").insertAdjacentHTML("beforeend", ttRow({ d: String(new Date().getDay()) }));
+  $("tt").insertAdjacentHTML("beforeend", ttRow({ d: String(new Date().getDay()), chosen: true }));
   syncPerson();
 });
 $("tt").addEventListener("click", e => {
@@ -971,6 +984,8 @@ chips("contObs", CONT_OBS, "checkbox");
 chips("sleepObs", SLEEP_OBS, "checkbox");
 chips("behaviour", BEHAVIOUR, "checkbox");
 chips("followup", FOLLOWUP, "checkbox");
+chips("enjoy", ENJOY, "radio");
+chips("benefit", BENEFIT, "checkbox");
 $("staffing").innerHTML = STAFFING.map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join("");
 
 function buildTasks(){
@@ -1011,7 +1026,7 @@ buildTasks();
    type clears the entry and says so. */
 const SCOPED_TEXT = ["offerA","offerB","chosen","declined","whatAte","drinkChoice",
                      "offered","drunk","skinDetail","extra","handover","actOther","behaviourOther","sessionTo"];
-const SCOPED_CHIPS = ["resp","how","consent","skin","mood","well","risk","outcome","learn","during",
+const SCOPED_CHIPS = ["resp","how","consent","skin","mood","well","risk","outcome","learn","during","enjoy","benefit",
                       "commUsed","dignity","contObs","sleepObs","behaviour","followup"];
 
 /* Everything below the person belongs to one entry, for one person. It is
@@ -1209,7 +1224,9 @@ function omittedLabel(key){
   const [g, id] = key.split(/_(.+)/);
   const from = (list, v) => GSN.core.plain((list.find(x => x[0] === v) || ["", v])[1]).toLowerCase();
   if(g === "task") return GSN.rules.taskLabel($("kind").value, id).toLowerCase();
-  const lists = { comm: COMM, how: HOW, risk: RISK, dig: DIGNITY, learn: LEARN, mood: MOOD, well: WELL, during: Object.values(DURING).flat() };
+  const lists = { comm: COMM, how: HOW, risk: RISK, dig: DIGNITY, learn: LEARN, mood: MOOD, well: WELL, during: Object.values(DURING).flat(), ben: BENEFIT };
+  if(g === "enjoy") return "how much they enjoyed it";
+  if(g === "enrol") return "how they chose the course";
   if(lists[g]) return from(lists[g], id);
   return { session: "session times", offer: "the option offered", level: "the overall support level", fluid: "the drink chosen",
            skin: "the skin check", prompt: "an answer to a profile question" }[g] || "a detail";
