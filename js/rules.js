@@ -420,7 +420,7 @@ function sourcesOf(template, key, f){
    most likely that class. Returns null when college is already chosen, there
    is no timetable, or nothing fits. `today` says the session is timetabled for
    today; `sameActivity` that the activity chosen is that course. */
-const ACT_COURSE = { music: "music", cooking: "cooking", baking: "baking", exercise: "exercise", arts: "art", gardening: "allotment" };
+const ACT_COURSE = { music: "music", cooking: "cooking", baking: "baking", exercise: "exercise", arts: "art", gardening: "allotment", connect: "connect" };
 function timetabled(s, profile, now){
   const tt = ((profile && profile.timetable) || []).filter(r => r && r.c);
   if(!s || s.kind !== "activity" || s.setting === "college" || !tt.length) return null;
