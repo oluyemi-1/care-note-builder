@@ -75,6 +75,9 @@ const ACTS = [
   ["music","Music","music","took part in music"],
   ["arts","Arts &amp; crafts","arts and crafts","did arts and crafts"],
   ["connect","Connect &amp; communication","{p} Connect and Communication session","took part in {p} Connect and Communication session"],
+  ["pop","Playing Pop","{p} Playing Pop session","took part in {p} Playing Pop session"],
+  ["tabletennis","Table tennis","table tennis","played table tennis"],
+  ["gateway","Gateway Club","Gateway Club","went to Gateway Club"],
   ["games","Games / puzzles","a game","played a game"],
   ["film","TV / film at home","TV or a film","watched TV or a film"],
   ["exercise","Exercise / gym","exercise","did some exercise"],
@@ -110,6 +113,7 @@ const ACT_INFO = {
   volunteering:{where:"out"}, music:{where:"either", tags:["music"]}, arts:{where:"either", tags:["arts"]}, games:{where:"home"},
   film:{where:"home"}, exercise:{where:"either", tags:["physical"]}, appt:{where:"out"}, connect:{where:"either", tags:["communication"]},
   family:{where:"either"}, drive:{where:"out", tags:["transport"]}, other:{where:"either"},
+  pop:{where:"either", tags:["music"]}, tabletennis:{where:"either", tags:["physical"]}, gateway:{where:"out", tags:["social"]},
   /* college courses that are not also an activity above */
   dance:{where:"out", tags:["music","physical"]}, singing:{where:"out", tags:["music"]}, allotment:{where:"out", tags:["garden"]},
   art:{where:"out", tags:["arts"]}
@@ -134,6 +138,8 @@ DURING.shopping = [["shopping-list","Used a shopping list"],["shopping-items","C
 DURING.garden = [["garden-planted","Planted or watered"],["garden-tools","Used garden tools"]];
 DURING.laundry = [["laundry-sorted","Sorted the washing"],["laundry-machine","Loaded and started the machine"],["laundry-folded","Folded the clean washing"]];
 DURING.chores = [["chores-room","Tidied their own room"],["chores-hoover","Hoovered or dusted"]];
+DURING.social = [["social-friends","Met up with friends"],["social-joined","Joined in the group activity"],
+                 ["social-new","Spoke to someone new"],["social-snack","Bought a drink or snack"]];
 DURING.communication = [["comm-greeted","Greeted others"],["comm-turns","Took turns in a conversation"],
                         ["comm-aid","Used their communication aid"],["comm-symbols","Made a choice using pictures or symbols"],
                         ["comm-listened","Listened while others spoke"],["comm-newsign","Practised a new word or sign"],
@@ -169,6 +175,10 @@ const DURINGBANK = {
  "laundry-machine":["{S} loaded and started the machine.","{S} loaded the machine and started it."],
  "laundry-folded":["{S} folded the clean washing.","{S} folded the washing once it was dry."],
  "chores-room":["{S} tidied {p} own room.","{S} tidied {p} room."],
+ "social-friends":["{S} met up with {p} friends.","{S} spent time with {p} friends there."],
+ "social-joined":["{S} joined in the group activity.","{S} took part in what the group was doing."],
+ "social-new":["{S} spoke to someone new.","{S} talked to someone {s} had not met before."],
+ "social-snack":["{S} bought {r} a drink or snack.","{S} chose and bought a drink or snack."],
  "comm-greeted":["{S} greeted the others.","{S} said hello to the others."],
  "comm-turns":["{S} took turns in a conversation.","{S} waited for {p} turn to speak and took it."],
  "comm-aid":["{S} used {p} communication aid.","{S} communicated using {p} aid."],
@@ -448,13 +458,15 @@ const ACT_SETTING = [["college","College course"],["community","At home or in th
 
 const COURSES = [
   ["music","Music","{p} music class","attended {p} music class"],
-  ["cooking","Cooking","{p} cooking class","attended {p} cooking class"],
+  ["cooking","Cookery class","{p} cookery class","attended {p} cookery class"],
   ["baking","Baking","{p} baking class","attended {p} baking class"],
   ["dance","Dance","{p} dance class","attended {p} dance class"],
   ["singing","Singing","{p} singing class","attended {p} singing class"],
   ["exercise","Exercise","{p} exercise class","attended {p} exercise class"],
   ["allotment","Allotment","{p} allotment session","attended {p} allotment session"],
-  ["art","Art &amp; painting","{p} art class","attended {p} art class"],
+  ["art","Art class","{p} art class","attended {p} art class"],
+  ["pop","Playing Pop","{p} Playing Pop session","attended {p} Playing Pop session"],
+  ["tabletennis","Table tennis","{p} table tennis session","attended {p} table tennis session"],
   ["drama","Drama","{p} drama class","attended {p} drama class"],
   ["connect","Connect &amp; communication","{p} Connect and Communication session","attended {p} Connect and Communication session"],
   ["computing","Computing","{p} computing class","attended {p} computing class"],
@@ -762,6 +774,8 @@ const MATCH = {
  "shopping-bags":["carried (?:the )?(?:bags|shopping)","\\bbags?\\b"], "garden-planted":["plant(?:ed|ing)","water(?:ed|ing) the","seeds"],
  "garden-tools":["trowel","spade","rake","secateurs","garden tools"], "laundry-sorted":["sorted (?:the )?(?:washing|laundry|clothes)"],
  "laundry-machine":["machine"], "laundry-folded":["folded"],
+ "social-friends":["(?:his|her|their) friends","met up with"], "social-joined":["joined in"], "social-new":["someone new","new (?:friend|person)"],
+ "social-snack":["bought (?:a|some|himself|herself|themselves)","(?:a|his|her|their) (?:drink|snack|crisps|coke|juice)"],
  "comm-greeted":["greeted","said hello","waved (?:to|at)"], "comm-turns":["took turns (?:talking|speaking|in)","turn[- ]taking"],
  "comm-aid":["communication aid","(?:his|her|their) (?:ipad|tablet|talker|device)"], "comm-symbols":["symbols?","picture(?:s| card)"],
  "comm-listened":["listened (?:to|while)"], "comm-newsign":["new (?:word|sign)"], "comm-initiated":["started (?:a|the) conversation","initiated"], "chores-room":["(?:his|her|their) (?:own )?room"], "chores-hoover":["hoover","vacuum","dust(?:ed|ing)"],

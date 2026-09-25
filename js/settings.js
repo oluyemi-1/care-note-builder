@@ -33,7 +33,7 @@ const section = (title, help, body, open) => '<details class="cfg"' + (open ? ' 
 
 const TAG_NAMES = { food: "cooking and baking", music: "music", arts: "arts and crafts", physical: "exercise", water: "swimming",
                     walking: "walks", shopping: "shopping", garden: "gardening", laundry: "laundry", chores: "housework",
-                    communication: "connect and communication" };
+                    communication: "connect and communication", social: "clubs and social groups" };
 const groupValue = o => o.group === "during" ? "during:" + ((o.tags || [])[0] || "food") : o.group;
 
 /* a list the provider can add to and remove from; each column is one input */
