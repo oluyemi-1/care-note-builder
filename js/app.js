@@ -673,6 +673,8 @@ function syncVisibility(s){
     ? "Already arranged, so nothing is offered today \u2014 record the journey, the support and what they gained."
     : "Offered today and chosen from the options \u2014 record the choice, the support and how it went.";
   $("offerWrap").hidden = college;
+  setText($("commUsedHead"), college ? "How staff told them it was college today" : "How staff communicated this time");
+  setText($("howHead"), college ? "How they let you know they\u2019d go" : "How they let you know");
   $("sessionToWrap").hidden = !college;
   $("learnWrap").hidden = s.kind !== "activity";
   showGroup("enjoyWrap", s.kind === "activity");

@@ -608,6 +608,33 @@ const HOWBANK = {
  reached:["{S} reached for the option {s} wanted.","{S} reached out towards {p} choice."],
  facial:["{P} facial expression made {p} preference clear.","{S} showed {p} preference through {p} facial expression."]
 };
+/* College is not offered on the day; what matters is that staff told the
+   person it was college today, how they told them, and how the person showed
+   they would go - all before the journey. The telling sentence exists only
+   when a communication method is ticked; the method becomes its clause. */
+const COMM_CLAUSE = {
+ verbal:"in short, clear sentences", makaton:"using Makaton alongside speech", pictures:"using {p} picture-based communication book",
+ nownext:"using {p} Now and Next board", objects:"using objects of reference", gesture:"with gesture and simple words"
+};
+const TELLBANK = [
+ "{tellWhen}, staff told {N} that it was college today, for {act}{tellHow}.",
+ "{tellWhen}, staff let {N} know it was college today and that {act} was on{tellHow}.",
+ "{tellWhen}, staff explained to {N} that it was college today, for {act}{tellHow}."
+];
+const HOWBANK_COLLEGE = {
+ said:["{S} told staff {s} {vbe} happy to go.","{S} said {s} wanted to go."],
+ pointed:["{S} pointed to show {s} understood and would go.","{S} pointed to show {s} would go."],
+ signed:["{S} signed to show {s} would go.","{S} signed that {s} {vbe} happy to go."],
+ nodded:["{S} nodded to show {s} would go.","{S} nodded when told."],
+ led:["{S} led staff to the door, ready to go.","{S} took staff to the door to show {s} {vbe} ready."],
+ reached:["{S} reached for {p} things, ready to go.","{S} got {p} things together, ready to go."],
+ facial:["{P} expression showed {s} {vbe} happy to go.","{S} showed with {p} expression that {s} {vbe} happy to go."]
+};
+const HOW_JOIN_COLLEGE = {
+ said:"telling staff so", pointed:"pointing to show it", signed:"signing to show it", nodded:"nodding to show it",
+ led:"leading staff to the door", reached:"reaching for {p} things", facial:"{p} expression making it clear"
+};
+
 /* the same, as a clause, so a choice and how it was shown can be one sentence */
 const HOW_JOIN = {
  said:"telling staff in {p} own words", pointed:"pointing to {p} choice", signed:"signing {p} choice",
@@ -847,6 +874,7 @@ G.data = {
   COMM, FLAGS, RESP, HOW, CONSENT, SKIN, MOOD, WELL, RISK, OUTCOME, ACTS, ACT_INFO, OVERALL_LEVELS, OUT_SCOPE, SLOTS, LEVELS, TASKS, ACT_SETTING, COURSES, RESP_COLLEGE, RESP_SCOPE, LEARN, LEARNBANK, TRAVEL_RISK, OPEN_COLLEGE, OPEN_ACT, OPEN_PC, OPEN, COMMBANK, RESPBANK, HOWBANK, CONSENTBANK, SKINBANK, MOODBANK, WELLBANK, RISKBANK, OUTBANK, MEALWORD, DAYS, OUT_LEAD,
   GROUPBANK, LEVELBANK, OFFERBANK, SESSIONBANK, INTAKEBANK, HOW_JOIN, OPEN_COLLEGE_DECLINED,
   DIGNITY, DIGNITYBANK, CONT_OBS, CONTBANK, SLEEP_OBS, SLEEPBANK, BEHAVIOUR, BEHAVIOURBANK, FOLLOWUP, FOLLOWBANK,
-  STAFFING, RISK_SCOPE, JOURNEY, DURING, DURINGBANK, MATCH, ENJOY, ENJOYBANK, BENEFIT, BENEFITBANK, ENROLBANK
+  STAFFING, RISK_SCOPE, JOURNEY, DURING, DURINGBANK, MATCH, ENJOY, ENJOYBANK, BENEFIT, BENEFITBANK, ENROLBANK,
+  COMM_CLAUSE, TELLBANK, HOWBANK_COLLEGE, HOW_JOIN_COLLEGE
 };
 })(globalThis.GSN = globalThis.GSN || {});

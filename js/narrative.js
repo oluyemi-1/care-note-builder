@@ -128,15 +128,25 @@ function plan(s, opts, pre){
     add({ key: "enrol", section: "choice", pri: 1, bank: D.ENROLBANK, src: ["setting", "slot", "profile.timetable." + s.slot + ".chosen"] });
 
   /* how staff communicated this time */
+  /* for college: staff told the person it was college today, and how - the
+     methods ticked become the clause of that one sentence */
+  const clauses = college && !notGoing ? (s.commUsed || []).filter(c => D.COMM_CLAUSE[c]) : [];
+  if(clauses.length){
+    const when = !s.time ? "Before setting off" : toMins(s.time) < 12 * 60 ? "That morning" : "Earlier that day";
+    add({ key: "tell", section: "offer", pri: 1, bank: D.TELLBANK, src: ["setting", "slot"],
+          vars: { tellWhen: when, tellHow: ", " + joinList(clauses.map(c => pre(D.COMM_CLAUSE[c]))) },
+          varSrc: { tellWhen: s.time ? ["time"] : [], tellHow: clauses.map(c => "commUsed." + c) } });
+  }
   (s.commUsed || []).forEach((c, i) => {
-    if(D.COMMBANK[c]) add({ key: "comm_" + c, section: "offer", pri: i ? 3 : 2, bank: D.COMMBANK[c], src: ["commUsed." + c] });
+    if(D.COMMBANK[c] && !clauses.includes(c)) add({ key: "comm_" + c, section: "offer", pri: i ? 3 : 2, bank: D.COMMBANK[c], src: ["commUsed." + c] });
   });
 
   /* choice or response, and how the person let staff know */
   if(s.resp && D.RESPBANK[s.resp]) add({ key: "resp", section: "choice", pri: 1, bank: D.RESPBANK[s.resp], src: ["resp"] });
   if(!["declined", "declinedgo", "noresp"].includes(s.resp))
     (s.how || []).forEach((h, i) => {
-      if(D.HOWBANK[h]) add({ key: "how_" + h, section: "choice", pri: i ? 3 : 2, bank: D.HOWBANK[h], src: ["how." + h], how: h });
+      const bank = (college ? D.HOWBANK_COLLEGE : D.HOWBANK)[h] || D.HOWBANK[h];
+      if(bank) add({ key: "how_" + h, section: "choice", pri: i ? 3 : 2, bank, src: ["how." + h], how: h });
     });
   if(s.consent) add({ key: "consent", section: "consent", pri: 1, bank: D.CONSENTBANK[s.consent], src: ["consent"] });
 
@@ -313,9 +323,12 @@ function build(s, opts){
   /* a choice and how it was shown, sometimes as one sentence */
   const ri = items.findIndex(x => x.key === "resp");
   const hi = items.findIndex(x => x.how);
-  if(ri > -1 && hi === ri + 1 && ["choseA", "choseB", "agreed"].includes(s.resp) && decide(2, "join|how") === 0){
+  const collegeNote = s.kind === "activity" && s.setting === "college";
+  const joinable = collegeNote ? ["keen", "agreedgo"] : ["choseA", "choseB", "agreed"];
+  const joins = collegeNote ? D.HOW_JOIN_COLLEGE : D.HOW_JOIN;
+  if(ri > -1 && hi === ri + 1 && joinable.includes(s.resp) && joins[items[hi].how] && decide(2, "join|how") === 0){
     const r = items[ri], h = items[hi];
-    r.join = D.HOW_JOIN[h.how];
+    r.join = joins[h.how];
     r.src = r.src.concat(h.src);
     items.splice(hi, 1);
   }

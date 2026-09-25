@@ -82,7 +82,8 @@ function dimensions(f, extra){
   }
 
   add("staffComm", "Staff communication", (s.commUsed || []).length ? "ok" : "gap",
-      "How staff communicated with " + V.N + " has not been recorded.");
+      f.college ? "How staff told " + V.N + " it was college today has not been recorded."
+                : "How staff communicated with " + V.N + " has not been recorded.");
 
   if(s.resp && s.resp !== "noresp")
     add("communication", "Communication", s.how.length ? "ok" : "gap",
