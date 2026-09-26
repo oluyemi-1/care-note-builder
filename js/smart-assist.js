@@ -203,6 +203,11 @@ function collect(ctx){
     if(d.id === "choice" && f.s.resp === "noresp")
       push({ id: "q:choice", severity: "suggestion", group: "quality", rank: 1, title: d.message,
              reason: "Even small signs - looking toward something, pushing it away - show the person's response.", fields: ["resp"] });
+    if(d.id === "medTold" || d.id === "medLabel" || d.id === "medGiven")
+      push({ id: "q:" + d.id, severity: "suggestion", group: "quality", rank: 0, title: d.message,
+             reason: d.id === "medLabel" ? "The care record asks whether the label was checked against the MAR chart. Tick it only if you did."
+                   : d.id === "medTold" ? "Telling the person what they are taking, and why, is part of consent. Tick it only if you did."
+                   : "The care record asks whether the medication was administered as prescribed.", fields: [d.id === "medGiven" ? "med" : "med"] });
     if(d.id === "enjoyment")
       push({ id: "q:enjoyment", severity: "suggestion", group: "quality", rank: 2, title: d.message,
              reason: "The care record asks for the level of enjoyment. One tick under How much they enjoyed it covers it; the behaviour options say what showed it.", fields: ["enjoy"] });
@@ -225,6 +230,7 @@ function collect(ctx){
                     communication: () => "Their communication recorded", staffComm: () => "Staff communication recorded",
                     consent: () => "Consent recorded", dignity: () => "Dignity and privacy evidenced", followup: () => "Follow-up recorded",
                     enjoyment: () => "Enjoyment recorded", benefit: () => "Benefit to them recorded", enrolment: () => "How they chose the course recorded",
+                    medTold: () => "Told what it was and why", medLabel: () => "MAR label check recorded", medGiven: () => "Given as prescribed recorded",
                     independence: () => "Independence evidenced", observation: () => "Observation recorded",
                     outcome: () => "Outcome recorded", refusal: () => "Refusal respected" };
   dims.forEach(d => { if((d.status === "ok" || d.status === "strong") && passFor[d.id]) passes.push(passFor[d.id](d)); });

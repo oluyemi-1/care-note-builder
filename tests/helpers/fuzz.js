@@ -17,11 +17,11 @@ function randomInteraction(seed){
   const maybe = (v, p) => r() < (p || 0.5) ? v : "";
   const ids = list => list.map(x => x[0]);
 
-  const kind = one(["personal", "eating", "activity"]);
+  const kind = one(["personal", "eating", "activity", "medication"]);
   const setting = kind === "activity" && r() < 0.3 ? "college" : "community";
   const slot = kind === "activity" ? (setting === "college" ? one(ids(D.COURSES)) : one(ids(D.ACTS)))
              : one(ids(D.SLOTS[kind]));
-  const resps = ids(setting === "college" ? D.RESP_COLLEGE : D.RESP).concat(setting === "college" ? ["agreed", "declined"] : []);
+  const resps = ids(setting === "college" ? D.RESP_COLLEGE : kind === "medication" ? D.RESP_MED : D.RESP).concat(setting === "college" || kind === "medication" ? ["agreed", "declined", "noresp"] : []);
   const levels = ["ind", "prompt", "min", "part", "full", "declined", ""];
   const tasks = some(D.TASKS[kind], 0.35).map(t => ({ id: t.id, level: one(levels), opt: t.opts ? one(t.opts) : "" }));
   const profile = {
@@ -55,6 +55,7 @@ function randomInteraction(seed){
     learn: kind === "activity" ? some(ids(D.LEARN), 0.2) : [],
     during: kind === "activity" ? some(((D.ACT_INFO[slot] || {}).tags || []).flatMap(t => ids(D.DURING[t] || [])), 0.3) : [],
     enjoy: kind === "activity" ? maybe(one(ids(D.ENJOY)), 0.5) : "", benefit: kind === "activity" ? some(ids(D.BENEFIT), 0.2) : [],
+    med: kind === "medication" ? some(ids(D.MED), 0.5) : [], medIssues: kind === "medication" ? some(ids(D.MED_ISSUES), 0.15) : [],
     dignity: kind === "personal" ? some(ids(D.DIGNITY), 0.3) : [],
     contObs: kind === "personal" ? some(ids(D.CONT_OBS), 0.2) : [],
     sleepObs: kind === "personal" ? some(ids(D.SLEEP_OBS), 0.2) : [],

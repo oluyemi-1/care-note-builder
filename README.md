@@ -155,6 +155,20 @@ Travel method (cab, bus, train, on foot, staff vehicle, minibus) and travel
 safeguarding (seatbelt, escorted door to door, waited at the stop, supported at
 crossings) sit with the journey in the finished note.
 
+### Medication
+
+A fourth kind of note, for a medication round. It follows the process rather
+than the pharmacy: staff tick that they told the person what the medication
+was and what it is for (the communication method becomes part of that
+sentence), how the person showed they were happy to take it, consent, that the
+label was checked against the MAR chart, how much help they needed to take it,
+that it was given as prescribed, and any issue (spat it out, difficulty
+swallowing, given late, took only part). A declined dose or an issue brings a
+handover suggestion and a prompt to record it on the MAR chart. The app never
+says anything about a dose or a drug, and nothing appears in the note that was
+not ticked. The record-field panel shows the care system's "Medication label
+checked with MAR chart" and "Medication administered as prescribed?".
+
 ### Shifts
 
 Personal care reads differently at 07:00 and 22:00. The app opens on the shift

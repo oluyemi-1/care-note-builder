@@ -89,15 +89,15 @@ const ACTS = [
 /* an activity cannot end "ready for the day"; a morning wash cannot end "asleep" */
 const OUT_SCOPE = {
   ready:        {kinds:["personal"], slots:["am","pm","continence"]},
-  settled:      {kinds:["personal","eating","activity"]},
+  settled:      {kinds:["personal","eating","activity","medication"]},
   enjoyed:      {kinds:["eating","activity"]},
   proud:        {kinds:["eating","activity"]},
   home:         {kinds:["activity"]},
   nightsettled: {kinds:["personal"], slots:["pm","night"]},
   slept:        {kinds:["personal"], slots:["pm","night"]},
   resettled:    {kinds:["personal"], slots:["pm","night"]},
-  later:        {kinds:["personal","eating","activity"]},
-  nochangeout:  {kinds:["personal","eating","activity"]}
+  later:        {kinds:["personal","eating","activity","medication"]},
+  nochangeout:  {kinds:["personal","eating","activity","medication"]}
 };
 
 /* Where each activity happens. "out" means in the community, so road, travel
@@ -196,7 +196,9 @@ const OVERALL_LEVELS = [["ind","Fully independent"],["prompt","Prompting only"],
 const SLOTS = {
   personal:[["am","Personal Care &mdash; AM"],["pm","Personal Care &mdash; PM"],["night","Personal Care &mdash; Night"],["continence","Continence support"]],
   eating:[["breakfast","Breakfast"],["lunch","Lunch"],["dinner","Dinner"],["snack","Snack"],["fluids","Daily Fluid Intake"]],
-  activity: ACTS.map(a => [a[0], a[1]])
+  activity: ACTS.map(a => [a[0], a[1]]),
+  medication:[["morning","Morning medication"],["lunchtime","Lunchtime medication"],["teatime","Teatime medication"],
+              ["night","Night medication"],["prn","PRN (when required) medication"]]
 };
 
 /* ---------- tasks: each row mirrors a field in the care records system ---------- */
@@ -367,6 +369,22 @@ eating:[
   declined:["{S} declined a drink at this point.","{S} did not want a drink."]}
 ],
 
+medication:[
+ {id:"medtake",label:"Taking the medication",nf:"Support to take medication",
+  opts:["{p} tablets","{p} liquid medicine","{p} inhaler","{p} eye drops","{p} prescribed cream"],verb:"took {opt}",
+  ind:["{S} took {opt} {r}, with no hands-on help.","{S} managed {opt} without support."],
+  prompt:["{S} took {opt} after a prompt from staff.","With prompting, {s} took {opt} {r}."],
+  part:["{S} took {opt} with some hands-on help from staff.","Staff handed {o} {opt} and {s} took them {r}."],
+  full:["Staff administered {opt}.","Staff gave {o} {opt}."],
+  declined:["{S} declined {opt}.","{S} did not want {opt} on this occasion."]},
+ {id:"medwater",label:"Having a drink with it",nf:"Daily note",verb:"had a drink with it",noun:"a drink with it",
+  ind:["{S} had a drink with it {r}.","{S} got {r} a drink to take it with."],
+  prompt:["{S} had a drink with it after a prompt.","Following a prompt, {s} had a drink with it."],
+  part:["{S} had a drink with it, with some help from staff.","Staff helped {o} with a drink to take it with."],
+  full:["Staff gave {o} a drink to take it with.","Staff held the drink for {o} to take it with."],
+  declined:["{S} did not want a drink with it.","{S} declined a drink with it."]}
+],
+
 activity:[
  {id:"plan",label:"Planning &amp; preparing",nf:"Daily note",phase:"start",verb:"got ready",noun:"getting ready",
   ind:["{S} got ready for {act} without any help.","{S} prepared for {act} independently."],
@@ -484,8 +502,9 @@ const RESP_COLLEGE = [
 ];
 const RESP_SCOPE = {
   choseA:"offer", choseB:"offer",
-  agreed:"all", nonverbal:"all", delayed:"all", declined:"all", noresp:"all",
-  keen:"college", agreedgo:"college", encouraged:"college", reluctant:"college", declinedgo:"college"
+  agreed:["offer","college"], nonverbal:"all", delayed:["offer","college"], declined:"all", noresp:"all",
+  keen:"college", agreedgo:"college", encouraged:"college", reluctant:"college", declinedgo:"college",
+  happy:"med", hesitant:"med"
 };
 
 /* what the person got out of it - the part a course note lives or dies on */
@@ -576,7 +595,11 @@ personal:[
 eating:[
  "{N} was offered {meal} at {time}{ratio}.",
  "At {time}, staff offered {N} {meal}{ratio}.",
- "{meal2} was offered to {N} at {time}{ratio}."]
+ "{meal2} was offered to {N} at {time}{ratio}."],
+medication:[
+ "{N} was offered {med} at {time}{ratio}.",
+ "At {time}, staff offered {N} {med}{ratio}.",
+ "{Med} was offered to {N} at {time}{ratio}."]
 };
 
 /* what was offered, when it is not already named by the opener */
@@ -611,6 +634,8 @@ const COMMBANK = {
  gesture:["Staff watched {p} body language and responded to the cues {s} gave.","Staff read {p} gestures and expressions."]
 };
 const RESPBANK = {
+ happy:["{S} {vbe} happy to take it.","{S} took it willingly."],
+ hesitant:["{S} {vbe} hesitant at first. {declined} {S} then agreed to take it.","{S} hesitated to begin with. {declined} {S} then took it."],
  choseA:["{S} chose {chosen}.","{S} indicated {chosen}.","{S} picked {chosen}."],
  choseB:["{S} chose {chosen}.","{S} went for {chosen}.","{S} selected {chosen}."],
  agreed:["{S} agreed to what was offered.","{S} agreed to go ahead.","{S} accepted the offer."],
@@ -776,6 +801,11 @@ const MATCH = {
  "laundry-machine":["machine"], "laundry-folded":["folded"],
  "social-friends":["(?:his|her|their) friends","met up with"], "social-joined":["joined in"], "social-new":["someone new","new (?:friend|person)"],
  "social-snack":["bought (?:a|some|himself|herself|themselves)","(?:a|his|her|their) (?:drink|snack|crisps|coke|juice)"],
+ explained:["told (?:him|her|them) what (?:it|the medication|the tablets?|they) (?:was|were|is|are)","explained (?:what|the medication|why)"],
+ label:["mar chart","checked the label"], water:["(?:glass|drink|sip) of water","with (?:a|some) (?:drink|water|juice)"],
+ watched:["stayed (?:with|until)","watched (?:him|her|them) take"], prescribed:["as prescribed"],
+ spat:["spat","spit"], swallow:["difficulty swallowing","struggled to swallow","hard to swallow"], late:["later than","given late"],
+ partial:["only (?:took|had) (?:some|part|half|one)","did not take all"],
  "comm-greeted":["greeted","said hello","waved (?:to|at)"], "comm-turns":["took turns (?:talking|speaking|in)","turn[- ]taking"],
  "comm-aid":["communication aid","(?:his|her|their) (?:ipad|tablet|talker|device)"], "comm-symbols":["symbols?","picture(?:s| card)"],
  "comm-listened":["listened (?:to|while)"], "comm-newsign":["new (?:word|sign)"], "comm-initiated":["started (?:a|the) conversation","initiated"], "chores-room":["(?:his|her|their) (?:own )?room"], "chores-hoover":["hoover","vacuum","dust(?:ed|ing)"],
@@ -850,6 +880,47 @@ const ENROLBANK = [
  "{S} picked {act} from the courses offered at the start of the year."
 ];
 
+/* Medication: the process is what the note has to show - the person was told
+   what it was and what it is for, they agreed to take it, the label was
+   checked against the MAR chart, it was given as prescribed, and anything
+   that did not go to plan. All ticks; nothing about doses or drugs is ever
+   suggested by the app. */
+const MEDWORD = { morning:"{p} morning medication", lunchtime:"{p} lunchtime medication", teatime:"{p} teatime medication",
+                  night:"{p} night medication", prn:"{p} when-required (PRN) medication" };
+const RESP_MED = [["happy","Happy to take it"],["hesitant","Hesitant at first, then took it"]];
+const MED = [["explained","Told them what the medication was and what it is for"],["label","Checked the label against the MAR chart"],
+             ["water","Offered a drink to take it with"],["watched","Stayed with them until it was taken"],["prescribed","Given as prescribed"]];
+const MEDBANK = {
+ label:["Staff checked the label against {p} MAR chart before giving it.","The label was checked against {p} MAR chart first."],
+ water:["Staff offered {o} a drink to take it with.","A drink was offered to take it with."],
+ watched:["Staff stayed with {o} until it was taken.","Staff remained with {o} until {s} had taken it."],
+ prescribed:["The medication was given as prescribed.","It was given as prescribed."]
+};
+/* told them what it was, and how - the communication methods ticked become the clause */
+const MEDTELLBANK = [
+ "Staff told {N} what the medication was and what it is for{tellHow}.",
+ "Staff explained to {N} what the medication was and why {s} takes it{tellHow}.",
+ "Before giving it, staff told {N} what it was and what it is for{tellHow}."
+];
+const HOWBANK_MED = {
+ said:["{S} said {s} {vbe} happy to take it.","{S} told staff {s} would take it."],
+ pointed:["{S} pointed to show {s} understood.","{S} pointed to show {s} {vbe} ready to take it."],
+ signed:["{S} signed to show {s} would take it.","{S} signed that {s} {vbe} happy to take it."],
+ nodded:["{S} nodded to show {s} would take it.","{S} nodded when asked."],
+ led:["{S} came to staff to take it.","{S} came over ready to take it."],
+ reached:["{S} reached out to take it.","{S} held out {p} hand for it."],
+ facial:["{P} expression showed {s} {vbe} happy to take it.","{S} showed with {p} expression that {s} {vbe} happy to take it."]
+};
+const HOW_JOIN_MED = { said:"telling staff so", pointed:"pointing to show it", signed:"signing to show it", nodded:"nodding to show it",
+                       led:"coming over to take it", reached:"reaching out for it", facial:"{p} expression making it clear" };
+const MED_ISSUES = [["spat","Spat it out"],["swallow","Difficulty swallowing it"],["late","Given later than the scheduled time"],["partial","Took only part of it"]];
+const MEDISSUEBANK = {
+ spat:["{S} spat it out.","{S} spat the medication out."],
+ swallow:["{S} had difficulty swallowing it.","{S} found it difficult to swallow."],
+ late:["It was given later than the scheduled time.","The medication was given later than scheduled."],
+ partial:["{S} took only part of it.","{S} did not take all of it."]
+};
+
 /* how staff communicated this time; the profile only says which are usual */
 const STAFFING = [["","Not stated"],["1:1","1:1"],["2:1","2:1"],["shared","Shared staffing"]];
 
@@ -905,6 +976,7 @@ G.data = {
   GROUPBANK, LEVELBANK, OFFERBANK, SESSIONBANK, INTAKEBANK, HOW_JOIN, OPEN_COLLEGE_DECLINED,
   DIGNITY, DIGNITYBANK, CONT_OBS, CONTBANK, SLEEP_OBS, SLEEPBANK, BEHAVIOUR, BEHAVIOURBANK, FOLLOWUP, FOLLOWBANK,
   STAFFING, RISK_SCOPE, JOURNEY, DURING, DURINGBANK, MATCH, ENJOY, ENJOYBANK, BENEFIT, BENEFITBANK, ENROLBANK,
-  COMM_CLAUSE, TELLBANK, HOWBANK_COLLEGE, HOW_JOIN_COLLEGE
+  COMM_CLAUSE, TELLBANK, HOWBANK_COLLEGE, HOW_JOIN_COLLEGE,
+  MEDWORD, RESP_MED, MED, MEDBANK, MEDTELLBANK, HOWBANK_MED, HOW_JOIN_MED, MED_ISSUES, MEDISSUEBANK
 };
 })(globalThis.GSN = globalThis.GSN || {});

@@ -16,7 +16,7 @@
 
 const { present } = G.core;
 
-const GROUPS = ["risk", "mood", "well", "how", "commUsed", "dignity", "contObs", "sleepObs", "behaviour", "followup", "learn", "during", "benefit"];
+const GROUPS = ["risk", "mood", "well", "how", "commUsed", "dignity", "contObs", "sleepObs", "behaviour", "followup", "learn", "during", "benefit", "med", "medIssues"];
 const CHOICES = ["enjoy"];          // one-of fields addressed as field.value
 
 function resolve(s, path){

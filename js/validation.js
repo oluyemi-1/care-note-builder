@@ -256,7 +256,7 @@ function validateConfig(raw){
     return { id: c.id(x.id, w + " id", sgTaken), template, label: c.text(x.label, 60, w + " label") || G.match.toLabel(template),
              group: OBS_GROUPS.includes(x.group) ? x.group : "behaviour",
              tags: c.list(x.tags, 3, w + " activities").filter(t => BUILT_IN.tags.includes(t)),
-             kind: ["personal", "eating", "activity"].includes(x.kind) ? x.kind : "",
+             kind: ["personal", "eating", "activity", "medication"].includes(x.kind) ? x.kind : "",
              at: /^\d{4}-\d{2}-\d{2}$/.test(x.at || "") ? x.at : "" };
   })).filter(Boolean);
 
@@ -279,7 +279,7 @@ function validateRecord(r){
   const ml = v => v === null || v === undefined ? null : (typeof v === "number" && v >= 0 && v <= 5000 ? v : undefined);
   const realDay = /^\d{4}-\d{2}-\d{2}$/.test(r.date || "") && G.patterns.iso(new Date(r.date + "T12:00:00")) === r.date;
   if(!/^[A-Za-z0-9_-]{1,40}$/.test(r.id || "") || !INITIALS_RE.test(r.person || "") || !realDay ||
-     !["personal", "eating", "activity"].includes(r.kind)) return null;
+     !["personal", "eating", "activity", "medication"].includes(r.kind)) return null;
   const out = {
     v: 1, id: r.id, person: r.person, date: r.date,
     time: /^(\d{2}:\d{2})?$/.test(r.time || "") ? (r.time || "") : "",
@@ -291,7 +291,7 @@ function validateRecord(r){
     food: isObj(r.food) && PCT_KEYS.includes(r.food.amount) ? { amount: r.food.amount, pct: G.patterns.PCT[r.food.amount] } : null,
     fluid: null,
     mood: ids(r.mood, 20), wellbeing: ids(r.wellbeing, 20), behaviour: ids(r.behaviour, 20), during: ids(r.during, 20),
-    enjoy: idish(r.enjoy), benefit: ids(r.benefit, 10),
+    enjoy: idish(r.enjoy), benefit: ids(r.benefit, 10), med: ids(r.med, 10), medIssues: ids(r.medIssues, 10),
     skin: ["", "clear", "concern", "none"].includes(r.skin) ? r.skin : "",
     sleep: ids(r.sleep, 10), continence: ids(r.continence, 10), prompts: {},
     outcome: idish(r.outcome), followup: ids(r.followup, 10), handover: r.handover === true

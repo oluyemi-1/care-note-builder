@@ -25,19 +25,23 @@ const GUARDS = [
   [/\binformed\b/i,              s => has(s.followup, "senior") || has(s.followup, "family")],
   [/\bcontacted\b/i,             s => has(s.followup, "health")],
   [/\bbody map\b/i,              s => has(s.followup, "bodymap")],
-  [/\bMAR\b/,                    s => has(s.followup, "mar")],
+  [/\bMAR\b/,                    s => has(s.followup, "mar") || has(s.med, "label")],
+  [/\bas prescribed\b/i,         s => has(s.med, "prescribed")],
+  [/\bspat\b/i,                  s => has(s.medIssues, "spat")],
+  [/\bswallow/i,                  s => has(s.medIssues, "swallow") || answered(s, ".swallowed")],
+  [/\bwhat the medication was\b|\bwhat it was and what it is for\b/i, s => has(s.med, "explained")],
   [/\bincident form\b/i,         s => has(s.followup, "incident")],
   [/\bhanded (this )?over\b/i,   s => !!s.handover || has(s.followup, "handover")],
   [/\bmanager\b|\bGP\b/,         s => has(s.followup, "senior")],
   [/\bchok/i,                    s => answered(s, ".choke")],
-  [/\bcough/i,                   s => has(s.well, "cough") || answered(s, ".cough")],
+  [/\bcough/i,                   s => has(s.well, "cough") || answered(s, ".cough") || answered(s, ".swallowed")],
   [/\bseizure/i,                 s => answered(s, "seizure") || answered(s, ".arrangements")],
   [/\btexture\b/i,               s => answered(s, ".texture")],
   [/\bupright\b/i,               s => answered(s, ".upright")],
   [/\borientation\b/i,           s => answered(s, ".orientation")],
   [/\bcare plan\b/i,             s => Object.keys(s.prompts || {}).some(k => s.prompts[k])],
   [/\bMakaton\b/,                s => has(s.commUsed, "makaton")],
-  [/\bpicture/i,                 s => has(s.commUsed, "pictures")],
+  [/\bpicture/i,                 s => has(s.commUsed, "pictures") || has(s.during, "comm-symbols")],
   [/\bNow and Next\b/,           s => has(s.commUsed, "nownext")],
   [/\b[12]:1\b/,                 s => /^[12]:1$/.test(s.staffing)],
   [/\bprivacy\b/i,               s => has(s.dignity, "door")],
@@ -61,7 +65,7 @@ const GUARDS = [
   [/\btutor\b/i,                 s => has(s.learn, "instructions")],
   [/\bdignity\b|\btemperature\b|\bthoroughly\b|\bprogress\b|\blast time\b/i, () => false],
   [/\bthe agreed time\b/i,       () => false],
-  [/\bthen agreed\b/i,           s => ["delayed", "reluctant"].includes(s.resp)]
+  [/\bthen agreed\b/i,           s => ["delayed", "reluctant", "hesitant"].includes(s.resp)]
 ];
 
 test("fact-bearing words appear only when the input behind them exists", () => {

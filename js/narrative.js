@@ -64,6 +64,8 @@ function baseVars(s, opts){
       s.staffing ? ["staffing"] : []);
   const meal = D.MEALWORD[s.slot] || ["the meal", "The meal"];
   set("meal", pre(meal[0]), ["slot"]); set("meal2", pre(meal[1]), ["slot"]);
+  const med = pre(D.MEDWORD[s.slot] || "{p} medication");
+  set("med", med, ["slot"]); set("Med", cap(med), ["slot"]);
 
   const actSrc = s.kind !== "activity" ? ["kind"] : s.setting === "college" ? ["setting", "slot"]
                : s.slot === "other" && s.actOther ? ["slot", "actOther"] : ["slot"];
@@ -119,7 +121,7 @@ function plan(s, opts, pre){
 
   /* offer - a college course is not offered on the day, and a single
      activity is already named by the opener */
-  if(!college){
+  if(!college && s.kind !== "medication"){
     if(s.offerA && s.offerB) add({ key: "offer", section: "offer", pri: 1, bank: D.OFFERBANK.two });
     else if(s.offerA && s.kind !== "activity") add({ key: "offer", section: "offer", pri: 2, bank: D.OFFERBANK.one });
   }
@@ -130,8 +132,14 @@ function plan(s, opts, pre){
   /* how staff communicated this time */
   /* for college: staff told the person it was college today, and how - the
      methods ticked become the clause of that one sentence */
-  const clauses = college && !notGoing ? (s.commUsed || []).filter(c => D.COMM_CLAUSE[c]) : [];
-  if(clauses.length){
+  const medication = s.kind === "medication";
+  const told = medication && (s.med || []).includes("explained");
+  const clauses = (college && !notGoing) || told ? (s.commUsed || []).filter(c => D.COMM_CLAUSE[c]) : [];
+  if(told)
+    add({ key: "medtell", section: "offer", pri: 1, bank: D.MEDTELLBANK, src: ["med.explained"],
+          vars: { tellHow: clauses.length ? ", " + joinList(clauses.map(c => pre(D.COMM_CLAUSE[c]))) : "" },
+          varSrc: { tellHow: clauses.map(c => "commUsed." + c) } });
+  else if(clauses.length){
     const when = !s.time ? "Before setting off" : toMins(s.time) < 12 * 60 ? "That morning" : "Earlier that day";
     add({ key: "tell", section: "offer", pri: 1, bank: D.TELLBANK, src: ["setting", "slot"],
           vars: { tellWhen: when, tellHow: ", " + joinList(clauses.map(c => pre(D.COMM_CLAUSE[c]))) },
@@ -145,7 +153,7 @@ function plan(s, opts, pre){
   if(s.resp && D.RESPBANK[s.resp]) add({ key: "resp", section: "choice", pri: 1, bank: D.RESPBANK[s.resp], src: ["resp"] });
   if(!["declined", "declinedgo", "noresp"].includes(s.resp))
     (s.how || []).forEach((h, i) => {
-      const bank = (college ? D.HOWBANK_COLLEGE : D.HOWBANK)[h] || D.HOWBANK[h];
+      const bank = (college ? D.HOWBANK_COLLEGE : medication ? D.HOWBANK_MED : D.HOWBANK)[h] || D.HOWBANK[h];
       if(bank) add({ key: "how_" + h, section: "choice", pri: i ? 3 : 2, bank, src: ["how." + h], how: h });
     });
   if(s.consent) add({ key: "consent", section: "consent", pri: 1, bank: D.CONSENTBANK[s.consent], src: ["consent"] });
@@ -176,6 +184,13 @@ function plan(s, opts, pre){
         add({ key: "risk_" + r, section: items[items.length - 1].section, pri: i < 3 ? 2 : 3, bank: D.RISKBANK[r],
               src: ["risk." + r], attach: "task_travel" }));
   });
+  if(medication){
+    if((s.med || []).includes("label") && !saidBy("med.label")) add({ key: "med_label", section: "start", pri: 1, bank: D.MEDBANK.label, src: ["med.label"] });
+    ["water", "watched"].forEach(k => { if((s.med || []).includes(k) && !saidBy("med." + k)) add({ key: "med_" + k, section: "support", pri: 2, bank: D.MEDBANK[k], src: ["med." + k] }); });
+    if((s.med || []).includes("prescribed") && !saidBy("med.prescribed")) add({ key: "med_prescribed", section: "risk", pri: 1, bank: D.MEDBANK.prescribed, src: ["med.prescribed"] });
+    (s.medIssues || []).filter(i => D.MEDISSUEBANK[i] && !saidBy("medIssues." + i)).forEach(i =>
+      add({ key: "issue_" + i, section: "observation", pri: 1, bank: D.MEDISSUEBANK[i], src: ["medIssues." + i] }));
+  }
   if(s.level && !(s.tasks || []).some(t => t.level) && D.LEVELBANK[s.level])
     add({ key: "level", section: "support", pri: 2, bank: D.LEVELBANK[s.level], src: ["level"] });
   if(s.kind === "personal")
@@ -323,9 +338,9 @@ function build(s, opts){
   /* a choice and how it was shown, sometimes as one sentence */
   const ri = items.findIndex(x => x.key === "resp");
   const hi = items.findIndex(x => x.how);
-  const collegeNote = s.kind === "activity" && s.setting === "college";
-  const joinable = collegeNote ? ["keen", "agreedgo"] : ["choseA", "choseB", "agreed"];
-  const joins = collegeNote ? D.HOW_JOIN_COLLEGE : D.HOW_JOIN;
+  const collegeNote = s.kind === "activity" && s.setting === "college", medNote = s.kind === "medication";
+  const joinable = collegeNote ? ["keen", "agreedgo"] : medNote ? ["happy"] : ["choseA", "choseB", "agreed"];
+  const joins = collegeNote ? D.HOW_JOIN_COLLEGE : medNote ? D.HOW_JOIN_MED : D.HOW_JOIN;
   if(ri > -1 && hi === ri + 1 && joinable.includes(s.resp) && joins[items[hi].how] && decide(2, "join|how") === 0){
     const r = items[ri], h = items[hi];
     r.join = joins[h.how];

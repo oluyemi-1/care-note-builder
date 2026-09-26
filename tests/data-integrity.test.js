@@ -8,7 +8,8 @@ test("every option has a phrase bank", () => {
   const pairs = [[D.RESP, D.RESPBANK], [D.RESP_COLLEGE, D.RESPBANK], [D.HOW, D.HOWBANK], [D.CONSENT, D.CONSENTBANK],
                  [D.SKIN, D.SKINBANK], [D.MOOD, D.MOODBANK], [D.WELL, D.WELLBANK], [D.RISK, D.RISKBANK],
                  [D.OUTCOME, D.OUTBANK], [D.COMM, D.COMMBANK], [D.LEARN, D.LEARNBANK],
-                 [Object.values(D.DURING).flat(), D.DURINGBANK], [D.ENJOY, D.ENJOYBANK], [D.BENEFIT, D.BENEFITBANK]];
+                 [Object.values(D.DURING).flat(), D.DURINGBANK], [D.ENJOY, D.ENJOYBANK], [D.BENEFIT, D.BENEFITBANK],
+                 [D.RESP_MED, D.RESPBANK], [D.MED.filter(m => m[0] !== "explained"), D.MEDBANK], [D.MED_ISSUES, D.MEDISSUEBANK]];
   for (const [opts, bank] of pairs) for (const [id] of opts) {
     if (id === "none" || id === "noresp") continue;
     assert.ok(bank[id] && bank[id].length, "no wording for " + id);

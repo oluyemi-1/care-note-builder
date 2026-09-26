@@ -45,6 +45,7 @@ function candidates(f, extra){
     if(s.slot === "continence" || ticked("continence") || (f.flags || []).includes("continence")) add("contObs", D.CONT_OBS);
     if(s.slot === "night" || ticked("sleepcheck") || ticked("settle")) add("sleepObs", D.SLEEP_OBS);
   }
+  if(f.kind === "medication"){ add("med", D.MED); add("medIssues", D.MED_ISSUES); }
   add("mood", D.MOOD);
   add("well", D.WELL, id => id !== "nochange");
   add("behaviour", D.BEHAVIOUR, id => id !== "other" && id !== "declinedact");

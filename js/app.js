@@ -12,7 +12,7 @@ const {
   COMM, FLAGS, RESP, HOW, CONSENT, SKIN, MOOD, WELL, RISK, OUTCOME, OUT_SCOPE, SLOTS, LEVELS, TASKS, ACT_SETTING,
   COURSES, RESP_COLLEGE, RESP_SCOPE, LEARN, COMMBANK, RESPBANK, HOWBANK, CONSENTBANK, SKINBANK, MOODBANK,
   WELLBANK, RISKBANK, OUTBANK, DAYS, DIGNITY, CONT_OBS, SLEEP_OBS, BEHAVIOUR, FOLLOWUP, STAFFING, RISK_SCOPE,
-  JOURNEY, DURING, ACT_INFO, ENJOY, BENEFIT
+  JOURNEY, DURING, ACT_INFO, ENJOY, BENEFIT, RESP_MED, MED, MED_ISSUES
 } = GSN.data;
 const { PROFILE_SECTIONS, normalizeProfile, contextSummary } = GSN.profiles;
 
@@ -84,6 +84,8 @@ function state(){
     learn:    checked("learn"),
     during:   checked("during"),
     enjoy:    one("enjoy"),
+    med:      checked("med"),
+    medIssues: checked("medIssues"),
     benefit:  checked("benefit"),
     actOther: $("actOther").value.trim(),
     len:      $("len").value,
@@ -92,7 +94,7 @@ function state(){
     commUsed: checked("commUsed"),
     offerA:   $("offerA").value.trim(),
     offerB:   $("offerB").value.trim(),
-    resp:     one("resp") || one("respc"),
+    resp:     one("resp") || one("respc") || one("respm"),
     chosen:   $("chosen").value.trim(),
     how:      checked("how"),
     consent:  one("consent"),
@@ -527,6 +529,7 @@ const STEP_OF = { kind: 1, slot: 1, time: 1, staffing: 1, commUsed: 1, offerA: 1
   resp: 2, how: 2, consent: 2, chosen: 2, declined: 2, level: 3, tasks: 3,
   mood: 4, well: 4, risk: 4, dignity: 4, contObs: 4, sleepObs: 4, skin: 4, skinDetail: 4, learn: 4, during: 4, behaviour: 4, behaviourOther: 4,
   ate: 4, whatAte: 4, drunk: 4, offered: 4, drinkChoice: 4, prompt: 4, outcome: 5, extra: 5, handover: 5, followup: 5, enjoy: 5, benefit: 5,
+  med: 1, medIssues: 4,
   tt: 0, comm: 0, flags: 0, initials: 0 };
 function stepOf(field){
   if(!field) return -1;
@@ -632,6 +635,13 @@ function renderFields(s){
     if(s.drunk){ rows.push(["Fluid intake (mls)", s.drunk]); rows.push(["Amount drunk (Mls)", s.drunk]); }
     if(s.drinkChoice) rows.push(["Drink choice", s.drinkChoice]);
   }
+  if(s.kind === "medication"){
+    const refused = ["declined"].includes(s.resp) || s.consent === "no";
+    rows.push(["Medication label checked with MAR chart", s.med.includes("label") ? "Yes" : "Not recorded \u2014 tick it if you checked"]);
+    rows.push(["Medication administered as prescribed?", s.med.includes("prescribed") ? "Yes" : refused ? "No \u2014 declined" : "Not recorded"]);
+    if(s.medIssues.length) rows.push(["Any issues", s.medIssues.map(i => GSN.core.plain((MED_ISSUES.find(x => x[0] === i) || ["", i])[1])).join("; ")]);
+    if(s.consent) rows.push(["Consent obtained?", s.consent === "no" ? "No" : "Yes"]);
+  }
   if(s.kind === "activity"){
     const where = s.setting === "college" ? "College" : ((ACT_INFO[s.slot] || {}).where || "either");
     rows.push(["Location activity took place", where === "College" ? "College" : where === "home" ? "At home"
@@ -672,9 +682,9 @@ function syncVisibility(s){
   $("settingHint").textContent = !s.kind ? "" : college
     ? "Already arranged, so nothing is offered today \u2014 record the journey, the support and what they gained."
     : "Offered today and chosen from the options \u2014 record the choice, the support and how it went.";
-  $("offerWrap").hidden = college;
-  setText($("commUsedHead"), college ? "How staff told them it was college today" : "How staff communicated this time");
-  setText($("howHead"), college ? "How they let you know they\u2019d go" : "How they let you know");
+  $("offerWrap").hidden = college || s.kind === "medication";
+  setText($("commUsedHead"), college ? "How staff told them it was college today" : s.kind === "medication" ? "How staff told them what it was" : "How staff communicated this time");
+  setText($("howHead"), college ? "How they let you know they\u2019d go" : s.kind === "medication" ? "How they let you know they\u2019d take it" : "How they let you know");
   $("sessionToWrap").hidden = !college;
   $("learnWrap").hidden = s.kind !== "activity";
   showGroup("enjoyWrap", s.kind === "activity");
@@ -682,16 +692,18 @@ function syncVisibility(s){
   syncDuring(s);
   $("actOtherWrap").hidden = !(s.kind === "activity" && s.slot === "other" && !college);
   /* only offer responses that make sense here */
-  const ctx = college ? "college" : "offer";
-  [...RESP, ...RESP_COLLEGE].forEach(o => {
-    const el = $("resp_" + o[0]) || $("respc_" + o[0]);
+  const ctx = college ? "college" : s.kind === "medication" ? "med" : "offer";
+  [...RESP, ...RESP_COLLEGE, ...RESP_MED].forEach(o => {
+    const el = $("resp_" + o[0]) || $("respc_" + o[0]) || $("respm_" + o[0]);
     if(!el) return;
     const sc = RESP_SCOPE[o[0]] || "all";
-    const ok = sc === "all" || sc === ctx;
+    const ok = sc === "all" || [].concat(sc).includes(ctx);
     el.closest(".chip").hidden = !ok;
     if(!ok && el.checked) el.checked = false;
   });
-  $("declWrap").hidden   = !["declined","delayed","declinedgo","reluctant"].includes(s.resp) && s.consent !== "no";
+  $("declWrap").hidden   = !["declined","delayed","declinedgo","reluctant","hesitant"].includes(s.resp) && s.consent !== "no";
+  showGroup("medWrap", s.kind === "medication");
+  showGroup("medIssuesWrap", s.kind === "medication");
   $("chosenWrap").hidden = !(s.resp === "choseA" || s.resp === "choseB");
   document.querySelector('#skin').closest('fieldset').hidden = s.kind !== "personal";
 
@@ -987,6 +999,9 @@ chips("sleepObs", SLEEP_OBS, "checkbox");
 chips("behaviour", BEHAVIOUR, "checkbox");
 chips("followup", FOLLOWUP, "checkbox");
 chips("enjoy", ENJOY, "radio");
+chips("respm", RESP_MED, "radio");
+chips("med", MED, "checkbox");
+chips("medIssues", MED_ISSUES, "checkbox");
 chips("benefit", BENEFIT, "checkbox");
 $("staffing").innerHTML = STAFFING.map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join("");
 
@@ -1028,7 +1043,7 @@ buildTasks();
    type clears the entry and says so. */
 const SCOPED_TEXT = ["offerA","offerB","chosen","declined","whatAte","drinkChoice",
                      "offered","drunk","skinDetail","extra","handover","actOther","behaviourOther","sessionTo"];
-const SCOPED_CHIPS = ["resp","how","consent","skin","mood","well","risk","outcome","learn","during","enjoy","benefit",
+const SCOPED_CHIPS = ["resp","respc","respm","how","consent","skin","mood","well","risk","outcome","learn","during","enjoy","benefit","med","medIssues",
                       "commUsed","dignity","contObs","sleepObs","behaviour","followup"];
 
 /* Everything below the person belongs to one entry, for one person. It is
@@ -1084,7 +1099,7 @@ function fillSlots(){
   $("slot").innerHTML = list.map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join("");
   if(keep && [...$("slot").options].some(o => o.value === keep)) $("slot").value = keep;
   $("slotWrap").querySelector("label").textContent =
-    college ? "Course" : k === "activity" ? "Activity" : k === "eating" ? "Which meal" : "Which one";
+    college ? "Course" : k === "activity" ? "Activity" : k === "eating" ? "Which meal" : k === "medication" ? "Which round" : "Which one";
   document.querySelector('label[for="offerA"]').textContent =
     k === "activity" ? "Activity offered" : k === "eating" ? "Meal offered" : "Option offered";
   document.querySelector('label[for="offerB"]').textContent =
@@ -1226,7 +1241,8 @@ function omittedLabel(key){
   const [g, id] = key.split(/_(.+)/);
   const from = (list, v) => GSN.core.plain((list.find(x => x[0] === v) || ["", v])[1]).toLowerCase();
   if(g === "task") return GSN.rules.taskLabel($("kind").value, id).toLowerCase();
-  const lists = { comm: COMM, how: HOW, risk: RISK, dig: DIGNITY, learn: LEARN, mood: MOOD, well: WELL, during: Object.values(DURING).flat(), ben: BENEFIT };
+  const lists = { comm: COMM, how: HOW, risk: RISK, dig: DIGNITY, learn: LEARN, mood: MOOD, well: WELL, during: Object.values(DURING).flat(), ben: BENEFIT, med: MED, issue: MED_ISSUES };
+  if(g === "medtell") return "telling them what the medication was";
   if(g === "enjoy") return "how much they enjoyed it";
   if(g === "enrol") return "how they chose the course";
   if(lists[g]) return from(lists[g], id);

@@ -131,6 +131,19 @@ const CONTRADICTIONS = [
     }
   },
   {
+    id: "declined-but-given-as-prescribed",
+    test: f => {
+      if(f.kind !== "medication" || !(f.s.medIssues || f.s.med)) return null;
+      const refused = DECLINED_RESP.includes(f.s.resp) || f.s.consent === "no" || (f.task.medtake || {}).level === "declined";
+      if(!refused || !(f.s.med || []).includes("prescribed")) return null;
+      return {
+        message: "The medication is recorded as declined, but also as given as prescribed.",
+        reason: "A dose that was declined was not given. Untick one, or if it was taken after a first refusal choose \u201cHesitant at first, then took it\u201d.",
+        fields: ["med", "resp"]
+      };
+    }
+  },
+  {
     id: "not-enjoyed-but-enjoyed",
     test: f => {
       if(f.s.enjoy !== "notmuch" || !["enjoyed", "proud"].includes(f.s.outcome)) return null;

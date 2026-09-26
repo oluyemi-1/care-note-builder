@@ -56,6 +56,8 @@ function facts(ctx){
   const ranks = tasks.map(t => RANK[t.level]).filter(r => r !== undefined);
   const off = num(s.offered), dr = num(s.drunk);
   const meal = s.kind === "eating" ? fill((MEALWORD[s.slot] || ["the meal"])[0], personVars(s.initials, s.pronoun)) : "";
+  const med = s.kind === "medication" ? fill(G.data.MEDWORD[s.slot] || "{p} medication", personVars(s.initials, s.pronoun)) : "";
+  const issues = (s.medIssues || []).map(i => plain((G.data.MED_ISSUES.find(x => x[0] === i) || ["", i])[1]).toLowerCase());
   const usual = (OVERALL_LEVELS.find(l => l[0] === profile.usualLevel) || ["", ""])[1];
   return {
     s, profile, flags, tasks, task, college, travel, where,
@@ -70,6 +72,8 @@ function facts(ctx){
     vars: Object.assign(personVars(s.initials || profile.initials, s.pronoun || profile.pronoun), {
       activity: plain(fill(activityPhrase(s, ctx.acts), personVars(s.initials || profile.initials, s.pronoun || profile.pronoun))),
       meal: meal || "the meal",
+      med: med || "the medication",
+      medIssuesList: issues.length ? issues.join(", ") : "an issue",
       textureNote: profile.texture ? " (" + profile.texture + ")" : "",
       aid: profile.mobilityAid || "mobility aid",
       targetNote: profile.fluidTarget ? " of " + profile.fluidTarget + " ml" : "",
@@ -245,6 +249,32 @@ const CARE_RULES = [
       { id: "lowerfat", text: "Was a lower-fat option offered?",
         yes: "A lower-fat option was offered to {o}.", no: null }
     ]
+  },
+
+  /* ---- medication ---- */
+  {
+    id: "choking-medication", title: "Choking risk \u00b7 medication",
+    appliesWhen: { any: [{ profileFlag: ["choking", "softdiet"] }, { profileHas: "texture" }], kind: "medication", not: { field: { resp: "declined" } } },
+    reason: "A choking risk or modified diet is recorded in {N}'s profile and this is medication.",
+    prompts: [
+      { id: "swallowed", pri: 1, text: "Did {N} swallow it without coughing or difficulty?",
+        yes: "{S} swallowed it without coughing or difficulty.", no: "{S} had difficulty swallowing it.",
+        onNo: { severity: "review", message: "{N} was recorded as having difficulty swallowing {med}.", handover: "Difficulty swallowing {med}." } }
+    ]
+  },
+  {
+    id: "medication-declined", title: "Medication declined",
+    appliesWhen: { kind: "medication", any: [{ field: { resp: "declined" } }, { field: { consent: "no" } }] },
+    reason: "{N} declined {med}.",
+    suggest: "A declined dose is recorded on the MAR chart and reported in line with your medication procedure. Tick what was done under What was done about it.",
+    highlight: ["followup.mar", "followup.senior"], watch: ["followup"],
+    handover: "Declined {med}."
+  },
+  {
+    id: "medication-issue", title: "Medication issue",
+    appliesWhen: { kind: "medication", includes: { medIssues: ["spat", "swallow", "late", "partial"] } },
+    reason: "An issue with {med} was recorded: {medIssuesList}.",
+    handover: "Issue with {med}: {medIssuesList}."
   },
 
   /* ---- epilepsy ---- */

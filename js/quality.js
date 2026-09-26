@@ -25,6 +25,7 @@ function orgAudit(f, extra){
        ? "One or more ticked tasks in step 3 still need a support level."
        : "Set the overall support level and tick what you supported in step 3."},
     {id:"observation", field:"mood", ok: s.mood.length > 0 || s.well.length > 0 || (s.kind==="personal" && !!s.skin) || (s.kind==="activity" && (s.risk.length > 0 || s.learn.length > 0 || (s.during || []).length > 0)) || (s.kind==="eating" && (!!s.ate || !!s.drunk)) ||
+                           (s.kind==="medication" && ((s.med || []).length > 0 || (s.medIssues || []).length > 0)) ||
                            answered || (s.behaviour || []).length > 0 || (s.contObs || []).length > 0 || (s.sleepObs || []).length > 0 || !!s.enjoy,
      t:"Relevant risk controls and observations included", need:"an observation", fix:"Add at least one observation in step 4."},
     {id:"outcome", field:"outcome", ok: !!s.outcome, t:"Meaningful outcome recorded", need:"how it ended for them", fix:"Choose an outcome in step 5."},
@@ -105,9 +106,20 @@ function dimensions(f, extra){
 
   const observed = s.mood.length || s.well.length || (s.kind === "personal" && s.skin) || (s.behaviour || []).length ||
                    (s.contObs || []).length || (s.sleepObs || []).length ||
-                   (s.kind === "activity" && (s.risk.length || s.learn.length || (s.during || []).length)) || (s.kind === "eating" && (s.ate || s.drunk));
+                   (s.kind === "activity" && (s.risk.length || s.learn.length || (s.during || []).length)) || (s.kind === "eating" && (s.ate || s.drunk)) ||
+                   (s.kind === "medication" && ((s.med || []).length || (s.medIssues || []).length));
   add("observation", "Observation", observed ? "ok" : "gap", "Nothing observed has been recorded yet.");
   add("outcome", "Outcome", s.outcome ? "ok" : "gap", "An outcome has not yet been documented.");
+  if(s.kind === "medication"){
+    const med = s.med || [];
+    add("medTold", "Told what it was", med.includes("explained") ? "ok" : "gap",
+        "Telling " + V.N + " what the medication was and what it is for has not been recorded.");
+    add("medLabel", "MAR label check", med.includes("label") ? "ok" : "gap",
+        "The label check against the MAR chart has not been recorded.");
+    if(!f.declinedAll)
+      add("medGiven", "Given as prescribed", med.includes("prescribed") || (s.medIssues || []).length ? "ok" : "gap",
+          "Whether it was given as prescribed has not been recorded - tick it, or record the issue.");
+  }
   if(s.kind === "activity" && !f.declinedAll){
     add("enjoyment", "Enjoyment", s.enjoy || s.outcome === "enjoyed" ? "ok" : "gap", "How much " + V.N + " enjoyed it has not been recorded.");
     add("benefit", "Benefit", (s.benefit || []).length ? "ok" : "gap", "How this met " + V.N + "'s wishes and outcomes has not been recorded.");

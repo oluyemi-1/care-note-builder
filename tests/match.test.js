@@ -72,7 +72,7 @@ test("a suggestion guesses where the option belongs and never stores initials", 
 
 test("every MATCH entry points at a real option and every pattern compiles", () => {
   const D = G.data;
-  const ids = new Set([].concat(Object.values(D.DURING).flat(), D.LEARN, D.DIGNITY, D.RISK, D.MOOD, D.WELL, D.BEHAVIOUR, D.FOLLOWUP, D.CONT_OBS, D.SLEEP_OBS, D.ENJOY, D.BENEFIT).map(o => o[0]));
+  const ids = new Set([].concat(Object.values(D.DURING).flat(), D.LEARN, D.DIGNITY, D.RISK, D.MOOD, D.WELL, D.BEHAVIOUR, D.FOLLOWUP, D.CONT_OBS, D.SLEEP_OBS, D.ENJOY, D.BENEFIT, D.MED, D.MED_ISSUES).map(o => o[0]));
   for(const id of Object.keys(D.MATCH)){
     assert.ok(ids.has(id), "MATCH." + id + " is not an option");
     for(const src of D.MATCH[id]) assert.doesNotThrow(() => new RegExp(src, "i"), id + ": " + src);

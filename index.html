@@ -82,6 +82,7 @@
                 <option value="personal">Personal Care</option>
                 <option value="eating">Eating &amp; Drinking</option>
                 <option value="activity">Activities</option>
+                <option value="medication">Medication</option>
               </select></div>
             <div class="f" id="slotWrap"><label for="slot">Which one</label><select id="slot"></select></div>
             <div class="f"><label for="time">Time</label><input type="time" id="time"></div>
@@ -93,6 +94,7 @@
             <div class="chips" id="commUsed"></div>
             <button type="button" class="pchip add" id="commUsual" hidden style="margin-top:8px"></button>
           </fieldset>
+          <fieldset id="medWrap" hidden style="margin-top:14px"><legend>The process &mdash; tick what you did</legend><div class="chips" id="med"></div></fieldset>
           <div class="rule"></div>
           <div id="offerWrap">
           <div class="f"><label for="offerA">Option offered</label><input type="text" id="offerA" placeholder="e.g. a shower" autocomplete="off"></div>
@@ -105,7 +107,7 @@
       <section class="step">
         <header><span class="num">2</span><h2>Choice or response</h2><span class="hint">Their voice, not yours</span></header>
         <div class="body stack">
-          <fieldset><legend>What they chose or how they responded</legend><div class="chips" id="resp"></div><div class="chips" id="respc"></div></fieldset>
+          <fieldset><legend>What they chose or how they responded</legend><div class="chips" id="resp"></div><div class="chips" id="respc"></div><div class="chips" id="respm"></div></fieldset>
           <div class="f" id="chosenWrap"><label for="chosen">What they chose</label><input type="text" id="chosen" placeholder="e.g. a shower" autocomplete="off"></div>
           <fieldset><legend id="howHead">How they let you know</legend><div class="chips" id="how"></div></fieldset>
           <fieldset><legend>Consent</legend><div class="chips" id="consent"></div></fieldset>
@@ -149,6 +151,7 @@
           <fieldset><legend>Skin (personal care)</legend><div class="chips" id="skin"></div></fieldset>
           <div class="f" id="skinWrap" hidden><label for="skinDetail">What you saw and where</label>
             <input type="text" id="skinDetail" placeholder="e.g. a small red area on his left heel" autocomplete="off"></div>
+          <fieldset id="medIssuesWrap" hidden><legend>Any issues with the medication</legend><div class="chips" id="medIssues"></div></fieldset>
           <fieldset id="dignityWrap" hidden><legend>Privacy &amp; dignity &mdash; what you did</legend><div class="chips" id="dignity"></div></fieldset>
           <fieldset id="contObsWrap" hidden><legend>Continence &mdash; what you observed</legend><div class="chips" id="contObs"></div></fieldset>
           <fieldset id="sleepObsWrap" hidden><legend>Sleep &mdash; at the check</legend><div class="chips" id="sleepObs"></div></fieldset>
