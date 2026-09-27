@@ -84,11 +84,26 @@
         { "id": "flag", "title": "Two answers that disagree",
           "say": "If two answers cannot both be true, Smart Assist flags them for review. Here, the overall support says fully independent, but the wash was done by staff." },
         { "id": "why", "title": "See the reason",
-          "say": "Open Why am I seeing this, to see the reason." },
+          "say": "Open Why am I seeing this, to see the reason. It also takes you to the step the answer is in." },
         { "id": "explain", "title": "Correct or explain",
           "say": "Correct whichever answer is wrong, or tap Explain and say what happened. Your explanation goes into the note word for word, and copying unlocks." },
         { "id": "words", "title": "Describe, don't label",
           "say": "Smart Assist also questions vague or judgemental words, like fine, or difficult. It never changes what you typed. It asks what you actually saw." }
+      ]
+    },
+    {
+      "id": "words",
+      "title": "Your own words",
+      "summary": "Write what you saw in your own words, and let the app learn the ticks it is missing.",
+      "steps": [
+        { "id": "type", "title": "Say it your way",
+          "say": "Anything you write in Anything else goes into the note word for word, straight after what the person did." },
+        { "id": "tick", "title": "Tick it",
+          "say": "If your words match a tick option the app already has, Smart Assist offers to tick it for you. Tap Tick it, and the tick joins your sentence instead of adding a second one." },
+        { "id": "suggest", "title": "Suggest a new option",
+          "say": "If there is no matching option, tap Suggest. Your sentence is saved for your manager, with the initials and pronouns taken out. Your note does not change." },
+        { "id": "adopt", "title": "Managers adopt it",
+          "say": "In Settings and data, under Observations, a manager can add it as a tick option for everyone on this device. That is how the app learns from staff, without sending anything anywhere." }
       ]
     },
     {
@@ -101,11 +116,53 @@
         { "id": "journey", "title": "The journey",
           "say": "Tick Travelling there to record the journey. Safety choices for that kind of journey, like waiting together at the stop, then appear." },
         { "id": "timetable", "title": "A weekly timetable",
-          "say": "For college, add their weekly sessions to their profile, just once." },
+          "say": "For college, add their weekly sessions to their profile, just once. Chose it means they picked that course themselves at enrolment, so the note can say so." },
         { "id": "college", "title": "College fills itself in",
           "say": "Then choose College. Today's course and times fill in from the timetable." },
-        { "id": "skills", "title": "What they did and gained",
-          "say": "Tick the particular things they did, like washing their hands before handling food. Then record the skills they practised, and how they got on with others. That is where a college note shows its value." }
+        { "id": "told", "title": "Telling them it was college",
+          "say": "Tick how you told them it was college today, and how they showed they would go. For a college note, that communication before the journey matters as much as the class." },
+        { "id": "skills", "title": "What they did",
+          "say": "Tick the particular things they did, like washing their hands before handling food, and the skills they practised." },
+        { "id": "value", "title": "What it gave them",
+          "say": "Finally, record how much they enjoyed it and what it gave them: time with others, or confidence. That is where a college note shows its value." }
+      ]
+    },
+    {
+      "id": "medication",
+      "title": "Write a medication note",
+      "summary": "Record a medication round as a process: told, agreed, checked, taken, given as prescribed.",
+      "steps": [
+        { "id": "round", "title": "Choose the round",
+          "say": "Choose Medication and the round. There is no offer step. The note follows the process instead." },
+        { "id": "told", "title": "Told what it was",
+          "say": "Tick that you told them what the medication was and what it is for. How you communicated becomes part of that sentence." },
+        { "id": "happy", "title": "Happy to take it",
+          "say": "Record how they showed they were happy to take it, and their consent." },
+        { "id": "label", "title": "Checked, taken, given",
+          "say": "Tick that the label was checked against the MAR chart, how much help they needed to take it, and that it was given as prescribed." },
+        { "id": "issues", "title": "When it doesn't go to plan",
+          "say": "If something did not go to plan, tick it under Observation. Smart Assist offers a factual line for the handover. The app never says anything about a dose." },
+        { "id": "outcome", "title": "Finish the note",
+          "say": "Choose the outcome, tick that the MAR chart was signed, and the note is ready to copy." }
+      ]
+    },
+    {
+      "id": "events",
+      "title": "Behaviour and incidents",
+      "summary": "An ABC chart and an incident report, in the order things happened, from what you saw.",
+      "steps": [
+        { "id": "kind", "title": "An ABC chart",
+          "say": "For an ABC chart, choose Behaviour and the kind of behaviour. The choice and support steps disappear, and one step, What happened, takes their place." },
+        { "id": "before", "title": "Before",
+          "say": "Record where it happened, and what was happening just before: tick what applies, and add your own words." },
+        { "id": "did", "title": "What they did",
+          "say": "Tick what you saw the person do, describe it in your own words, and say how long it lasted. Facts only. The app never records why." },
+        { "id": "staff", "title": "What staff did",
+          "say": "Tick what staff did, and how the person responded." },
+        { "id": "hurt", "title": "Was anyone hurt?",
+          "say": "Say whether anyone was hurt. If someone was, Smart Assist reminds you of the incident form, body map and senior, in line with your procedure, and the note cannot be copied until you tick what was done." },
+        { "id": "incident", "title": "An incident report",
+          "say": "An incident note works the same way. Choose the type of incident, then tick what happened and the actions staff took, and record whether an injury was seen, and where. The rest is the same What happened step, in the same order." }
       ]
     },
     {

@@ -212,7 +212,7 @@ const TUTORIALS = {
       steps: async h => {
         await h.unspot();
         for(const n of [2, 3, 4, 5, 6]){
-          const head = h.page.locator("main .step").nth(n - 1).locator("header");
+          const head = h.page.locator("main .step:not([hidden])").nth(n - 1).locator("header");
           await h.headTo(head); await h.spot(head, 4);
         }
         await h.unspot(); await h.scrollTo(0);
@@ -306,7 +306,10 @@ const TUTORIALS = {
         await h.reveal('#saList li[data-id="c:overall-independent-vs-hands-on"]');
         await h.spot('#saList li[data-id="c:overall-independent-vs-hands-on"]', 4);
       },
-      why: async h => { await h.unspot(); await h.tap('#saList li[data-id="c:overall-independent-vs-hands-on"] .sa-why summary'); },
+      why: async h => {
+        await h.unspot(); await h.tap('#saList li[data-id="c:overall-independent-vs-hands-on"] .sa-why summary');
+        await h.wait(900); await h.spot("#stepSupport > header", 6);
+      },
       explain: async h => {
         await h.unspot();
         await h.tap('#saList li[data-id="c:overall-independent-vs-hands-on"] .sa-exp-btn');
@@ -341,12 +344,125 @@ const TUTORIALS = {
         await h.choose("#tt .ttrow:last-child .tt-c", "cooking");
         await h.fillTime("#tt .ttrow:last-child .tt-from", "10:00");
         await h.fillTime("#tt .ttrow:last-child .tt-to", "12:30");
+        await h.spot("#tt .ttrow:last-child .tt-ch", 6);
       },
-      college: async h => { await h.tap("#setting_college"); await h.spot("#settingWrap", 6); await h.wait(1500); await h.spot("#ttHint", 6); },
+      college: async h => { await h.unspot(); await h.tap("#setting_college"); await h.spot("#settingWrap", 6); await h.wait(1500); await h.spot("#ttHint", 6); },
+      told: async h => {
+        await h.unspot();
+        await h.tap("#commUsual"); await h.tap("#respc_keen");
+        await h.railTop(); await h.spot("#noteCard .out", 6);
+      },
       skills: async h => {
         await h.unspot();
-        await h.tap("#during_food-hands"); await h.tap("#during_food-recipe");
-        await h.tap("#learn_skill"); await h.tap("#learn_conversation");
+        await h.tap("#during_food-hands"); await h.tap("#during_food-recipe"); await h.tap("#learn_skill");
+      },
+      value: async h => {
+        await h.tap("#enjoy_throughout"); await h.tap("#benefit_social"); await h.tap("#benefit_confidence");
+        await h.railTop(); await h.spot("#noteCard .out", 6);
+      }
+    }
+  },
+
+  words: {
+    seed: storage(["MA"]),
+    prepare: async h => h.silent([
+      ["set", "kind", "activity"], ["tick", "setting_community"], ["set", "slot", "music"], ["set", "time", "14:00"], ["tick", "commUsed_verbal"],
+      ["tick", "resp_agreed"], ["tick", "how_said"], ["tick", "consent_yes"], ...task("engage", "ind", "activity"), ["set", "level", "ind"], ["tick", "outcome_settled"]
+    ]),
+    steps: {
+      type: async h => {
+        await h.type("#extra", "He danced with the others and sang along to every song.");
+        await h.railTop(); await h.spot("#noteCard .out", 6);
+      },
+      tick: async h => {
+        await h.unspot();
+        const item = '#saList li[data-id="m:during.music-danced"]';
+        await h.reveal(item); await h.spot(item, 4); await h.wait(1600); await h.unspot();
+        await h.tap(item + " .sa-tick"); await h.wait(400);
+        await h.spot("label:has(#during_music-danced)", 6); await h.wait(1200);
+        await h.unspot(); await h.railTop(); await h.spot("#noteCard .out", 6);
+      },
+      suggest: async h => {
+        await h.unspot();
+        await h.tap("#extra", { after: 150 });
+        await h.loc("#extra").evaluate(el => el.setSelectionRange(el.value.length, el.value.length));
+        await h.loc("#extra").pressSequentially(" He made a cup of tea for the group in the break.", { delay: 38 });
+        await h.wait(300);
+        await h.reveal("#suggestBox"); await h.spot("#suggestBox", 6); await h.wait(900);
+        await h.tap('#suggestBox [data-suggest="1"]'); await h.spot("#suggestMsg", 6);
+      },
+      adopt: async h => {
+        await h.unspot(); await h.scrollTo(0);
+        await h.tap("#openSettings"); await h.wait(500);
+        await h.tap('details.cfg:has(> summary:text-is("Observations")) > summary'); await h.wait(400);
+        await h.reveal("#cfgSugg"); await h.spot("#cfgSugg", 6);
+      }
+    }
+  },
+
+  medication: {
+    seed: storage(["MA"]),
+    steps: {
+      round: async h => {
+        await h.choose("#kind", "medication"); await h.choose("#slot", "morning"); await h.fillTime("#time", "08:00");
+        await h.reveal("#medWrap"); await h.spot("#medWrap", 6);
+      },
+      told: async h => {
+        await h.unspot();
+        await h.tap("#med_explained"); await h.tap("#commUsual");
+        await h.railTop(); await h.spot("#noteCard .out", 6);
+      },
+      happy: async h => { await h.unspot(); await h.tap("#respm_happy"); await h.tap("#how_nodded"); await h.tap("#consent_yes"); },
+      label: async h => {
+        await h.tap("#med_label");
+        await h.tap("#t_medication_medtake"); await h.choose("#lvl_medication_medtake", "ind"); await h.choose("#level", "ind");
+        await h.tap("#med_prescribed");
+      },
+      issues: async h => {
+        await h.tap("#medIssues_partial");
+        const item = '#saList li[data-id="h:medication-issue"]';
+        await h.reveal(item); await h.spot(item, 4); await h.wait(1600); await h.unspot();
+        await h.tap(item + " .sa-ho"); await h.spot("#handover", 6);
+      },
+      outcome: async h => {
+        await h.unspot();
+        await h.tap("#outcome_nochangeout"); await h.tap("#followup_mar");
+        await h.railTop(); await h.spot("#noteCard .out", 6);
+      }
+    }
+  },
+
+  events: {
+    seed: storage(["MA"]),
+    steps: {
+      kind: async h => {
+        await h.choose("#kind", "abc"); await h.choose("#slot", "verbal"); await h.fillTime("#time", "16:10");
+        await h.headTo("#stepHappened > header"); await h.spot("#stepHappened > header", 4);
+      },
+      before: async h => {
+        await h.unspot();
+        await h.tap("#where_living"); await h.tap("#before_noise"); await h.tap("#before_toldno");
+        await h.type("#beforeText", "The TV had just been turned off for tea");
+      },
+      did: async h => {
+        await h.tap("#behaviour_shouted");
+        await h.type("#behText", "He said he wanted the TV back on and banged the table twice.");
+        await h.type("#duration", "10");
+      },
+      staff: async h => { await h.tap("#staffDid_reassured"); await h.tap("#staffDid_space"); await h.tap("#after_gradual"); },
+      hurt: async h => {
+        await h.tap("#impact_hurt"); await h.tap("#impactWho_staff");
+        const item = '#saList li[data-id="r:event-hurt"]';
+        await h.reveal(item); await h.spot(item, 4); await h.wait(2200); await h.unspot();
+        await h.tap("#followup_incident"); await h.tap("#followup_senior");
+        await h.railTop(); await h.spot("#noteCard .out", 6);
+      },
+      incident: async h => {
+        await h.unspot();
+        await h.choose("#kind", "incident"); await h.choose("#slot", "fall"); await h.fillTime("#time", "07:45");
+        await h.tap("#where_bathroom"); await h.tap("#happened_fall-found"); await h.tap("#actions_firstaid");
+        await h.tap("#injury_injury"); await h.tap("#injuryType_graze");
+        await h.spot("#injuryWrap", 6); await h.wait(1200); await h.unspot();
         await h.railTop(); await h.spot("#noteCard .out", 6);
       }
     }
