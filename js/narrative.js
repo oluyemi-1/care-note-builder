@@ -23,8 +23,8 @@ const D = G.data;
 /* An activity is told in time order: getting ready and the journey ("start"),
    what the person did and the support given, what happened and was seen,
    then clearing up and coming home ("closing") just before the outcome. */
-const SECTIONS = ["context", "offer", "choice", "consent", "start", "independence", "support", "declinedTasks",
-                  "observation", "risk", "explain", "closing", "outcome", "benefit", "followup"];
+const SECTIONS = ["context", "before", "offer", "choice", "consent", "start", "independence", "support", "declinedTasks",
+                  "behaviour", "staff", "after", "impact", "observation", "risk", "explain", "closing", "outcome", "benefit", "followup"];
 /* sections that open a new paragraph when the note is split into paragraphs */
 const PARA_START = { independence: 1, observation: 1 };
 
@@ -66,6 +66,10 @@ function baseVars(s, opts){
   set("meal", pre(meal[0]), ["slot"]); set("meal2", pre(meal[1]), ["slot"]);
   const med = pre(D.MEDWORD[s.slot] || "{p} medication");
   set("med", med, ["slot"]); set("Med", cap(med), ["slot"]);
+  const inc = D.INCWORD[s.slot] || "an incident";
+  set("incType", inc, ["slot"]); set("IncType", cap(inc), ["slot"]);
+  set("where", s.where && D.WHERE_PHRASE[s.where] ? pre(D.WHERE_PHRASE[s.where]) : "", s.where && D.WHERE_PHRASE[s.where] ? ["where"] : []);
+  set("duration", s.duration, ["duration"]);
 
   const actSrc = s.kind !== "activity" ? ["kind"] : s.setting === "college" ? ["setting", "slot"]
                : s.slot === "other" && s.actOther ? ["slot", "actOther"] : ["slot"];
@@ -101,11 +105,11 @@ function plan(s, opts, pre){
   /* ticks the staff member's own words already say add no sentence of their
      own; they become sources of that sentence instead, so nothing is lost */
   const said = G.match.covered(s, G.rules.facts({ s, profile: s.profile || {} }));
-  const extraSrc = ["extra"], behSrc = ["behaviour.other", "behaviourOther"];
+  const extraSrc = ["extra"], behSrc = ["behaviour.other", "behaviourOther"], beforeSrc = ["beforeText"], behTextSrc = ["behText"];
   const saidBy = key => {
     const field = said[key];
     if(!field) return false;
-    const arr = field === "extra" ? extraSrc : behSrc;
+    const arr = { extra: extraSrc, behaviourOther: behSrc, beforeText: beforeSrc, behText: behTextSrc }[field];
     if(!arr.includes(key)) arr.push(key);
     return true;
   };
@@ -121,10 +125,49 @@ function plan(s, opts, pre){
 
   /* offer - a college course is not offered on the day, and a single
      activity is already named by the opener */
-  if(!college && s.kind !== "medication"){
+  const event = s.kind === "abc" || s.kind === "incident";
+  if(!college && s.kind !== "medication" && !event){
     if(s.offerA && s.offerB) add({ key: "offer", section: "offer", pri: 1, bank: D.OFFERBANK.two });
     else if(s.offerA && s.kind !== "activity") add({ key: "offer", section: "offer", pri: 2, bank: D.OFFERBANK.one });
   }
+  /* behaviour (ABC) and incidents: before, what the person did, what staff
+     did, how they responded, whether anyone was hurt - in that order.
+     There is no offer, choice or consent step for these notes. */
+  if(event){
+    if(s.others) add({ key: "others", section: "context", pri: 2, text: "Also present: " + s.others.replace(/\.?\s*$/, "") + ".", src: ["others"] });
+    (s.before || []).filter(b => D.BEFOREBANK[b] && !saidBy("before." + b)).forEach((b, i) =>
+      add({ key: "before_" + b, section: "before", pri: i < 2 ? 1 : 2, bank: D.BEFOREBANK[b], src: ["before." + b] }));
+    if(s.beforeText) add({ key: "beforeText", section: "before", pri: 1, text: verbatim(s.beforeText), src: beforeSrc });
+    (s.happened || []).filter(h => D.HAPPENEDBANK[h] && !saidBy("happened." + h)).forEach(h =>
+      add({ key: "hap_" + h, section: "behaviour", pri: 1, bank: D.HAPPENEDBANK[h], src: ["happened." + h] }));
+    (s.behaviour || []).filter(b => D.BEHAVIOURBANK[b] && !saidBy("behaviour." + b)).forEach(b =>
+      add({ key: "beh_" + b, section: "behaviour", pri: 1, bank: D.BEHAVIOURBANK[b], src: ["behaviour." + b] }));
+    if(s.behText) add({ key: "behText", section: "behaviour", pri: 1, text: verbatim(s.behText), src: behTextSrc });
+    if(present(s.duration) && Number(s.duration) > 0)
+      add({ key: "duration", section: "behaviour", pri: 1, bank: ["It lasted about {duration} minutes.", "This went on for about {duration} minutes."] });
+    /* how staff communicated leads what staff did */
+    (s.commUsed || []).forEach((c, i) => {
+      if(D.COMMBANK[c]) add({ key: "comm_" + c, section: "staff", pri: i ? 3 : 2, bank: D.COMMBANK[c], src: ["commUsed." + c] });
+    });
+    (s.staffDid || []).filter(k => D.STAFFBANK[k] && !saidBy("staffDid." + k)).forEach((k, i) =>
+      add({ key: "staff_" + k, section: "staff", pri: i < 3 ? 1 : 2, bank: D.STAFFBANK[k], src: ["staffDid." + k] }));
+    (s.actions || []).filter(k => D.ACTIONBANK[k] && !saidBy("actions." + k)).forEach((k, i) =>
+      add({ key: "action_" + k, section: "staff", pri: i < 3 ? 1 : 2, bank: D.ACTIONBANK[k], src: ["actions." + k] }));
+    if(s.after && D.AFTERBANK[s.after] && !saidBy("after." + s.after)) add({ key: "after", section: "after", pri: 1, bank: D.AFTERBANK[s.after], src: ["after"] });
+    if(s.impact && D.IMPACTBANK[s.impact]) add({ key: "impact", section: "impact", pri: 1, bank: D.IMPACTBANK[s.impact], src: ["impact"] });
+    if(s.impact === "hurt") (s.impactWho || []).filter(w => D.IMPACTWHOBANK[w]).forEach(w =>
+      add({ key: "who_" + w, section: "impact", pri: 1, bank: D.IMPACTWHOBANK[w], src: ["impactWho." + w] }));
+    if(s.kind === "incident" && s.injury === "noinjury") add({ key: "injury", section: "impact", pri: 1, bank: ["No injury was seen.", "Staff saw no injury."], src: ["injury"] });
+    if(s.kind === "incident" && s.injury === "injury"){
+      const types = (s.injuryType || []).map(t => plain((D.INJURYTYPE.find(x => x[0] === t) || ["", t])[1]).toLowerCase()).filter(t => t !== "other");
+      const detail = (types.length ? ": " + joinList(types) : "") + (s.injuryWhere ? " to " + s.injuryWhere.replace(/\.?\s*$/, "") : "");
+      add({ key: "injury", section: "impact", pri: 1, bank: ["An injury was seen{injuryDetail}.", "Staff saw an injury{injuryDetail}."],
+            vars: { injuryDetail: detail }, varSrc: { injuryDetail: (s.injuryType || []).map(t => "injuryType." + t).concat(s.injuryWhere ? ["injuryWhere"] : []) }, src: ["injury"] });
+      (s.injuryObs || []).filter(o => D.INJURYOBSBANK[o] && !saidBy("injuryObs." + o)).forEach(o =>
+        add({ key: "injobs_" + o, section: "impact", pri: 1, bank: D.INJURYOBSBANK[o], src: ["injuryObs." + o] }));
+    }
+  }
+
   /* a college course the person chose for the year is a choice worth saying */
   if(college && !notGoing && ((s.profile || {}).timetable || []).some(r => r.c === s.slot && r.chosen))
     add({ key: "enrol", section: "choice", pri: 1, bank: D.ENROLBANK, src: ["setting", "slot", "profile.timetable." + s.slot + ".chosen"] });
@@ -145,18 +188,18 @@ function plan(s, opts, pre){
           vars: { tellWhen: when, tellHow: ", " + joinList(clauses.map(c => pre(D.COMM_CLAUSE[c]))) },
           varSrc: { tellWhen: s.time ? ["time"] : [], tellHow: clauses.map(c => "commUsed." + c) } });
   }
-  (s.commUsed || []).forEach((c, i) => {
+  if(!event) (s.commUsed || []).forEach((c, i) => {
     if(D.COMMBANK[c] && !clauses.includes(c)) add({ key: "comm_" + c, section: "offer", pri: i ? 3 : 2, bank: D.COMMBANK[c], src: ["commUsed." + c] });
   });
 
   /* choice or response, and how the person let staff know */
-  if(s.resp && D.RESPBANK[s.resp]) add({ key: "resp", section: "choice", pri: 1, bank: D.RESPBANK[s.resp], src: ["resp"] });
-  if(!["declined", "declinedgo", "noresp"].includes(s.resp))
+  if(!event && s.resp && D.RESPBANK[s.resp]) add({ key: "resp", section: "choice", pri: 1, bank: D.RESPBANK[s.resp], src: ["resp"] });
+  if(!event && !["declined", "declinedgo", "noresp"].includes(s.resp))
     (s.how || []).forEach((h, i) => {
       const bank = (college ? D.HOWBANK_COLLEGE : medication ? D.HOWBANK_MED : D.HOWBANK)[h] || D.HOWBANK[h];
       if(bank) add({ key: "how_" + h, section: "choice", pri: i ? 3 : 2, bank, src: ["how." + h], how: h });
     });
-  if(s.consent) add({ key: "consent", section: "consent", pri: 1, bank: D.CONSENTBANK[s.consent], src: ["consent"] });
+  if(!event && s.consent) add({ key: "consent", section: "consent", pri: 1, bank: D.CONSENTBANK[s.consent], src: ["consent"] });
 
   /* what the person did, then the support given, then what they declined -
      except that an activity's opening and closing tasks keep their place in time */
@@ -223,10 +266,10 @@ function plan(s, opts, pre){
     (s.learn || []).filter(l => !saidBy("learn." + l)).forEach((l, i) => add({ key: "learn_" + l, section: "observation", pri: i < 2 ? 1 : 2, bank: D.LEARNBANK[l], src: ["learn." + l] }));
   (s.mood || []).filter(m => !saidBy("mood." + m)).forEach((m, i) => add({ key: "mood_" + m, section: "observation", pri: i ? 3 : 2, bank: D.MOODBANK[m], src: ["mood." + m] }));
   (s.well || []).filter(w => !saidBy("well." + w)).forEach(w => add({ key: "well_" + w, section: "observation", pri: w === "nochange" ? 3 : 2, bank: D.WELLBANK[w], src: ["well." + w] }));
-  (s.behaviour || []).filter(b => D.BEHAVIOURBANK[b] && !saidBy("behaviour." + b)).forEach(b =>
+  if(!event) (s.behaviour || []).filter(b => D.BEHAVIOURBANK[b] && !saidBy("behaviour." + b)).forEach(b =>
     add({ key: "beh_" + b, section: "observation", pri: 1, bank: D.BEHAVIOURBANK[b], src: ["behaviour." + b] }));
   if((s.behaviour || []).includes("other") && s.behaviourOther)
-    add({ key: "behOther", section: "observation", pri: 1, text: verbatim(s.behaviourOther), src: behSrc });
+    add({ key: "behOther", section: event ? "behaviour" : "observation", pri: 1, text: verbatim(s.behaviourOther), src: behSrc });
 
   /* risk management staff confirmed: safety choices, then answers to the profile's questions */
   if(s.kind === "activity")

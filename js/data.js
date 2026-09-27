@@ -53,7 +53,10 @@ const OUTCOME = [
   ["slept","Settled and asleep at the next check"],
   ["resettled","Resettled without distress"],
   ["later","Declined for now &mdash; to be offered again later"],
-  ["nochangeout","No concerns; usual routine resumed"]
+  ["nochangeout","No concerns; usual routine resumed"],
+  ["calmagain","Settled and back to their usual routine"],
+  ["monitored","Being monitored (say how often in the handover)"],
+  ["hospital","Taken to hospital"]
 ];
 const ACTS = [
   ["college","College","{p} college session","attended college"],
@@ -89,7 +92,10 @@ const ACTS = [
 /* an activity cannot end "ready for the day"; a morning wash cannot end "asleep" */
 const OUT_SCOPE = {
   ready:        {kinds:["personal"], slots:["am","pm","continence"]},
-  settled:      {kinds:["personal","eating","activity","medication"]},
+  settled:      {kinds:["personal","eating","activity","medication","abc","incident"]},
+  calmagain:    {kinds:["abc","incident"]},
+  monitored:    {kinds:["abc","incident"]},
+  hospital:     {kinds:["incident"]},
   enjoyed:      {kinds:["eating","activity"]},
   proud:        {kinds:["eating","activity"]},
   home:         {kinds:["activity"]},
@@ -97,7 +103,7 @@ const OUT_SCOPE = {
   slept:        {kinds:["personal"], slots:["pm","night"]},
   resettled:    {kinds:["personal"], slots:["pm","night"]},
   later:        {kinds:["personal","eating","activity","medication"]},
-  nochangeout:  {kinds:["personal","eating","activity","medication"]}
+  nochangeout:  {kinds:["personal","eating","activity","medication","abc","incident"]}
 };
 
 /* Where each activity happens. "out" means in the community, so road, travel
@@ -198,7 +204,13 @@ const SLOTS = {
   eating:[["breakfast","Breakfast"],["lunch","Lunch"],["dinner","Dinner"],["snack","Snack"],["fluids","Daily Fluid Intake"]],
   activity: ACTS.map(a => [a[0], a[1]]),
   medication:[["morning","Morning medication"],["lunchtime","Lunchtime medication"],["teatime","Teatime medication"],
-              ["night","Night medication"],["prn","PRN (when required) medication"]]
+              ["night","Night medication"],["prn","PRN (when required) medication"]],
+  abc:[["verbal","Verbal (shouting, swearing)"],["physical","Physical towards others"],["selfinjury","Self-injury"],
+       ["property","Damage to property"],["withdrawal","Withdrawal or refusing interaction"],["refusal","Refusing care or medication"],
+       ["leaving","Trying to leave or leaving the building"],["distress","Distress (crying, agitation)"],["otherbeh","Other"]],
+  incident:[["fall","Fall"],["injury","Injury"],["mederror","Medication error"],["behaviour","Behaviour towards others"],
+            ["choking","Choking"],["missing","Missing person"],["propertydamage","Property damage"],["safeguarding","Safeguarding concern"],
+            ["allegation","Allegation"],["environment","Environmental (fire, flood, equipment)"],["otherinc","Other"]]
 };
 
 /* ---------- tasks: each row mirrors a field in the care records system ---------- */
@@ -384,6 +396,8 @@ medication:[
   full:["Staff gave {o} a drink to take it with.","Staff held the drink for {o} to take it with."],
   declined:["{S} did not want a drink with it.","{S} declined a drink with it."]}
 ],
+
+abc:[], incident:[],
 
 activity:[
  {id:"plan",label:"Planning &amp; preparing",nf:"Daily note",phase:"start",verb:"got ready",noun:"getting ready",
@@ -599,7 +613,15 @@ eating:[
 medication:[
  "{N} was offered {med} at {time}{ratio}.",
  "At {time}, staff offered {N} {med}{ratio}.",
- "{Med} was offered to {N} at {time}{ratio}."]
+ "{Med} was offered to {N} at {time}{ratio}."],
+abc:[
+ "At {time}, the following happened with {N}{where}{ratio}.",
+ "The following was observed with {N}{where} at {time}{ratio}.",
+ "This is a record of what happened with {N}{where} at {time}{ratio}."],
+incident:[
+ "At {time}, {N} was involved in {incType}{where}{ratio}.",
+ "{N} was involved in {incType}{where} at {time}{ratio}.",
+ "{IncType} involving {N} happened{where} at {time}{ratio}."]
 };
 
 /* what was offered, when it is not already named by the opener */
@@ -753,8 +775,11 @@ const SLEEPBANK = {
 };
 
 /* observable behaviour - what staff are asked for instead of "difficult" */
-const BEHAVIOUR = [["raised","Raised voice"],["movedaway","Moved away from staff"],["declinedact","Declined the activity"],
-                   ["pushed","Pushed an item away"],["askedleave","Repeatedly asked to leave"],["smiled","Smiled or laughed"],
+const BEHAVIOUR = [["raised","Raised voice"],["shouted","Shouted or swore"],["movedaway","Moved away from staff"],["declinedact","Declined the activity"],
+                   ["pushed","Pushed an item away"],["threw","Threw an item"],["hitout","Hit out at someone"],["kicked","Kicked or pushed someone"],
+                   ["grabbed","Grabbed someone or something"],["selfinj","Hit, bit or scratched themselves"],["damaged","Damaged property"],
+                   ["askedleave","Repeatedly asked to leave"],["leave","Tried to leave the building"],["paced","Paced up and down"],
+                   ["repeated","Repeated a question or phrase"],["cried","Cried"],["smiled","Smiled or laughed"],
                    ["other","Other \u2014 describe"]];
 const BEHAVIOURBANK = {
  raised:["{S} raised {p} voice.","{S} spoke with a raised voice."],
@@ -762,13 +787,25 @@ const BEHAVIOURBANK = {
  declinedact:["{S} declined the activity.","{S} said no to the activity."],
  pushed:["{S} pushed an item away.","{S} pushed an item away from {r}."],
  askedleave:["{S} asked to leave several times.","{S} repeatedly asked to leave."],
- smiled:["{S} smiled and laughed.","{S} {vbe} seen smiling and laughing."]
+ smiled:["{S} smiled and laughed.","{S} {vbe} seen smiling and laughing."],
+ shouted:["{S} shouted and swore.","{S} raised {p} voice and swore."],
+ threw:["{S} threw an item.","{S} picked up an item and threw it."],
+ hitout:["{S} hit out at someone.","{S} struck out at someone."],
+ kicked:["{S} kicked or pushed someone.","{S} kicked out at someone."],
+ grabbed:["{S} grabbed someone or something.","{S} took hold of someone or something."],
+ selfinj:["{S} hit, bit or scratched {r}.","{S} hurt {r} by hitting, biting or scratching."],
+ damaged:["{S} damaged property.","Property was damaged by {o}."],
+ leave:["{S} tried to leave the building.","{S} made for the door and tried to leave."],
+ paced:["{S} paced up and down.","{S} walked up and down repeatedly."],
+ repeated:["{S} repeated a question or phrase.","{S} asked the same thing again and again."],
+ cried:["{S} cried.","{S} {vbe} crying."]
 };
 
 /* what was done about it - each one appears only when it was actually done */
 const FOLLOWUP = [["handover","Handed over to the next shift"],["senior","Senior or manager informed"],
                   ["health","Health professional contacted"],["family","Family or representative informed"],
-                  ["bodymap","Body map completed"],["mar","MAR chart signed"],["incident","Incident form completed"]];
+                  ["bodymap","Body map completed"],["mar","MAR chart signed"],["incident","Incident form completed"],
+                  ["police","Police informed"],["safeguarding","Safeguarding concern raised in line with procedure"]];
 const FOLLOWBANK = {
  handover:["This was handed over to the next shift.","Staff handed this over to the next shift."],
  senior:["A senior colleague or manager was informed.","Staff informed a senior colleague or manager."],
@@ -776,7 +813,135 @@ const FOLLOWBANK = {
  family:["{P} family or representative was informed.","Staff informed {p} family or representative."],
  bodymap:["A body map was completed.","Staff completed a body map."],
  mar:["The MAR chart was signed.","Staff signed the MAR chart."],
- incident:["An incident form was completed.","Staff completed an incident form."]
+ incident:["An incident form was completed.","Staff completed an incident form."],
+ police:["The police were informed.","Staff informed the police."],
+ safeguarding:["A safeguarding concern was raised in line with procedure.","Staff raised a safeguarding concern in line with procedure."]
+};
+
+/* ---------- behaviour (ABC chart) and incidents ----------
+   Before - what the person did - what staff did - how they responded - was
+   anyone hurt. Observable throughout: the app records what happened and
+   never why it happened; that is for the behaviour-support review. */
+const WHERE = [["bedroom","Bedroom"],["bathroom","Bathroom"],["kitchen","Kitchen"],["living","Living room"],["dining","Dining room"],
+               ["garden","Garden"],["hallway","Hallway"],["community","Out in the community"],["vehicle","In a vehicle"],["otherplace","Somewhere else"]];
+const WHERE_PHRASE = { bedroom:" in {p} bedroom", bathroom:" in the bathroom", kitchen:" in the kitchen", living:" in the living room",
+                       dining:" in the dining room", garden:" in the garden", hallway:" in the hallway", community:" out in the community",
+                       vehicle:" in a vehicle", otherplace:"" };
+const ABCWORD = { verbal:"shouting or swearing", physical:"physical behaviour towards others", selfinjury:"self-injury", property:"damage to property",
+                  withdrawal:"withdrawal", refusal:"refusing care or medication", leaving:"trying to leave the building", distress:"distress",
+                  otherbeh:"behaviour that concerned staff" };
+const INCWORD = { fall:"a fall", injury:"an injury", mederror:"a medication error", behaviour:"an incident involving behaviour towards others",
+                  choking:"a choking incident", missing:"a missing-person incident", propertydamage:"damage to property",
+                  safeguarding:"a safeguarding concern", allegation:"an allegation", environment:"an environmental incident", otherinc:"an incident" };
+const BEFORE = [["routine","A change to the usual routine"],["noise","Noise or a busy environment"],["asked","Being asked to do something"],
+                ["waiting","Waiting for something"],["toldno","Being told no, or having to stop"],["interaction","An interaction with another person"],
+                ["transition","Moving from one activity to another"],["pain","Signs of pain or discomfort beforehand"],
+                ["unwell","Seemed unwell or tired beforehand"],["nothing","Nothing noticeable"]];
+const BEFOREBANK = {
+ routine:["Just before, there had been a change to {p} usual routine.","Beforehand, {p} usual routine had changed."],
+ noise:["Just before, the environment was noisy and busy.","It was noisy and busy beforehand."],
+ asked:["Just before, {s} had been asked to do something.","Beforehand, staff had asked {o} to do something."],
+ waiting:["Just before, {s} had been waiting for something.","Beforehand, {s} {vbe} waiting for something."],
+ toldno:["Just before, {s} had been told no, or that {s} had to stop.","Beforehand, {s} had been told no, or asked to stop."],
+ interaction:["Just before, there had been an interaction with another person.","Beforehand, {s} had been interacting with someone else."],
+ transition:["Just before, {s} {vbe} moving from one activity to another.","It happened as {s} {vbe} changing from one activity to another."],
+ pain:["Beforehand, {s} had shown signs of pain or discomfort.","There were signs of pain or discomfort beforehand."],
+ unwell:["Beforehand, {s} had seemed unwell or tired.","{S} had seemed unwell or tired beforehand."],
+ nothing:["Nothing noticeable happened beforehand.","Staff noticed nothing unusual beforehand."]
+};
+const STAFFDID = [["reassured","Reassured them verbally"],["space","Gave them space and time"],["distraction","Used distraction"],
+                  ["redirected","Redirected them to something else"],["calming","Used a calming technique (breathing, music)"],
+                  ["quiet","Moved to a quieter space"],["sensory","Reduced noise or light"],["alternative","Offered an alternative activity"],
+                  ["comfort","Offered physical comfort, which they accepted"],["prn","PRN medication given as prescribed"],
+                  ["safety","Moved others or items to keep everyone safe"],["senior","Called a senior colleague for support"],
+                  ["stayed","Stayed nearby and watched"],["plan","Followed their behaviour support plan"]];
+const STAFFBANK = {
+ reassured:["Staff reassured {o} verbally.","Staff spoke to {o} calmly and reassured {o}."],
+ space:["Staff gave {o} space and time.","Staff stepped back and gave {o} time."],
+ distraction:["Staff used distraction.","Staff tried to distract {o}."],
+ redirected:["Staff redirected {o} to something else.","Staff guided {o} towards something else."],
+ calming:["Staff used a calming technique with {o}.","Staff used a calming technique, such as breathing or music."],
+ quiet:["Staff supported {o} to a quieter space.","{S} {vbe} supported to move to a quieter space."],
+ sensory:["Staff reduced the noise and light around {o}.","Noise and light were reduced."],
+ alternative:["Staff offered {o} an alternative activity.","An alternative activity was offered."],
+ comfort:["Staff offered physical comfort, which {s} accepted.","{S} accepted physical comfort from staff."],
+ prn:["PRN medication was given as prescribed.","{P} PRN medication was given as prescribed."],
+ safety:["Staff moved others and items away to keep everyone safe.","Staff kept everyone safe by moving others and items away."],
+ senior:["Staff called a senior colleague for support.","A senior colleague was called to support."],
+ stayed:["Staff stayed nearby and kept watch.","Staff remained nearby, watching."],
+ plan:["Staff followed {p} behaviour support plan.","{P} behaviour support plan was followed."]
+};
+const AFTER = [["quick","Settled within a few minutes"],["gradual","Settled gradually"],["laterst","Settled later in the shift"],
+               ["nochange","No change while staff were with them"],["worse","Became more distressed at first"],["unsettled","Remained unsettled"]];
+const AFTERBANK = {
+ quick:["{S} settled within a few minutes.","Within a few minutes, {s} had settled."],
+ gradual:["{S} settled gradually.","{S} gradually became calmer."],
+ laterst:["{S} settled later in the shift.","{S} did not settle straight away but did later in the shift."],
+ nochange:["There was no change while staff were with {o}.","{S} stayed the same while staff were with {o}."],
+ worse:["{S} became more distressed at first.","At first {s} became more distressed."],
+ unsettled:["{S} remained unsettled.","{S} stayed unsettled."]
+};
+const IMPACT = [["none","No one was hurt and nothing was damaged"],["risk","Someone was at risk but no one was hurt"],
+                ["hurt","Someone was hurt"],["damage","Property was damaged"]];
+const IMPACTBANK = {
+ none:["No one was hurt and nothing was damaged.","Nobody was hurt and there was no damage."],
+ risk:["Someone was at risk, but no one was hurt.","There was a risk to someone, but no one was hurt."],
+ hurt:["Someone was hurt.","Someone was hurt during this."],
+ damage:["Property was damaged.","There was damage to property."]
+};
+const IMPACTWHO = [["self","The person themselves"],["staff","A member of staff"],["otherperson","Another person"]];
+const IMPACTWHOBANK = { self:["{S} {vbe} hurt.","{S} {vbe} the one hurt."], staff:["A member of staff was hurt.","A staff member was hurt."],
+                        otherperson:["Another person was hurt.","Someone else was hurt."] };
+const HAPPENED = {
+  fall:[["fall-found","Found on the floor"],["fall-seen","Seen to fall"],["fall-trip","Tripped"],["fall-slip","Slipped"],["fall-bed","Fell from bed"],["fall-chair","Fell from a chair"]],
+  choking:[["chok-cough","Coughing"],["chok-nospeak","Could not speak or breathe"],["chok-back","Back blows given"],["chok-abdo","Abdominal thrusts given"],
+           ["chok-self","Cleared it by coughing"],["chok-staff","Cleared with staff help"]],
+  missing:[["miss-left","Left the building unaccompanied"],["miss-search","Staff searched the area"],["miss-found","Found by staff"],
+           ["miss-returned","Returned by themselves"],["miss-brought","Brought back by someone else"]],
+  mederror:[["med-missed","A dose was missed"],["med-wrongtime","Given at the wrong time"],["med-dropped","A dose was dropped or spilled"],
+            ["med-wrongperson","Given to the wrong person"],["med-wrongdose","The wrong dose was given"]],
+  propertydamage:[["prop-broke","Something was broken"],["prop-thrown","Something was thrown"],["prop-wall","A wall, door or window was damaged"]]
+};
+const HAPPENEDBANK = {
+ "fall-found":["{S} {vbe} found on the floor.","Staff found {o} on the floor."], "fall-seen":["{S} {vbe} seen to fall.","Staff saw {o} fall."],
+ "fall-trip":["{S} tripped.","{S} tripped and fell."], "fall-slip":["{S} slipped.","{S} slipped and fell."],
+ "fall-bed":["{S} fell from {p} bed.","{S} fell out of bed."], "fall-chair":["{S} fell from a chair.","{S} fell from {p} chair."],
+ "chok-cough":["{S} {vbe} coughing.","{S} began coughing."], "chok-nospeak":["{S} could not speak or breathe.","{S} {vbe} unable to speak or breathe."],
+ "chok-back":["Back blows were given.","Staff gave back blows."], "chok-abdo":["Abdominal thrusts were given.","Staff gave abdominal thrusts."],
+ "chok-self":["{S} cleared it by coughing.","{S} coughed it clear {r}."], "chok-staff":["It was cleared with help from staff.","Staff helped {o} clear it."],
+ "miss-left":["{S} left the building unaccompanied.","{S} went out of the building without staff."],
+ "miss-search":["Staff searched the area.","Staff searched the building and surrounding area."],
+ "miss-found":["{S} {vbe} found by staff.","Staff found {o}."], "miss-returned":["{S} returned by {r}.","{S} came back on {p} own."],
+ "miss-brought":["{S} {vbe} brought back by someone else.","Someone else brought {o} back."],
+ "med-missed":["A dose was missed.","A dose of medication was missed."], "med-wrongtime":["It was given at the wrong time.","The medication was given at the wrong time."],
+ "med-dropped":["A dose was dropped or spilled.","A dose of medication was dropped or spilled."],
+ "med-wrongperson":["It was given to the wrong person.","The medication was given to the wrong person."],
+ "med-wrongdose":["The wrong dose was given.","The dose given was wrong."],
+ "prop-broke":["Something was broken.","An item was broken."], "prop-thrown":["Something was thrown.","An item was thrown."],
+ "prop-wall":["A wall, door or window was damaged.","There was damage to a wall, door or window."]
+};
+const INJURY = [["noinjury","No injury seen"],["injury","Injury seen"]];
+const INJURYTYPE = [["bruise","Bruise"],["cut","Cut"],["graze","Graze"],["skintear","Skin tear"],["swelling","Swelling"],["burn","Burn"],["otherinjury","Other"]];
+const INJURYOBS = [["bleeding","Bleeding"],["head","Hit their head"],["conscious","Conscious and alert throughout"],
+                   ["unconscious","Brief loss of consciousness observed"],["painobs","Complained of or showed pain"]];
+const INJURYOBSBANK = {
+ bleeding:["There was bleeding.","The injury was bleeding."], head:["{S} hit {p} head.","{S} banged {p} head."],
+ conscious:["{S} {vbe} conscious and alert throughout.","{S} remained conscious and alert."],
+ unconscious:["A brief loss of consciousness was observed.","{S} briefly lost consciousness."],
+ painobs:["{S} complained of pain or showed signs of it.","{S} showed signs of pain."]
+};
+const ACTIONS = [["firstaid","First aid given"],["stayed","Stayed with them"],["checked","Checked them for injuries"],["safe","Made the area safe"],
+                 ["moved","Moved others to safety"],["ambulance","Ambulance called"],["nhsline","NHS non-emergency line called"],
+                 ["gp","GP contacted"],["hospital","Taken to hospital"],["prn","PRN medication given as prescribed"],
+                 ["observations","Observations started (say how often in the handover)"]];
+const ACTIONBANK = {
+ firstaid:["First aid was given.","Staff gave first aid."], stayed:["Staff stayed with {o}.","Staff remained with {o} throughout."],
+ checked:["Staff checked {o} for injuries.","{S} {vbe} checked for injuries."], safe:["Staff made the area safe.","The area was made safe."],
+ moved:["Staff moved others to safety.","Others were moved to safety."], ambulance:["An ambulance was called.","Staff called an ambulance."],
+ nhsline:["The NHS non-emergency line was called.","Staff called the NHS non-emergency line for advice."],
+ gp:["The GP was contacted.","Staff contacted the GP."], hospital:["{S} {vbe} taken to hospital.","{S} went to hospital."],
+ prn:["PRN medication was given as prescribed.","{P} PRN medication was given as prescribed."],
+ observations:["Observations were started.","Staff began regular observations."]
 };
 
 /* Phrases in a staff member's own words that mean the same as a tick option,
@@ -801,6 +966,17 @@ const MATCH = {
  "laundry-machine":["machine"], "laundry-folded":["folded"],
  "social-friends":["(?:his|her|their) friends","met up with"], "social-joined":["joined in"], "social-new":["someone new","new (?:friend|person)"],
  "social-snack":["bought (?:a|some|himself|herself|themselves)","(?:a|his|her|their) (?:drink|snack|crisps|coke|juice)"],
+ /* before, behaviour, what staff did, injuries, actions */
+ routine:["change (?:to|in) (?:his|her|their|the) routine","routine (?:had )?changed"], noise:["noisy","loud","busy"], asked:["(?:was|were) asked to","asked (?:him|her|them) to"],
+ waiting:["waiting for"], toldno:["told (?:him|her|them)? ?no","had to stop","asked to stop"], transition:["moving (?:from|to)","transition"],
+ shouted:["shout","swor(?:e|ing)","swear"], threw:["threw","throwing"], hitout:["hit (?:out|at|a|the|staff|another)","punch","slapp"], kicked:["kick"],
+ grabbed:["grabb"], selfinj:["(?:hit|bit|scratch(?:ed|ing)) (?:himself|herself|themselves)","self[- ]harm","head[- ]bang"], damaged:["damag","broke (?:the|a)"],
+ leave:["(?:tried|trying) to leave","made for the door","ran (?:out|off)"], paced:["pac(?:ed|ing)"], repeated:["repeat(?:ed|ing)","again and again"], cried:["cr(?:ied|ying)","tears"],
+ reassured:["reassur"], space:["gave (?:him|her|them) (?:some )?(?:space|time)","stepped back"], distraction:["distract"], redirected:["redirect"],
+ calming:["breathing","calming"], quiet:["quiet(?:er)? (?:room|space|area)"], alternative:["alternative activity","offered (?:him|her|them) something else"],
+ stayed:["stayed (?:with|nearby|close)"], senior:["senior","team leader","called (?:the )?manager"],
+ firstaid:["first aid"], ambulance:["ambulance","paramedic","999"], gp:["\\bgp\\b","doctor"], hospital:["hospital","a&e"], checked:["checked (?:him|her|them) (?:over|for)"],
+ bleeding:["bleed","blood"], head:["(?:hit|bang|bump)(?:ed)? (?:his|her|their) head"], conscious:["conscious","alert"], painobs:["\\bpain\\b","sore","hurt(?:ing)?"],
  explained:["told (?:him|her|them) what (?:it|the medication|the tablets?|they) (?:was|were|is|are)","explained (?:what|the medication|why)"],
  label:["mar chart","checked the label"], water:["(?:glass|drink|sip) of water","with (?:a|some) (?:drink|water|juice)"],
  watched:["stayed (?:with|until)","watched (?:him|her|them) take"], prescribed:["as prescribed"],
@@ -961,7 +1137,10 @@ const OUTBANK = {
  resettled:["{S} resettled without distress.",
         "{S} settled again without distress."],
  nochangeout:["The interaction finished with no concerns and {p} usual routine continued.",
-              "There were no concerns and {s} carried on with {p} usual routine."]
+              "There were no concerns and {s} carried on with {p} usual routine."],
+ calmagain:["{S} settled and returned to {p} usual routine.","{S} {vbe} settled again and went back to {p} usual routine."],
+ monitored:["{S} {vbe} being monitored afterwards.","Staff continued to monitor {o} afterwards."],
+ hospital:["{S} {vbe} taken to hospital.","{S} went to hospital."]
 };
 /* an outcome that can take "Afterwards, " in front without saying it twice */
 const OUT_LEAD = ["", "Afterwards, ", "By the end, "];
@@ -977,6 +1156,8 @@ G.data = {
   DIGNITY, DIGNITYBANK, CONT_OBS, CONTBANK, SLEEP_OBS, SLEEPBANK, BEHAVIOUR, BEHAVIOURBANK, FOLLOWUP, FOLLOWBANK,
   STAFFING, RISK_SCOPE, JOURNEY, DURING, DURINGBANK, MATCH, ENJOY, ENJOYBANK, BENEFIT, BENEFITBANK, ENROLBANK,
   COMM_CLAUSE, TELLBANK, HOWBANK_COLLEGE, HOW_JOIN_COLLEGE,
-  MEDWORD, RESP_MED, MED, MEDBANK, MEDTELLBANK, HOWBANK_MED, HOW_JOIN_MED, MED_ISSUES, MEDISSUEBANK
+  MEDWORD, RESP_MED, MED, MEDBANK, MEDTELLBANK, HOWBANK_MED, HOW_JOIN_MED, MED_ISSUES, MEDISSUEBANK,
+  WHERE, WHERE_PHRASE, ABCWORD, INCWORD, BEFORE, BEFOREBANK, STAFFDID, STAFFBANK, AFTER, AFTERBANK, IMPACT, IMPACTBANK, IMPACTWHO, IMPACTWHOBANK,
+  HAPPENED, HAPPENEDBANK, INJURY, INJURYTYPE, INJURYOBS, INJURYOBSBANK, ACTIONS, ACTIONBANK
 };
 })(globalThis.GSN = globalThis.GSN || {});

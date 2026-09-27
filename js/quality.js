@@ -9,6 +9,7 @@ const { taskLabel } = G.rules;
 /* ---------- the organisation's audit checks (gate the Copy button) ---------- */
 function orgAudit(f, extra){
   const s = f.s;
+  if(s.kind === "abc" || s.kind === "incident") return eventAudit(f);
   /* answering a profile safety question is a risk control in its own right */
   const answered = !!(extra && extra.answered);
   const declined = s.resp === "declined" || s.resp === "delayed" || s.consent === "no";
@@ -30,6 +31,22 @@ function orgAudit(f, extra){
      t:"Relevant risk controls and observations included", need:"an observation", fix:"Add at least one observation in step 4."},
     {id:"outcome", field:"outcome", ok: !!s.outcome, t:"Meaningful outcome recorded", need:"how it ended for them", fix:"Choose an outcome in step 5."},
     {id:"refusal", field:"declined", ok: !declined || !!s.declined, t:"Refusal or non-engagement respected", need:"how you respected the refusal", fix:"Say what you did to respect the refusal in step 2."},
+    {id:"attest", ok: !!s.attest, t:"Entry reflects what actually happened", fix:"Tick the confirmation under the note."}
+  ];
+}
+
+/* The organisation's checks, read for a behaviour or incident note: the same
+   seven slots, so the badge and the copy gate work unchanged. */
+function eventAudit(f){
+  const s = f.s;
+  const hurt = ["hurt", "damage", "risk"].includes(s.impact) || s.injury === "injury";
+  return [
+    {id:"interaction", field:"kind", ok: !!s.kind && !!s.slot, t:"Correct interaction selected", need:"the type of interaction", fix:"Pick the type in step 1."},
+    {id:"response", field:"before", ok: (s.before || []).length > 0 || !!s.beforeText, t:"What was happening before recorded", need:"what was happening just before", fix:"Tick or describe what was happening just before, under What happened."},
+    {id:"support", field:"behText", ok: (s.behaviour || []).length > 0 || !!s.behText || (s.happened || []).length > 0, t:"What the person did described", need:"what the person did", fix:"Tick what you saw and describe it in your own words, under What happened."},
+    {id:"observation", field:"staffDid", ok: (s.staffDid || []).length > 0 || (s.actions || []).length > 0, t:"What staff did recorded", need:"what staff did", fix:"Tick what staff did, under What happened."},
+    {id:"outcome", field: s.after ? "outcome" : "after", ok: !!s.after && !!s.outcome, t:"How it ended recorded", need:"how it ended", fix:"Record how they responded, and choose an outcome in the last step."},
+    {id:"refusal", field:"followup", ok: !hurt || (s.followup || []).length > 0 || !!s.handover, t:"Harm or risk followed up", need:"what was done about it", fix:"Someone was hurt or at risk: tick what was done about it, or write the handover."},
     {id:"attest", ok: !!s.attest, t:"Entry reflects what actually happened", fix:"Tick the confirmation under the note."}
   ];
 }
@@ -60,6 +77,17 @@ function independence(f){
 function dimensions(f, extra){
   extra = extra || {};
   const s = f.s, V = f.vars;
+  if(s.kind === "abc" || s.kind === "incident"){
+    const d = [];
+    const add = (id, label, status, message) => d.push({ id, label, status, message: message || "" });
+    add("staffComm", "Staff communication", (s.commUsed || []).length ? "ok" : "gap", "How staff communicated with " + V.N + " has not been recorded.");
+    add("impact", "Anyone hurt or at risk", s.impact ? "ok" : "gap", "Whether anyone was hurt or at risk has not been recorded.");
+    if(s.kind === "incident") add("injury", "Injury", s.injury ? "ok" : "gap", "Whether an injury was seen has not been recorded.");
+    if(["hurt", "damage", "risk"].includes(s.impact) || s.injury === "injury")
+      add("followup", "Follow-up", s.handover || (s.followup || []).length ? "ok" : "gap", "Someone was hurt or at risk, and no follow-up has been recorded yet.");
+    add("outcome", "Outcome", s.outcome ? "ok" : "gap", "An outcome has not yet been documented.");
+    return d;
+  }
   const ind = independence(f);
   const d = [];
   const add = (id, label, status, message) => d.push({ id, label, status, message: message || "" });

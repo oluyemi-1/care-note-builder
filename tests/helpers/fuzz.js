@@ -17,7 +17,8 @@ function randomInteraction(seed){
   const maybe = (v, p) => r() < (p || 0.5) ? v : "";
   const ids = list => list.map(x => x[0]);
 
-  const kind = one(["personal", "eating", "activity", "medication"]);
+  const kind = one(["personal", "eating", "activity", "medication", "abc", "incident"]);
+  const event = kind === "abc" || kind === "incident";
   const setting = kind === "activity" && r() < 0.3 ? "college" : "community";
   const slot = kind === "activity" ? (setting === "college" ? one(ids(D.COURSES)) : one(ids(D.ACTS)))
              : one(ids(D.SLOTS[kind]));
@@ -38,10 +39,10 @@ function randomInteraction(seed){
     time: maybe(one(["07:30", "12:15", "19:45"]), 0.85), staffing: one(["", "1:1", "2:1", "shared"]),
     sessionTo: setting === "college" ? maybe("15:30", 0.6) : "",
     actOther: slot === "other" ? maybe("a trip to the library", 0.7) : "",
-    offerA: maybe(one(["a shower", "pasta", "a walk"]), 0.6), offerB: maybe(one(["a bath", "soup", "the park"]), 0.4),
-    resp: maybe(one(resps), 0.85), chosen: maybe(one(["a shower", "soup", "the park"]), 0.3),
-    how: some(ids(D.HOW), 0.2), consent: maybe(one(ids(D.CONSENT)), 0.8),
-    declined: maybe("gave her ten minutes and asked again", 0.3), level: maybe(one(["ind", "prompt", "min", "part", "full"]), 0.5),
+    offerA: event ? "" : maybe(one(["a shower", "pasta", "a walk"]), 0.6), offerB: event ? "" : maybe(one(["a bath", "soup", "the park"]), 0.4),
+    resp: event ? "" : maybe(one(resps), 0.85), chosen: event ? "" : maybe(one(["a shower", "soup", "the park"]), 0.3),
+    how: event ? [] : some(ids(D.HOW), 0.2), consent: event ? "" : maybe(one(ids(D.CONSENT)), 0.8),
+    declined: event ? "" : maybe("gave her ten minutes and asked again", 0.3), level: event ? "" : maybe(one(["ind", "prompt", "min", "part", "full"]), 0.5),
     tasks, commUsed: some(ids(D.COMM), 0.25),
     ate: kind === "eating" ? maybe(one(["All", "Most", "About half", "A small amount", "None"]), 0.6) : "",
     whatAte: kind === "eating" ? maybe("cheese on toast", 0.4) : "",
@@ -56,6 +57,16 @@ function randomInteraction(seed){
     during: kind === "activity" ? some(((D.ACT_INFO[slot] || {}).tags || []).flatMap(t => ids(D.DURING[t] || [])), 0.3) : [],
     enjoy: kind === "activity" ? maybe(one(ids(D.ENJOY)), 0.5) : "", benefit: kind === "activity" ? some(ids(D.BENEFIT), 0.2) : [],
     med: kind === "medication" ? some(ids(D.MED), 0.5) : [], medIssues: kind === "medication" ? some(ids(D.MED_ISSUES), 0.15) : [],
+    where: event ? maybe(one(ids(D.WHERE)), 0.7) : "", before: event ? some(ids(D.BEFORE), 0.2) : [],
+    beforeText: event ? maybe("The television had just been switched off.", 0.3) : "",
+    behText: event ? maybe("He shouted that he wanted to go out and banged the table twice.", 0.5) : "",
+    duration: event ? maybe(one(["5", "15", "40"]), 0.5) : "", others: event ? maybe("JB, support worker", 0.3) : "",
+    staffDid: event ? some(ids(D.STAFFDID), 0.2) : [], actions: kind === "incident" ? some(ids(D.ACTIONS), 0.2) : [],
+    happened: kind === "incident" ? some(ids(D.HAPPENED[slot] || []), 0.4) : [],
+    after: event ? maybe(one(ids(D.AFTER)), 0.7) : "", impact: event ? maybe(one(ids(D.IMPACT)), 0.8) : "",
+    impactWho: event ? some(ids(D.IMPACTWHO), 0.3) : [], injury: kind === "incident" ? maybe(one(ids(D.INJURY)), 0.7) : "",
+    injuryType: kind === "incident" ? some(ids(D.INJURYTYPE), 0.2) : [], injuryObs: kind === "incident" ? some(ids(D.INJURYOBS), 0.2) : [],
+    injuryWhere: kind === "incident" ? maybe("left forearm", 0.4) : "",
     dignity: kind === "personal" ? some(ids(D.DIGNITY), 0.3) : [],
     contObs: kind === "personal" ? some(ids(D.CONT_OBS), 0.2) : [],
     sleepObs: kind === "personal" ? some(ids(D.SLEEP_OBS), 0.2) : [],

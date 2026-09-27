@@ -10,7 +10,7 @@
 (function (G) {
 "use strict";
 
-const { fill, personVars, present, plain } = G.core;
+const { fill, personVars, present, plain, cap } = G.core;
 const { TASKS, ACTS, ACT_INFO, COURSES, MEALWORD, OVERALL_LEVELS, DAYS } = G.data;
 
 /* ---------- facts every rule and check leans on, worked out once ---------- */
@@ -73,6 +73,11 @@ function facts(ctx){
       activity: plain(fill(activityPhrase(s, ctx.acts), personVars(s.initials || profile.initials, s.pronoun || profile.pronoun))),
       meal: meal || "the meal",
       med: med || "the medication",
+      incType: plain(G.data.INCWORD[s.slot] || "an incident"),
+      IncTypeCap: cap(plain(G.data.INCWORD[s.slot] || "an incident")),
+      behType: plain(G.data.ABCWORD[s.slot] || "behaviour that concerned staff"),
+      triggersRaw: (profile.triggers || "").replace(/[.\s]+$/, ""),
+      time: s.time || "the time recorded",
       medIssuesList: issues.length ? issues.join(", ") : "an issue",
       textureNote: profile.texture ? " (" + profile.texture + ")" : "",
       aid: profile.mobilityAid || "mobility aid",
@@ -249,6 +254,37 @@ const CARE_RULES = [
       { id: "lowerfat", text: "Was a lower-fat option offered?",
         yes: "A lower-fat option was offered to {o}.", no: null }
     ]
+  },
+
+  /* ---- behaviour and incidents ---- */
+  {
+    id: "event-hurt", title: "Someone hurt or property damaged",
+    appliesWhen: { kind: ["abc", "incident"], any: [{ field: { impact: ["hurt", "damage"] } }, { field: { injury: "injury" } }] },
+    reason: "Someone was hurt or property was damaged.",
+    suggest: "Someone was hurt or property was damaged: an incident form, a body map for any injury, and informing a senior are done in line with your procedure. Tick what was done under What was done about it.",
+    highlight: ["followup.incident", "followup.bodymap", "followup.senior"], watch: ["followup"],
+    handover: "Incident at {time}: someone was hurt or property was damaged."
+  },
+  {
+    id: "incident-procedure", title: "Incident reporting",
+    appliesWhen: { kind: "incident", not: { any: [{ field: { impact: ["hurt", "damage"] } }, { field: { injury: "injury" } }] } },
+    reason: "This is an incident note.",
+    suggest: "Incidents are reported in line with your procedure - tick what was done under What was done about it (senior informed, incident form completed).",
+    highlight: ["followup.incident", "followup.senior"], watch: ["followup"],
+    handover: "{IncTypeCap} involving {N} at {time}."
+  },
+  {
+    id: "abc-handover", title: "ABC chart",
+    appliesWhen: { kind: "abc" },
+    reason: "Behaviour that concerned staff was recorded.",
+    handover: "Behaviour recorded on an ABC chart at {time}: {behType}."
+  },
+  {
+    id: "triggers-event", title: "Recorded triggers",
+    appliesWhen: { kind: ["abc", "incident"], profileHas: "triggers" },
+    reason: "{N}'s profile records triggers: {triggersRaw}.",
+    suggest: "{N}'s profile records triggers: {triggersRaw}. If any of these were present, tick or describe them under What was happening just before.",
+    watch: ["before", "beforeText"]
   },
 
   /* ---- medication ---- */

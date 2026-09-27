@@ -131,6 +131,32 @@ const CONTRADICTIONS = [
     }
   },
   {
+    id: "no-injury-but-injury-details",
+    test: f => {
+      if(f.kind !== "incident" || f.s.injury !== "noinjury") return null;
+      if(!(f.s.injuryType || []).length && !(f.s.injuryObs || []).some(o => o === "bleeding" || o === "head" || o === "unconscious")) return null;
+      return { message: "\u201cNo injury seen\u201d is recorded, but injury details are also ticked.",
+               reason: "Either an injury was seen or it was not. Change the answer, or untick the details.", fields: ["injury", "injuryType"] };
+    }
+  },
+  {
+    id: "no-one-hurt-but-hurt",
+    test: f => {
+      if(f.s.impact !== "none") return null;
+      if(f.s.injury !== "injury" && !(f.s.impactWho || []).length) return null;
+      return { message: "\u201cNo one was hurt\u201d is recorded, but an injury or a person hurt is also recorded.",
+               reason: "These cannot both be true. Change the answer to who was hurt, or remove the injury.", fields: ["impact", "injury"] };
+    }
+  },
+  {
+    id: "duration-implausible",
+    test: f => {
+      const d = num(f.s.duration);
+      if(d === null || (d >= 0 && d <= 720)) return null;
+      return { message: "The duration recorded is " + f.s.duration + " minutes.", reason: "A duration is recorded in minutes and cannot be negative or longer than a shift. Check the number.", fields: ["duration"] };
+    }
+  },
+  {
     id: "declined-but-given-as-prescribed",
     test: f => {
       if(f.kind !== "medication" || !(f.s.medIssues || f.s.med)) return null;

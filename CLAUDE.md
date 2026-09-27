@@ -5,8 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 Care Note Builder is an offline PWA for UK adult social care. Staff answer structured
-questions about one interaction (personal care, eating and drinking, an activity, or a
-medication round) and
+questions about one interaction (personal care, eating and drinking, an activity, a
+medication round, behaviour for an ABC chart, or an incident) and
 the app writes a person-centred daily note, which they copy and paste into their
 care-record system (the owner's service uses Nourish; the app must stay generic and
 takes the system's name from Settings). Plain HTML/CSS/JS, no framework, no build step,
@@ -68,6 +68,14 @@ Other rules the tests and the owner hold to:
   communication clause), happy to take it (`RESP_MED`), consent, MAR label check, taking it
   (`TASKS.medication`), given as prescribed, issues (`medIssues`). Never suggest anything
   about a dose or a drug; a declined dose or an issue only raises handover/MAR prompts.
+- Behaviour (`abc`) and incident notes share a "What happened" step (`#stepHappened`) and
+  hide the choice and support steps; step numbers renumber and `STEP_OF` maps fields to
+  section ids, not indexes. Order is before → what the person did → what staff did → how
+  they responded → anyone hurt (`SECTIONS` before/behaviour/staff/after/impact). Record
+  only what was observed: no behaviour "function", cause or diagnosis; profile `triggers`
+  raise a prompt (`triggers-event`), never a sentence. `quality.eventAudit` supplies the
+  seven audit checks for these kinds. Harm or damage suggests the incident form, body map
+  and senior (`event-hurt`) and blocks copy until a follow-up tick or handover exists.
 - An activity note should cover what the care record's note box asks: how the person chose
   it (for college, the timetable's per-course `chosen` tick → `ENROLBANK`), the support, how
   much they enjoyed it (`enjoy`) and how it met their wishes and outcomes (`benefit`).

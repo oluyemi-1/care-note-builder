@@ -27,6 +27,9 @@ function textFields(s, explanations){
     { id: "skinDetail", label: "What you saw on the skin",       text: s.skinDetail },
     { id: "whatAte",    label: "What was eaten",                 text: s.whatAte },
     { id: "actOther",   label: "Name the activity",              text: s.actOther },
+    { id: "beforeText", label: "What was happening just before", text: s.beforeText },
+    { id: "behText",    label: "Describe what you saw and heard", text: s.behText },
+    { id: "others",     label: "Others present",                 text: s.others },
     { id: "behaviourOther", label: "What you observed",              text: s.behaviourOther }
   ];
   Object.keys(explanations || {}).forEach(k => f.push({ id: "explain:" + k, label: "Your explanation", text: explanations[k] }));
@@ -118,6 +121,15 @@ function collect(ctx){
            fields: ["setting"] });
   }
 
+  /* ---- a head injury or loss of consciousness recorded ---- */
+  if(f.s.kind === "incident" && (f.s.injuryObs || []).some(o => o === "head" || o === "unconscious")){
+    const what = (f.s.injuryObs || []).includes("unconscious") ? "A brief loss of consciousness" : "A head injury";
+    push({ id: "inj:head", severity: "review", group: "event", title: what + " was recorded.",
+           reason: what + " was recorded. Consider whether medical advice is needed, in line with " + V.N + "'s care plan and your organisation's procedure. The app does not decide this.",
+           fields: ["injuryObs"], handover: inHandover(what + " recorded at " + (f.s.time || "the time of the incident") + ".") ? "" : what + " recorded at " + (f.s.time || "the time of the incident") + "." });
+    handovers.push(what + " recorded at " + (f.s.time || "the time of the incident") + ".");
+  }
+
   /* ---- contradictions ---- */
   const contra = G.contradictions.detect(ctx);
   contra.forEach(c => {
@@ -203,6 +215,12 @@ function collect(ctx){
     if(d.id === "choice" && f.s.resp === "noresp")
       push({ id: "q:choice", severity: "suggestion", group: "quality", rank: 1, title: d.message,
              reason: "Even small signs - looking toward something, pushing it away - show the person's response.", fields: ["resp"] });
+    if(d.id === "impact")
+      push({ id: "q:impact", severity: "suggestion", group: "quality", rank: 0, title: d.message,
+             reason: "An ABC chart or incident record needs to say whether anyone was hurt or at risk, even when the answer is no one.", fields: ["impact"] });
+    if(d.id === "injury")
+      push({ id: "q:injury", severity: "suggestion", group: "quality", rank: 0, title: d.message,
+             reason: "The incident form asks whether there was an injury. Record it either way.", fields: ["injury"] });
     if(d.id === "medTold" || d.id === "medLabel" || d.id === "medGiven")
       push({ id: "q:" + d.id, severity: "suggestion", group: "quality", rank: 0, title: d.message,
              reason: d.id === "medLabel" ? "The care record asks whether the label was checked against the MAR chart. Tick it only if you did."
@@ -231,6 +249,7 @@ function collect(ctx){
                     consent: () => "Consent recorded", dignity: () => "Dignity and privacy evidenced", followup: () => "Follow-up recorded",
                     enjoyment: () => "Enjoyment recorded", benefit: () => "Benefit to them recorded", enrolment: () => "How they chose the course recorded",
                     medTold: () => "Told what it was and why", medLabel: () => "MAR label check recorded", medGiven: () => "Given as prescribed recorded",
+                    impact: () => "Anyone hurt or at risk recorded", injury: () => "Injury recorded either way",
                     independence: () => "Independence evidenced", observation: () => "Observation recorded",
                     outcome: () => "Outcome recorded", refusal: () => "Refusal respected" };
   dims.forEach(d => { if((d.status === "ok" || d.status === "strong") && passFor[d.id]) passes.push(passFor[d.id](d)); });

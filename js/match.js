@@ -46,6 +46,11 @@ function candidates(f, extra){
     if(s.slot === "night" || ticked("sleepcheck") || ticked("settle")) add("sleepObs", D.SLEEP_OBS);
   }
   if(f.kind === "medication"){ add("med", D.MED); add("medIssues", D.MED_ISSUES); }
+  if(f.kind === "abc" || f.kind === "incident"){
+    add("before", D.BEFORE, id => id !== "nothing");
+    add("staffDid", D.STAFFDID);
+    if(f.kind === "incident"){ add("actions", D.ACTIONS); add("injuryObs", D.INJURYOBS, id => id !== "unconscious"); }
+  }
   add("mood", D.MOOD);
   add("well", D.WELL, id => id !== "nochange");
   add("behaviour", D.BEHAVIOUR, id => id !== "other" && id !== "declinedact");
@@ -74,7 +79,8 @@ function find(text, cands, patterns){
 function covered(s, f){
   const out = {};
   const cands = candidates(f);
-  [["extra", s.extra], ["behaviourOther", (s.behaviour || []).includes("other") ? s.behaviourOther : ""]].forEach(([field, text]) => {
+  [["extra", s.extra], ["behaviourOther", (s.behaviour || []).includes("other") ? s.behaviourOther : ""],
+   ["beforeText", s.beforeText], ["behText", s.behText]].forEach(([field, text]) => {
     if(!text) return;
     find(text, cands).forEach(m => {
       const cur = s[m.group];

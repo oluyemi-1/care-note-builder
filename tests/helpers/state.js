@@ -7,7 +7,9 @@ const BASE = {
   declined: "", level: "", tasks: [], ate: "", whatAte: "", drinkChoice: "", offered: "", drunk: "",
   skin: "", skinDetail: "", mood: [], well: [], risk: [], outcome: "", extra: "", handover: "",
   attest: false, staffing: "", commUsed: [], dignity: [], contObs: [], sleepObs: [], behaviour: [],
-  behaviourOther: "", followup: [], prompts: {}, during: [], enjoy: "", benefit: [], med: [], medIssues: []
+  behaviourOther: "", followup: [], prompts: {}, during: [], enjoy: "", benefit: [], med: [], medIssues: [],
+  where: "", before: [], beforeText: "", behText: "", duration: "", others: "", staffDid: [], actions: [], happened: [],
+  after: "", impact: "", impactWho: [], injury: "", injuryType: [], injuryObs: [], injuryWhere: ""
 };
 
 function makeState(over){

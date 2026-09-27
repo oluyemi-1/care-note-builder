@@ -12,7 +12,8 @@ const {
   COMM, FLAGS, RESP, HOW, CONSENT, SKIN, MOOD, WELL, RISK, OUTCOME, OUT_SCOPE, SLOTS, LEVELS, TASKS, ACT_SETTING,
   COURSES, RESP_COLLEGE, RESP_SCOPE, LEARN, COMMBANK, RESPBANK, HOWBANK, CONSENTBANK, SKINBANK, MOODBANK,
   WELLBANK, RISKBANK, OUTBANK, DAYS, DIGNITY, CONT_OBS, SLEEP_OBS, BEHAVIOUR, FOLLOWUP, STAFFING, RISK_SCOPE,
-  JOURNEY, DURING, ACT_INFO, ENJOY, BENEFIT, RESP_MED, MED, MED_ISSUES
+  JOURNEY, DURING, ACT_INFO, ENJOY, BENEFIT, RESP_MED, MED, MED_ISSUES,
+  WHERE, BEFORE, STAFFDID, AFTER, IMPACT, IMPACTWHO, HAPPENED, INJURY, INJURYTYPE, INJURYOBS, ACTIONS
 } = GSN.data;
 const { PROFILE_SECTIONS, normalizeProfile, contextSummary } = GSN.profiles;
 
@@ -86,6 +87,22 @@ function state(){
     enjoy:    one("enjoy"),
     med:      checked("med"),
     medIssues: checked("medIssues"),
+    where:    one("where"),
+    before:   checked("before"),
+    beforeText: $("beforeText").value.trim(),
+    behText:  $("behText").value.trim(),
+    duration: $("duration").value,
+    others:   $("others").value.trim(),
+    staffDid: checked("staffDid"),
+    actions:  checked("actions"),
+    happened: checked("happened"),
+    after:    one("after"),
+    impact:   one("impact"),
+    impactWho: checked("impactWho"),
+    injury:   one("injury"),
+    injuryType: checked("injuryType"),
+    injuryObs: checked("injuryObs"),
+    injuryWhere: $("injuryWhere").value.trim(),
     benefit:  checked("benefit"),
     actOther: $("actOther").value.trim(),
     len:      $("len").value,
@@ -525,21 +542,25 @@ function saItem(f){
 const setText = (el, t) => { if(el && el.textContent !== t) el.textContent = t; };
 
 /* which numbered step a field lives in, so a finding can point staff there */
-const STEP_OF = { kind: 1, slot: 1, time: 1, staffing: 1, commUsed: 1, offerA: 1, offerB: 1, setting: 1, sessionTo: 1, actOther: 1,
-  resp: 2, how: 2, consent: 2, chosen: 2, declined: 2, level: 3, tasks: 3,
-  mood: 4, well: 4, risk: 4, dignity: 4, contObs: 4, sleepObs: 4, skin: 4, skinDetail: 4, learn: 4, during: 4, behaviour: 4, behaviourOther: 4,
-  ate: 4, whatAte: 4, drunk: 4, offered: 4, drinkChoice: 4, prompt: 4, outcome: 5, extra: 5, handover: 5, followup: 5, enjoy: 5, benefit: 5,
-  med: 1, medIssues: 4,
-  tt: 0, comm: 0, flags: 0, initials: 0 };
+const O = "stepOffer", C = "stepChoice", S = "stepSupport", B = "stepObservation", U = "stepOutcome", H = "stepHappened", P0 = "stepPerson";
+const STEP_OF = { kind: O, slot: O, time: O, staffing: O, commUsed: O, offerA: O, offerB: O, setting: O, sessionTo: O, actOther: O, med: O,
+  resp: C, how: C, consent: C, chosen: C, declined: C, level: S, tasks: S,
+  mood: B, well: B, risk: B, dignity: B, contObs: B, sleepObs: B, skin: B, skinDetail: B, learn: B, during: B, behaviourOther: B,
+  ate: B, whatAte: B, drunk: B, offered: B, drinkChoice: B, prompt: B, medIssues: B,
+  outcome: U, extra: U, handover: U, followup: U, enjoy: U, benefit: U,
+  where: H, before: H, beforeText: H, behText: H, duration: H, others: H, staffDid: H, actions: H, happened: H, after: H, impact: H, impactWho: H,
+  injury: H, injuryType: H, injuryObs: H, injuryWhere: H,
+  tt: P0, comm: P0, flags: P0, initials: P0 };
 function stepOf(field){
-  if(!field) return -1;
+  if(!field) return "";
   const k = field.split(/[.:]/)[0];
-  return k in STEP_OF ? STEP_OF[k] : -1;
+  if(k === "behaviour") return $("stepHappened").hidden ? B : H;
+  return STEP_OF[k] || "";
 }
 let hlTimer = null;
-function goToStep(n){
-  const step = document.querySelectorAll("main .step")[n];   // the person's card is index 0
-  if(!step) return;
+function goToStep(id){
+  const step = $(id);
+  if(!step || step.hidden) return;
   step.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
   document.querySelectorAll(".step.hl").forEach(x => x.classList.remove("hl"));
   step.classList.add("hl");
@@ -554,6 +575,7 @@ function findField(name){
   const m = /^tasks\.(\w+)\.level$/.exec(name);
   if(m) return $("lvl_" + k + "_" + m[1]);
   if(name === "tasks") return document.querySelector('#tasks .task:not([hidden]) input');
+  if(name === "behText" || name === "beforeText") return $(name);
   if(name.startsWith("prompt:")) return document.querySelector('.pbtn[data-key="' + name.slice(7) + '"]');
   if(name === "resp") return document.querySelector('#resp .chip:not([hidden]) input, #respc .chip:not([hidden]) input');
   const el = $(name);
@@ -567,8 +589,8 @@ $("saList").addEventListener("toggle", e => {
   const d = e.target;
   if(!d.classList || !d.classList.contains("sa-why") || !d.open) return;
   const go = d.closest("li").querySelector(".sa-go");
-  const n = stepOf(go && go.dataset.field);
-  if(n >= 0) goToStep(n);
+  const id = stepOf(go && go.dataset.field);
+  if(id) goToStep(id);
 }, true);
 $("saList").addEventListener("input", e => {
   const id = e.target.dataset && e.target.dataset.explain;
@@ -635,6 +657,17 @@ function renderFields(s){
     if(s.drunk){ rows.push(["Fluid intake (mls)", s.drunk]); rows.push(["Amount drunk (Mls)", s.drunk]); }
     if(s.drinkChoice) rows.push(["Drink choice", s.drinkChoice]);
   }
+  if(s.kind === "abc" || s.kind === "incident"){
+    const lab = (list, v) => v ? GSN.core.plain((list.find(x => x[0] === v) || ["", v])[1]) : "";
+    rows.push([s.kind === "abc" ? "Behaviour type" : "Incident type", lab(SLOTS[s.kind], s.slot)]);
+    if(s.where) rows.push(["Location", lab(WHERE, s.where)]);
+    if(s.duration) rows.push(["Duration (minutes)", s.duration]);
+    if(s.impact) rows.push(["Anyone hurt or at risk", lab(IMPACT, s.impact)]);
+    if(s.kind === "incident" && s.injury) rows.push(["Injury", s.injury === "injury" ? "Yes" + (s.injuryType.length ? " \u2014 " + s.injuryType.map(t => lab(INJURYTYPE, t)).join(", ") : "") : "No"]);
+    if(s.kind === "incident") rows.push(["First aid given", s.actions.includes("firstaid") ? "Yes" : "No"]);
+    if(s.followup.includes("incident")) rows.push(["Incident form", "Completed"]);
+    if(s.followup.includes("bodymap")) rows.push(["Body Map", "Completed"]);
+  }
   if(s.kind === "medication"){
     const refused = ["declined"].includes(s.resp) || s.consent === "no";
     rows.push(["Medication label checked with MAR chart", s.med.includes("label") ? "Yes" : "Not recorded \u2014 tick it if you checked"]);
@@ -682,7 +715,7 @@ function syncVisibility(s){
   $("settingHint").textContent = !s.kind ? "" : college
     ? "Already arranged, so nothing is offered today \u2014 record the journey, the support and what they gained."
     : "Offered today and chosen from the options \u2014 record the choice, the support and how it went.";
-  $("offerWrap").hidden = college || s.kind === "medication";
+  $("offerWrap").hidden = college || s.kind === "medication" || s.kind === "abc" || s.kind === "incident";
   setText($("commUsedHead"), college ? "How staff told them it was college today" : s.kind === "medication" ? "How staff told them what it was" : "How staff communicated this time");
   setText($("howHead"), college ? "How they let you know they\u2019d go" : s.kind === "medication" ? "How they let you know they\u2019d take it" : "How they let you know");
   $("sessionToWrap").hidden = !college;
@@ -704,6 +737,26 @@ function syncVisibility(s){
   $("declWrap").hidden   = !["declined","delayed","declinedgo","reluctant","hesitant"].includes(s.resp) && s.consent !== "no";
   showGroup("medWrap", s.kind === "medication");
   showGroup("medIssuesWrap", s.kind === "medication");
+  const event = s.kind === "abc" || s.kind === "incident";
+  $("stepHappened").hidden = !event;
+  $("stepChoice").hidden = event;
+  $("stepSupport").hidden = event;
+  if(event){ $("stepChoice").querySelectorAll("input:checked").forEach(i => { i.checked = false; }); $("level").value = ""; }
+  /* the behaviour options live in the What happened step for these notes, and under Observation otherwise */
+  const host = event ? $("behHostEvent") : $("behHostObs");
+  if($("behGroup").parentNode !== host) host.appendChild($("behGroup"));
+  $("behWrap").hidden = event;
+  showChip("behaviour_declinedact", !event);   // there is no activity to decline in these notes
+  showGroup("actionsWrap", s.kind === "incident");
+  showGroup("injuryWrap", s.kind === "incident");
+  $("injuryDetail").hidden = s.injury !== "injury";
+  if(s.injury !== "injury") $("injuryDetail").querySelectorAll("input:checked").forEach(i => { i.checked = false; });
+  $("impactWhoWrap").hidden = s.impact !== "hurt";
+  if(s.impact !== "hurt") $("impactWho").querySelectorAll("input:checked").forEach(i => { i.checked = false; });
+  syncHappened(s);
+  setText($("offerHead"), event ? "When and where" : "Offer");
+  setText($("behLegend"), s.kind === "incident" ? "What the person did \u2014 tick what you saw" : "What they did \u2014 tick what you saw");
+  renumberSteps();
   $("chosenWrap").hidden = !(s.resp === "choseA" || s.resp === "choseB");
   document.querySelector('#skin').closest('fieldset').hidden = s.kind !== "personal";
 
@@ -757,6 +810,26 @@ function syncDuring(s){
   }
   $("duringWrap").hidden = !list.length;
   if(list.length) setText($("duringHead"), "What they did during " + GSN.core.plain(GSN.rules.activityName(s)).replace(/ \(college\)$/, "") + " \u2014 tick what happened");
+}
+
+/* the events that go with this type of incident (a fall, choking, ...) */
+let happenedSig = "";
+function syncHappened(s){
+  const list = s.kind === "incident" ? (HAPPENED[s.slot] || []) : [];
+  const sig = list.map(o => o[0]).join(",");
+  if(sig !== happenedSig){ happenedSig = sig; chips("happened", list, "checkbox"); }
+  $("happenedWrap").hidden = !list.length;
+}
+
+/* the visible steps are numbered in order, whatever this kind of note shows */
+function renumberSteps(){
+  let n = 0;
+  document.querySelectorAll("main .step").forEach((st, i) => {
+    if(i === 0 || st.hidden) return;
+    n++;
+    const num = st.querySelector(":scope > header .num");
+    if(num && num.textContent !== String(n)) num.textContent = String(n);
+  });
 }
 
 /* a hidden choice is never left selected, so it cannot reach the note */
@@ -1000,6 +1073,16 @@ chips("behaviour", BEHAVIOUR, "checkbox");
 chips("followup", FOLLOWUP, "checkbox");
 chips("enjoy", ENJOY, "radio");
 chips("respm", RESP_MED, "radio");
+chips("where", WHERE, "radio");
+chips("before", BEFORE, "checkbox");
+chips("staffDid", STAFFDID, "checkbox");
+chips("actions", ACTIONS, "checkbox");
+chips("after", AFTER, "radio");
+chips("impact", IMPACT, "radio");
+chips("impactWho", IMPACTWHO, "checkbox");
+chips("injury", INJURY, "radio");
+chips("injuryType", INJURYTYPE, "checkbox");
+chips("injuryObs", INJURYOBS, "checkbox");
 chips("med", MED, "checkbox");
 chips("medIssues", MED_ISSUES, "checkbox");
 chips("benefit", BENEFIT, "checkbox");
@@ -1042,8 +1125,10 @@ buildTasks();
    produced notes like "offered the cooking ... he chose a shower", so switching
    type clears the entry and says so. */
 const SCOPED_TEXT = ["offerA","offerB","chosen","declined","whatAte","drinkChoice",
-                     "offered","drunk","skinDetail","extra","handover","actOther","behaviourOther","sessionTo"];
+                     "offered","drunk","skinDetail","extra","handover","actOther","behaviourOther","sessionTo",
+                     "beforeText","behText","duration","others","injuryWhere"];
 const SCOPED_CHIPS = ["resp","respc","respm","how","consent","skin","mood","well","risk","outcome","learn","during","enjoy","benefit","med","medIssues",
+                      "where","before","staffDid","actions","happened","after","impact","impactWho","injury","injuryType","injuryObs",
                       "commUsed","dignity","contObs","sleepObs","behaviour","followup"];
 
 /* Everything below the person belongs to one entry, for one person. It is
@@ -1099,7 +1184,8 @@ function fillSlots(){
   $("slot").innerHTML = list.map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join("");
   if(keep && [...$("slot").options].some(o => o.value === keep)) $("slot").value = keep;
   $("slotWrap").querySelector("label").textContent =
-    college ? "Course" : k === "activity" ? "Activity" : k === "eating" ? "Which meal" : k === "medication" ? "Which round" : "Which one";
+    college ? "Course" : k === "activity" ? "Activity" : k === "eating" ? "Which meal" : k === "medication" ? "Which round"
+    : k === "abc" ? "Kind of behaviour" : k === "incident" ? "Type of incident" : "Which one";
   document.querySelector('label[for="offerA"]').textContent =
     k === "activity" ? "Activity offered" : k === "eating" ? "Meal offered" : "Option offered";
   document.querySelector('label[for="offerB"]').textContent =
@@ -1241,8 +1327,12 @@ function omittedLabel(key){
   const [g, id] = key.split(/_(.+)/);
   const from = (list, v) => GSN.core.plain((list.find(x => x[0] === v) || ["", v])[1]).toLowerCase();
   if(g === "task") return GSN.rules.taskLabel($("kind").value, id).toLowerCase();
-  const lists = { comm: COMM, how: HOW, risk: RISK, dig: DIGNITY, learn: LEARN, mood: MOOD, well: WELL, during: Object.values(DURING).flat(), ben: BENEFIT, med: MED, issue: MED_ISSUES };
+  const lists = { comm: COMM, how: HOW, risk: RISK, dig: DIGNITY, learn: LEARN, mood: MOOD, well: WELL, during: Object.values(DURING).flat(), ben: BENEFIT, med: MED, issue: MED_ISSUES,
+                  before: BEFORE, staff: STAFFDID, action: ACTIONS, hap: Object.values(HAPPENED).flat(), injobs: INJURYOBS, who: IMPACTWHO, beh: BEHAVIOUR };
   if(g === "medtell") return "telling them what the medication was";
+  const single = { others: "who else was present", beforeText: "your words about what happened before", behText: "your description of what happened",
+                   duration: "how long it lasted", after: "how they responded", impact: "whether anyone was hurt", injury: "the injury" };
+  if(single[g]) return single[g];
   if(g === "enjoy") return "how much they enjoyed it";
   if(g === "enrol") return "how they chose the course";
   if(lists[g]) return from(lists[g], id);

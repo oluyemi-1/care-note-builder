@@ -169,6 +169,33 @@ says anything about a dose or a drug, and nothing appears in the note that was
 not ticked. The record-field panel shows the care system's "Medication label
 checked with MAR chart" and "Medication administered as prescribed?".
 
+### Behaviour (ABC chart) and incidents
+
+Two more kinds of note, for what services record on an ABC chart and an
+incident form. Both replace the offer, choice and support steps with one
+**What happened** step, in the order things happened: where it was, what was
+happening just before (ticks and the staff member's own words), what the
+person did (observable ticks - shouted, threw an item, hit out, cried, tried
+to leave - plus a description in their own words and how long it lasted),
+what staff did (reassured, gave space, redirected, moved to a quieter space,
+PRN given as prescribed, called a senior, followed their behaviour support
+plan), how the person responded, and whether anyone was hurt or property
+damaged. An incident note also asks for the type of incident, the events that
+go with it (found on the floor, back blows given, left the building
+unaccompanied), the actions taken (first aid, ambulance, GP, observations)
+and, either way, whether an injury was seen - type, where on the body, and
+what was observed (bleeding, hit their head, conscious throughout).
+
+The app records what happened and never why: there is no "function" of the
+behaviour, no cause and no diagnosis. Triggers recorded in the person's
+profile become a prompt to tick or describe what was present, not a sentence.
+When someone was hurt or property was damaged, Smart Assist reminds staff that
+the incident form, body map and informing a senior are done in line with the
+service's procedure, and asks them to tick what was done; a recorded head
+injury or loss of consciousness asks staff to consider medical advice per the
+procedure. The note cannot be copied until harm or risk has a follow-up tick or
+a handover line.
+
 ### Shifts
 
 Personal care reads differently at 07:00 and 22:00. The app opens on the shift

@@ -30,7 +30,7 @@
   <div class="cols">
     <!-- ================= FORM ================= -->
     <main id="main">
-      <section class="step">
+      <section class="step" id="stepPerson">
         <header><span class="num">&#9679;</span><h2 id="personHead">The person</h2><span class="hint">Saved on this device only</span></header>
         <div class="body">
           <div class="people" id="people"></div>
@@ -66,8 +66,8 @@
         </div>
       </section>
 
-      <section class="step">
-        <header><span class="num">1</span><h2>Offer</h2><span class="hint">What was offered, and how</span></header>
+      <section class="step" id="stepOffer">
+        <header><span class="num">1</span><h2 id="offerHead">Offer</h2><span class="hint">What was offered, and how</span></header>
         <div class="body">
           <p class="switch-note" id="switchNote" hidden></p>
           <fieldset id="settingWrap" hidden style="margin-bottom:14px"><legend>Where is this activity?</legend>
@@ -83,6 +83,8 @@
                 <option value="eating">Eating &amp; Drinking</option>
                 <option value="activity">Activities</option>
                 <option value="medication">Medication</option>
+                <option value="abc">Behaviour (ABC chart)</option>
+                <option value="incident">Incident</option>
               </select></div>
             <div class="f" id="slotWrap"><label for="slot">Which one</label><select id="slot"></select></div>
             <div class="f"><label for="time">Time</label><input type="time" id="time"></div>
@@ -104,7 +106,35 @@
         </div>
       </section>
 
-      <section class="step">
+      <section class="step" id="stepHappened" hidden>
+        <header><span class="num">2</span><h2>What happened</h2><span class="hint">In the order it happened &mdash; facts only</span></header>
+        <div class="body stack">
+          <fieldset><legend>Where</legend><div class="chips" id="where"></div></fieldset>
+          <fieldset><legend>What was happening just before</legend><div class="chips" id="before"></div>
+            <div class="f" style="margin-top:10px"><label for="beforeText">In your own words (optional)</label>
+              <input type="text" id="beforeText" placeholder="e.g. the TV had just been turned off for lunch" autocomplete="off"></div></fieldset>
+          <fieldset id="happenedWrap" hidden><legend id="happenedLegend">What happened</legend><div class="chips" id="happened"></div></fieldset>
+          <fieldset><legend id="behLegend">What they did &mdash; tick what you saw</legend><div id="behHostEvent"></div>
+            <div class="f" style="margin-top:10px"><label for="behText">Describe what you saw and heard</label>
+              <textarea id="behText" placeholder="Facts only: what they did and said. Added to the note word for word."></textarea></div>
+            <div class="f" style="max-width:240px"><label for="duration">How long it lasted (minutes)</label>
+              <input type="number" id="duration" min="0" max="720" step="1" inputmode="numeric"></div></fieldset>
+          <fieldset><legend>What staff did</legend><div class="chips" id="staffDid"></div></fieldset>
+          <fieldset id="actionsWrap" hidden><legend>Actions taken</legend><div class="chips" id="actions"></div></fieldset>
+          <fieldset><legend>How they responded</legend><div class="chips" id="after"></div></fieldset>
+          <fieldset><legend>Was anyone hurt or at risk?</legend><div class="chips" id="impact"></div>
+            <div id="impactWhoWrap" hidden style="margin-top:8px"><div class="chips" id="impactWho"></div></div></fieldset>
+          <fieldset id="injuryWrap" hidden><legend>Injury</legend><div class="chips" id="injury"></div>
+            <div id="injuryDetail" class="stack" hidden style="margin-top:10px">
+              <div class="chips" id="injuryType"></div>
+              <div class="f"><label for="injuryWhere">Where on the body</label><input type="text" id="injuryWhere" placeholder="e.g. left forearm" autocomplete="off"></div>
+              <div class="chips" id="injuryObs"></div></div></fieldset>
+          <div class="f"><label for="others">Others present (initials or role)</label>
+            <input type="text" id="others" placeholder="e.g. JB (support worker), two other residents" autocomplete="off"></div>
+        </div>
+      </section>
+
+      <section class="step" id="stepChoice">
         <header><span class="num">2</span><h2>Choice or response</h2><span class="hint">Their voice, not yours</span></header>
         <div class="body stack">
           <fieldset><legend>What they chose or how they responded</legend><div class="chips" id="resp"></div><div class="chips" id="respc"></div><div class="chips" id="respm"></div></fieldset>
@@ -116,7 +146,7 @@
         </div>
       </section>
 
-      <section class="step">
+      <section class="step" id="stepSupport">
         <header><span class="num">3</span><h2>Support &amp; independence</h2><span class="hint">Tick only what happened</span></header>
         <div class="body">
           <div class="f" style="margin-bottom:14px"><label for="level">Overall level of support</label>
@@ -133,7 +163,7 @@
         </div>
       </section>
 
-      <section class="step">
+      <section class="step" id="stepObservation">
         <header><span class="num">4</span><h2>Observation</h2><span class="hint">Only what you actually saw</span></header>
         <div class="body stack">
           <div class="prompts" id="prompts" hidden></div>
@@ -163,14 +193,16 @@
           <fieldset id="learnWrap" hidden><legend>What they got out of it &mdash; skills and social</legend><div class="chips" id="learn"></div></fieldset>
           <details class="more" id="behWrap">
             <summary>Behaviour you observed <span>optional &mdash; describe, don&rsquo;t label</span></summary>
-            <div class="chips" id="behaviour" style="margin-top:10px"></div>
-            <div class="f" id="behOtherWrap" hidden style="margin-top:10px"><label for="behaviourOther">Describe what you observed</label>
-              <input type="text" id="behaviourOther" placeholder="e.g. walked to the door and waited there" autocomplete="off"></div>
+            <div id="behHostObs"><div id="behGroup">
+              <div class="chips" id="behaviour" style="margin-top:10px"></div>
+              <div class="f" id="behOtherWrap" hidden style="margin-top:10px"><label for="behaviourOther">Describe what you observed</label>
+                <input type="text" id="behaviourOther" placeholder="e.g. walked to the door and waited there" autocomplete="off"></div>
+            </div></div>
           </details>
         </div>
       </section>
 
-      <section class="step">
+      <section class="step" id="stepOutcome">
         <header><span class="num">5</span><h2>Outcome</h2><span class="hint">How it ended for them</span></header>
         <div class="body stack">
           <fieldset><legend>Outcome</legend><div class="chips" id="outcome"></div></fieldset>

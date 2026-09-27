@@ -16,8 +16,9 @@
 
 const { present } = G.core;
 
-const GROUPS = ["risk", "mood", "well", "how", "commUsed", "dignity", "contObs", "sleepObs", "behaviour", "followup", "learn", "during", "benefit", "med", "medIssues"];
-const CHOICES = ["enjoy"];          // one-of fields addressed as field.value
+const GROUPS = ["risk", "mood", "well", "how", "commUsed", "dignity", "contObs", "sleepObs", "behaviour", "followup", "learn", "during", "benefit", "med", "medIssues",
+                "before", "staffDid", "actions", "happened", "injuryType", "injuryObs", "impactWho"];
+const CHOICES = ["enjoy", "after", "impact", "injury", "where"];          // one-of fields addressed as field.value
 
 function resolve(s, path){
   if(path.startsWith("prompts.")) return String((s.prompts || {})[path.slice(8)] || "");
@@ -80,7 +81,9 @@ const LABELS = {
   offerA: "Option offered", offerB: "Second option", resp: "Choice or response", chosen: "What they chose",
   declined: "How the refusal was respected", consent: "Consent", level: "Overall support", ate: "Amount eaten",
   whatAte: "What was eaten", offered: "Offered (ml)", drunk: "Drunk (ml)", drinkChoice: "Drink", skin: "Skin",
-  skinDetail: "Skin detail", enjoy: "How much they enjoyed it", behaviourOther: "Behaviour (described)", extra: "Anything else", handover: "Handover", outcome: "Outcome"
+  skinDetail: "Skin detail", enjoy: "How much they enjoyed it", where: "Where", duration: "How long it lasted", others: "Others present",
+  beforeText: "What was happening just before", behText: "What you saw and heard", injuryWhere: "Where on the body", after: "How they responded",
+  impact: "Anyone hurt or at risk", injury: "Injury", behaviourOther: "Behaviour (described)", extra: "Anything else", handover: "Handover", outcome: "Outcome"
 };
 const label = path => LABELS[path] || path;
 
