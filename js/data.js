@@ -206,7 +206,7 @@ const SLOTS = {
   medication:[["morning","Morning medication"],["lunchtime","Lunchtime medication"],["teatime","Teatime medication"],
               ["night","Night medication"],["prn","PRN (when required) medication"]],
   abc:[["verbal","Verbal (shouting, swearing)"],["physical","Physical towards others"],["selfinjury","Self-injury"],
-       ["property","Damage to property"],["withdrawal","Withdrawal or refusing interaction"],["refusal","Refusing care or medication"],
+       ["property","Damage to property"],["smearing","Smearing (faeces)"],["withdrawal","Withdrawal or refusing interaction"],["refusal","Refusing care or medication"],
        ["leaving","Trying to leave or leaving the building"],["distress","Distress (crying, agitation)"],["otherbeh","Other"]],
   incident:[["fall","Fall"],["injury","Injury"],["mederror","Medication error"],["behaviour","Behaviour towards others"],
             ["choking","Choking"],["missing","Missing person"],["propertydamage","Property damage"],["safeguarding","Safeguarding concern"],
@@ -777,7 +777,7 @@ const SLEEPBANK = {
 /* observable behaviour - what staff are asked for instead of "difficult" */
 const BEHAVIOUR = [["raised","Raised voice"],["shouted","Shouted or swore"],["movedaway","Moved away from staff"],["declinedact","Declined the activity"],
                    ["pushed","Pushed an item away"],["threw","Threw an item"],["hitout","Hit out at someone"],["kicked","Kicked or pushed someone"],
-                   ["grabbed","Grabbed someone or something"],["selfinj","Hit, bit or scratched themselves"],["damaged","Damaged property"],
+                   ["grabbed","Grabbed someone or something"],["selfinj","Hit, bit or scratched themselves"],["damaged","Damaged property"],["smeared","Smeared faeces"],
                    ["askedleave","Repeatedly asked to leave"],["leave","Tried to leave the building"],["paced","Paced up and down"],
                    ["repeated","Repeated a question or phrase"],["cried","Cried"],["smiled","Smiled or laughed"],
                    ["other","Other \u2014 describe"]];
@@ -795,6 +795,7 @@ const BEHAVIOURBANK = {
  grabbed:["{S} grabbed someone or something.","{S} took hold of someone or something."],
  selfinj:["{S} hit, bit or scratched {r}.","{S} hurt {r} by hitting, biting or scratching."],
  damaged:["{S} damaged property.","Property was damaged by {o}."],
+ smeared:["{S} smeared faeces.","There was smearing of faeces by {o}."],
  leave:["{S} tried to leave the building.","{S} made for the door and tried to leave."],
  paced:["{S} paced up and down.","{S} walked up and down repeatedly."],
  repeated:["{S} repeated a question or phrase.","{S} asked the same thing again and again."],
@@ -827,7 +828,7 @@ const WHERE = [["bedroom","Bedroom"],["bathroom","Bathroom"],["kitchen","Kitchen
 const WHERE_PHRASE = { bedroom:" in {p} bedroom", bathroom:" in the bathroom", kitchen:" in the kitchen", living:" in the living room",
                        dining:" in the dining room", garden:" in the garden", hallway:" in the hallway", community:" out in the community",
                        vehicle:" in a vehicle", otherplace:"" };
-const ABCWORD = { verbal:"shouting or swearing", physical:"physical behaviour towards others", selfinjury:"self-injury", property:"damage to property",
+const ABCWORD = { verbal:"shouting or swearing", physical:"physical behaviour towards others", selfinjury:"self-injury", property:"damage to property", smearing:"smearing",
                   withdrawal:"withdrawal", refusal:"refusing care or medication", leaving:"trying to leave the building", distress:"distress",
                   otherbeh:"behaviour that concerned staff" };
 const INCWORD = { fall:"a fall", injury:"an injury", mederror:"a medication error", behaviour:"an incident involving behaviour towards others",
@@ -853,7 +854,8 @@ const STAFFDID = [["reassured","Reassured them verbally"],["space","Gave them sp
                   ["redirected","Redirected them to something else"],["calming","Used a calming technique (breathing, music)"],
                   ["quiet","Moved to a quieter space"],["sensory","Reduced noise or light"],["alternative","Offered an alternative activity"],
                   ["comfort","Offered physical comfort, which they accepted"],["prn","PRN medication given as prescribed"],
-                  ["safety","Moved others or items to keep everyone safe"],["senior","Called a senior colleague for support"],
+                  ["safety","Moved others or items to keep everyone safe"],["wash","Supported them to wash and change"],
+                  ["cleaned","Cleaned and disinfected the area"],["senior","Called a senior colleague for support"],
                   ["stayed","Stayed nearby and watched"],["plan","Followed their behaviour support plan"]];
 const STAFFBANK = {
  reassured:["Staff reassured {o} verbally.","Staff spoke to {o} calmly and reassured {o}."],
@@ -867,6 +869,8 @@ const STAFFBANK = {
  comfort:["Staff offered physical comfort, which {s} accepted.","{S} accepted physical comfort from staff."],
  prn:["PRN medication was given as prescribed.","{P} PRN medication was given as prescribed."],
  safety:["Staff moved others and items away to keep everyone safe.","Staff kept everyone safe by moving others and items away."],
+ wash:["Staff supported {o} to wash and change.","{S} {vbe} supported to wash and change."],
+ cleaned:["Staff cleaned and disinfected the area.","The area was cleaned and disinfected by staff."],
  senior:["Staff called a senior colleague for support.","A senior colleague was called to support."],
  stayed:["Staff stayed nearby and kept watch.","Staff remained nearby, watching."],
  plan:["Staff followed {p} behaviour support plan.","{P} behaviour support plan was followed."]
@@ -970,7 +974,7 @@ const MATCH = {
  routine:["change (?:to|in) (?:his|her|their|the) routine","routine (?:had )?changed"], noise:["noisy","loud","busy"], asked:["(?:was|were) asked to","asked (?:him|her|them) to"],
  waiting:["waiting for"], toldno:["told (?:him|her|them)? ?no","had to stop","asked to stop"], transition:["moving (?:from|to)","transition"],
  shouted:["shout","swor(?:e|ing)","swear"], threw:["threw","throwing"], hitout:["hit (?:out|at|a|the|staff|another)","punch","slapp"], kicked:["kick"],
- grabbed:["grabb"], selfinj:["(?:hit|bit|scratch(?:ed|ing)) (?:himself|herself|themselves)","self[- ]harm","head[- ]bang"], damaged:["damag","broke (?:the|a)"],
+ grabbed:["grabb"], smeared:["smear"], wash:["(?:wash|shower|bath)(?:ed)? and chang","supported (?:him|her|them) to (?:wash|shower|bathe?)"], cleaned:["disinfect","cleaned (?:the|up|it)"], selfinj:["(?:hit|bit|scratch(?:ed|ing)) (?:himself|herself|themselves)","self[- ]harm","head[- ]bang"], damaged:["damag","broke (?:the|a)"],
  leave:["(?:tried|trying) to leave","made for the door","ran (?:out|off)"], paced:["pac(?:ed|ing)"], repeated:["repeat(?:ed|ing)","again and again"], cried:["cr(?:ied|ying)","tears"],
  reassured:["reassur"], space:["gave (?:him|her|them) (?:some )?(?:space|time)","stepped back"], distraction:["distract"], redirected:["redirect"],
  calming:["breathing","calming"], quiet:["quiet(?:er)? (?:room|space|area)"], alternative:["alternative activity","offered (?:him|her|them) something else"],
