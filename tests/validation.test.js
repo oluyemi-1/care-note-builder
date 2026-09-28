@@ -38,6 +38,17 @@ test("text with markup is refused rather than stored", () => {
   assert.ok(r.errors.some(e => /must not contain < or >/.test(e)));
 });
 
+test("a host app can open the builder only for a person and a known kind of note", () => {
+  assert.deepEqual(V.validateLaunch({ initials: "ab", kind: "abc", pronoun: "she", script: "alert(1)" }),
+    { initials: "AB", kind: "abc", pronoun: "she" }, "unknown keys are dropped");
+  assert.deepEqual(V.validateLaunch({ initials: "AB", kind: "surgery", pronoun: "it" }),
+    { initials: "AB", kind: null, pronoun: null }, "an unknown kind or pronoun is left for staff to choose");
+  assert.equal(V.validateLaunch({ kind: "eating" }), null, "no person, no launch");
+  assert.equal(V.validateLaunch({ initials: "<b>" }).initials, "B", "markup never reaches the page");
+  assert.equal(V.validateLaunch({ initials: "<>" }), null);
+  assert.equal(V.validateLaunch("AB"), null);
+});
+
 test("history records are checked field by field", () => {
   const good = { id: "abc123", person: "AB", date: "2026-09-20", time: "12:30", kind: "eating", slot: "lunch",
                  food: { amount: "Most", pct: 3 }, fluid: { offered: 250, drunk: 200 }, mood: ["settled"], tasks: [{ id: "eat", level: "prompt" }] };

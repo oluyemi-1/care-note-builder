@@ -19,6 +19,15 @@ const { PROFILE_SECTIONS, normalizeProfile, contextSummary } = GSN.profiles;
 
 const $  = id => document.getElementById(id);
 
+/* Embedded in a host app (a care-record app's own form): the host opens the
+   builder for one person, and the finished note goes back to that host
+   instead of the clipboard, only when staff press the button. A native app
+   provides a NoteHost channel; a web app puts the page in a same-origin frame. */
+const HOST = window.NoteHost ? msg => window.NoteHost.postMessage(msg)
+  : window.parent !== window ? msg => window.parent.postMessage(msg, location.origin)
+  : null;
+let launched = null;           // what the host opened the builder for
+
 /* ============================================================
    State + persistence (this browser only)
    ============================================================ */
@@ -1011,6 +1020,28 @@ function newPerson(){
   render();
   $("initials").focus();
 }
+/* the host opens a clean entry for its person (and kind of note, if it knows
+   it), and holds them there so the note cannot go back about someone else */
+function hostLaunch(raw){
+  const l = GSN.validation.validateLaunch(raw);
+  if(!l) return;
+  launched = l;
+  if(l.kind){ $("kind").value = l.kind; fillSlots(); }
+  resetInteraction("Writing for " + l.initials + ".");
+  const pr = (store.people || {})[l.initials];
+  store.active = l.initials;
+  applyProfile(pr || { initials: l.initials, pronoun: l.pronoun || "they" });
+  syncPerson();
+  applyTodaySession();
+  prefillActivity();
+  reseed();
+  if(!one("setting")) $("setting_community").checked = true;
+  $("kind").disabled = !!l.kind;
+  $("initials").readOnly = true;
+  $("people").hidden = true;
+  $("copy").textContent = "Use this note"; $("dockCopy").textContent = "Use note";
+  render();
+}
 function removePerson(name){
   if(!(store.people || {})[name]) return;
   if(!confirm("Remove " + name + " from this device? Their profile" + (historyOn() ? " and saved history" : "") + " will be deleted. This cannot be undone.")) return;
@@ -1262,6 +1293,13 @@ function renderProvenance(){
 }
 $("devToggle").addEventListener("click", () => { store.dev = !store.dev; save(); renderProvenance(); });
 
+/* a title for the host form: the kind of note and which one, e.g. "Eating & Drinking — Lunch" */
+function noteTitle(){
+  const kind = $("kind").selectedOptions[0].textContent;
+  const which = $("slot").value === "other" && $("actOther").value.trim()
+    ? $("actOther").value.trim() : ($("slot").selectedOptions[0] || {}).textContent || "";
+  return !which ? kind : which.toLowerCase().includes(kind.toLowerCase()) ? which : kind + " — " + which;
+}
 function doCopy(){
   const txt = noteText;
   const done = () => {
@@ -1272,11 +1310,17 @@ function doCopy(){
     syncPerson();
     salt = Math.floor(Math.random() * 1e9);
     onScreen = {};
-    const b = $("copy"), d = $("dockCopy"), old = b.textContent;
-    b.textContent = "Copied"; d.textContent = "Copied";
-    setTimeout(() => { b.textContent = old; d.textContent = "Copy"; }, 1600);
+    const b = $("copy"), d = $("dockCopy"), old = b.textContent, oldD = d.textContent;
+    b.textContent = d.textContent = launched ? "Sent" : "Copied";
+    setTimeout(() => { b.textContent = old; d.textContent = oldD; }, 1600);
     render();
   };
+  if(launched){
+    HOST(JSON.stringify({ type: "note", kind: $("kind").value, initials: lastState.initials, title: noteTitle(), text: txt,
+      sentences: lastBuild.sentences.map(x => ({ section: x.section, text: x.text })) }));
+    done();
+    return;
+  }
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(txt).then(done, fallback);
   } else fallback();
@@ -1359,7 +1403,7 @@ $("includeAll").addEventListener("click", () => { $("len").value = "full"; rende
   if(first){
     store.active = first.initials;
     applyProfile(first);
-  } else {
+  } else if(!HOST){
     /* example entry, so the page opens showing what it does */
     $("initials").value = "MA";
     $("comm_verbal").checked = true;
@@ -1415,6 +1459,13 @@ $("includeAll").addEventListener("click", () => { $("len").value = "full"; rende
   TASKS.personal.concat(TASKS.eating, TASKS.activity).forEach(t =>
     LEVELS.forEach(l => { if(l[0] && (!t[l[0]] || !t[l[0]].length)) console.warn("No wording for task " + t.id + "." + l[0]); }));
 
-  if("serviceWorker" in navigator && location.protocol === "https:")
+  /* an embedded builder is the host's to cache and update; it just asks what to open */
+  if(HOST){
+    if(window.parent !== window) window.addEventListener("message", e => {
+      if(e.source !== window.parent || e.origin !== location.origin || typeof e.data !== "string") return;
+      try { hostLaunch(JSON.parse(e.data)); } catch(err){}
+    });
+    HOST(JSON.stringify({ type: "ready" }));
+  } else if("serviceWorker" in navigator && location.protocol === "https:")
     navigator.serviceWorker.register("sw.js").catch(() => {});
 })();

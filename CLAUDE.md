@@ -157,6 +157,23 @@ text). **Keep these internal names** even though the app was renamed; changing t
 staff data. Backup files carry `app: "care-note-builder"`; `"gold-standard-notes"` is still
 accepted on restore.
 
+### Embedded in a host app
+
+The owner's care-record app (CareCrest, Flutter, `../care_home_management`) bundles a copy
+of this app (`scripts/sync_note_builder.sh` there) and opens it from its own forms. Keep this
+contract, or those forms break:
+
+- The host is `window.NoteHost.postMessage` (native WebView channel) or the same-origin
+  parent frame (web). `HOST` in `app.js` is null otherwise, and nothing below happens.
+- On boot an embedded page sends `{"type":"ready"}`, skips the worked example and the
+  service worker, and waits. The host calls `hostLaunch({ initials, kind?, pronoun? })`
+  (native) or posts that JSON (web); `validation.validateLaunch` filters it. The person and
+  kind are then locked and the copy buttons read "Use this note".
+- The gated copy sends `{"type":"note", kind, initials, title, text, sentences:[{section,text}]}`
+  (`title` is `noteTitle()`: the kind and slot labels, for the host form's title box)
+  instead of using the clipboard. The host splits ABC and incident notes by `section`
+  (`SECTIONS` in `narrative.js`), so renaming a section id is a breaking change.
+
 ### UI conventions in app.js
 
 `chips(id, list, type)` builds a group whose inputs are `#<group>_<value>`; a hidden choice

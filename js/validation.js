@@ -353,5 +353,18 @@ function validateBackup(text){
   return { ok: true, value, errors, summary };
 }
 
-G.validation = { validateConfig, validateRule, validateRecord, validateBackup, ID_RE, PERSON_TOKENS, PROMPT_TOKENS, slug };
+/* A host app that embeds the builder in one of its own forms opens it for
+   one person and, if it knows it, one kind of note. Nothing else is taken. */
+function validateLaunch(raw){
+  if(!isObj(raw)) return null;
+  const initials = G.profiles.cleanInitials(raw.initials);
+  if(!INITIALS_RE.test(initials)) return null;
+  return {
+    initials,
+    kind: Object.keys(D.SLOTS).includes(raw.kind) ? raw.kind : null,
+    pronoun: ["he", "she", "they"].includes(raw.pronoun) ? raw.pronoun : null
+  };
+}
+
+G.validation = { validateConfig, validateRule, validateRecord, validateBackup, validateLaunch, ID_RE, PERSON_TOKENS, PROMPT_TOKENS, slug };
 })(globalThis.GSN = globalThis.GSN || {});

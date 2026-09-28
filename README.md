@@ -202,6 +202,16 @@ Personal care reads differently at 07:00 and 22:00. The app opens on the shift
 that matches the clock and carries night-specific wording and tasks — settling,
 repositioning, night checks, night clothes — with outcomes to match.
 
+### Inside a care-record app
+
+A care-record app can bundle the builder and open it from its own forms for one
+person and one kind of note. The person and kind are then fixed, and **Use this
+note** hands the finished note to that app's form instead of the clipboard, only
+once the same checks and confirmation have passed. The host gives the builder
+initials and a pronoun, nothing more; what happens to the note afterwards is the
+host app's own record-keeping. Opened on its own, the builder behaves exactly as
+above.
+
 ## Adapting it to your service
 
 **Settings & data** lets a service adapt the builder without touching the code:
