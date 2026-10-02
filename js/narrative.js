@@ -23,7 +23,7 @@ const D = G.data;
 /* An activity is told in time order: getting ready and the journey ("start"),
    what the person did and the support given, what happened and was seen,
    then clearing up and coming home ("closing") just before the outcome. */
-const SECTIONS = ["context", "before", "offer", "choice", "consent", "start", "independence", "support", "declinedTasks",
+const SECTIONS = ["context", "arrive", "before", "offer", "choice", "consent", "prepare", "start", "independence", "support", "declinedTasks",
                   "behaviour", "staff", "after", "impact", "observation", "risk", "explain", "closing", "outcome", "benefit", "followup"];
 /* sections that open a new paragraph when the note is split into paragraphs */
 const PARA_START = { independence: 1, observation: 1 };
@@ -236,8 +236,11 @@ function plan(s, opts, pre){
   }
   if(s.level && !(s.tasks || []).some(t => t.level) && D.LEVELBANK[s.level])
     add({ key: "level", section: "support", pri: 2, bank: D.LEVELBANK[s.level], src: ["level"] });
+  /* dignity in the order it happens: knocking on the way in, then the door,
+     covering and explaining once consent is given - all before the care itself */
   if(s.kind === "personal")
-    (s.dignity || []).filter(d => !saidBy("dignity." + d)).forEach((d, i) => add({ key: "dig_" + d, section: "support", pri: i < 2 ? 2 : 3, bank: D.DIGNITYBANK[d], src: ["dignity." + d] }));
+    (s.dignity || []).filter(d => !saidBy("dignity." + d)).forEach((d, i) =>
+      add({ key: "dig_" + d, section: d === "knocked" ? "arrive" : "prepare", pri: i < 2 ? 2 : 3, bank: D.DIGNITYBANK[d], src: ["dignity." + d] }));
 
   /* observation: first the particular things they did during an activity and
      the staff member's own account of what happened, then what was measured
@@ -297,6 +300,49 @@ function plan(s, opts, pre){
     .sort((a, b) => (SECTIONS.indexOf(a.section) - SECTIONS.indexOf(b.section)) || (a.order - b.order));
 }
 
+/* ---------- not saying the same thing twice ---------- */
+const PEOPLE_WORDS = /^(?:he|she|they|his|her|their)$/i;
+const grams = t => {
+  const w = t.toLowerCase().replace(/[^a-z' ]/g, " ").split(/\s+/).filter(Boolean);
+  const out = [];
+  for(let i = 0; i + 3 <= w.length; i++) out.push(w.slice(i, i + 3).join(" "));
+  return out;
+};
+/* how much a candidate sentence would repeat the note so far: three-word
+   phrases already used, and two sentences in a row opening on the same word */
+function repeats(text, sentences){
+  if(!sentences.length) return 0;
+  const used = new Set([].concat(...sentences.map(x => grams(x.text))));
+  let n = grams(text).filter(g => used.has(g)).length;
+  const first = t => t.split(" ")[0];
+  const prev = first(sentences[sentences.length - 1].text);
+  if(first(text) === prev && !PEOPLE_WORDS.test(prev) && !/^[A-Z0-9'-]{1,4}$/.test(prev)) n += 2;
+  return n;
+}
+
+/* "Coughing was observed during lunch. Choking was observed during lunch."
+   becomes one sentence; both sets of sources are kept */
+const OBSERVED = /^(.+?) (?:was|were) observed during (.+)\.$/;
+function joinObserved(sentences){
+  for(let i = 0; i < sentences.length - 1; i++){
+    const a = OBSERVED.exec(sentences[i].text);
+    if(!a) continue;
+    let j = i + 1;
+    const subjects = [a[1]];
+    for(; j < sentences.length && sentences[j].para === sentences[i].para; j++){
+      const b = OBSERVED.exec(sentences[j].text);
+      if(!b || b[2] !== a[2]) break;
+      subjects.push(b[1].charAt(0).toLowerCase() + b[1].slice(1));
+    }
+    if(subjects.length < 2) continue;
+    const run = sentences.slice(i, j);
+    sentences.splice(i, j - i, { key: run[0].key, section: run[0].section, para: run[0].para,
+      text: joinList(subjects) + " were observed during " + a[2] + ".",
+      sources: [...new Set([].concat(...run.map(x => x.sources)))],
+      members: [].concat(...run.map(x => x.members || [x.key])) });
+  }
+}
+
 /* ---------- the note ---------- */
 function build(s, opts){
   opts = opts || {};
@@ -306,15 +352,19 @@ function build(s, opts){
   const chosen = {};
   const decide = (n, key) => hashStr(salt + "|" + key) % n;
 
-  /* pick a phrase, steering away from the ones recently used for this person */
-  function pick(bank, slot){
+  /* pick a phrase: never the wording "Reword it" is replacing, then one that
+     does not repeat what this note has already said, then one not recently
+     used for this person */
+  function pick(bank, slot, repeats){
     if(!bank || !bank.length) return "";
-    let h = hist[slot] || [];
-    if(slot in avoid) h = [avoid[slot]].concat(h.filter(x => x !== avoid[slot]));
+    /* avoid[slot] is the wording on screen, or every wording shown so far for
+       this entry, newest first - so pressing Reword again moves on to one not seen yet */
+    const shown = slot in avoid ? [].concat(avoid[slot]) : [];
+    const h = shown.concat((hist[slot] || []).filter(x => !shown.includes(x)));
     let best = [], bestScore = Infinity;
-    bank.forEach((_, i) => {
+    bank.forEach((t, i) => {
       const pos = h.indexOf(i);
-      const score = pos === -1 ? -1 : (h.length - pos);
+      const score = (shown[0] === i ? 1e6 : 0) + (repeats ? repeats(t) * 1000 : 0) + (pos === -1 ? -1 : (h.length - pos));
       if(score < bestScore){ bestScore = score; best = [i]; }
       else if(score === bestScore) best.push(i);
     });
@@ -363,7 +413,7 @@ function build(s, opts){
         if(!nx.task || nx.task.level !== lvl || nx.section !== it.section || !nx.task[word]) break;
         run.push(nx);
       }
-      if(it.task[word] && run.length > 1 && decide(2, "group|" + lvl) === 0){
+      if(it.task[word] && run.length > 1){
         const parts = run.map(r => say(r.task[word], r));
         const list = joinList(parts.map(x => x.text));
         out.push({ key: "group_" + lvl, section: it.section, bank: D.GROUPBANK[lvl],
@@ -402,7 +452,7 @@ function build(s, opts){
     let res;
     if(it.text) res = { text: it.ours ? terms(it.text) : it.text, sources: it.src.slice() };
     else {
-      let t = pick(it.bank, it.key);
+      let t = pick(it.bank, it.key, t => repeats(plain(say(t, it).text), sentences));
       /* a new paragraph names the person rather than starting "He ..." */
       if(first && para > 0 && t.startsWith("{S} ")) t = "{N} " + t.slice(4);
       if(it.join) t = t.replace(/\.$/, ", " + it.join + ".");
@@ -416,6 +466,7 @@ function build(s, opts){
     if(text) sentences.push({ key: it.key, section: it.section, para, text, sources: res.sources, members: it.members });
   });
 
+  joinObserved(sentences);
   const text = [...new Set(sentences.map(x => x.para))]
     .map(p => sentences.filter(x => x.para === p).map(x => x.text).join(" ")).join("\n\n");
   return { sentences, text, chosen, omitted };

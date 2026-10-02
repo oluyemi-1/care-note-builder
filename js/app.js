@@ -1259,7 +1259,9 @@ document.addEventListener("change", e => {
 let rewordCheck = "";
 $("reword").addEventListener("click", () => {
   const before = lastBuild, oldSalt = salt, oldAvoid = onScreen;
-  onScreen = Object.assign({}, chosenIdx);
+  /* every wording shown for this entry, newest first, so each press moves on to one not seen yet */
+  onScreen = Object.keys(chosenIdx).reduce((o, k) =>
+    Object.assign(o, { [k]: [chosenIdx[k]].concat([].concat(oldAvoid[k] === undefined ? [] : oldAvoid[k]).filter(x => x !== chosenIdx[k])) }), {});
   let check = { same: true, why: [] };
   for(let i = 0; i < 8; i++){
     salt = Math.floor(Math.random() * 1e9);

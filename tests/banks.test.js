@@ -65,3 +65,7 @@ test("every task has wording for every level, including minimal help", () => {
   for(const kind in D.TASKS) for(const t of D.TASKS[kind])
     for(const [l] of D.LEVELS) if(l) assert.ok(t[l] && t[l].length, kind + "." + t.id + "." + l);
 });
+
+test("every sentence has at least three wordings, so Reword it has somewhere to go", () => {
+  for(const [name, list] of banks()) assert.ok(list.length >= 3, name + " has " + list.length + " wordings");
+});

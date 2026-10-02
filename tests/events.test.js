@@ -23,10 +23,10 @@ test("an ABC note reads before, behaviour, staff response, how it ended, anyone 
     assert.match(t, /16:10/); assert.match(t, /living room/); assert.match(t, /1:1/);
     assert.match(t, /noisy and busy/); assert.match(t, /told no/);
     assert.match(t, /The TV had just been turned off for tea\./);
-    assert.match(t, /shouted|swore/); assert.match(t, /threw/); assert.match(t, /about 10 minutes/);
+    assert.match(t, /shouted|swore/); assert.match(t, /threw|thrown/); assert.match(t, /about 10 minutes/);
     assert.match(t, /reassured/); assert.match(t, /space and time|stepped back/); assert.match(t, /quieter space/);
-    assert.match(t, /gradually/); assert.match(t, /No one was hurt|Nobody was hurt/);
-    assert.match(t, /settled and returned to his usual routine|settled again and went back to his usual routine/);
+    assert.match(t, /gradually|bit by bit/); assert.match(t, /No one was hurt|Nobody was hurt|no injuries/);
+    assert.match(t, /settled and returned to his usual routine|settled again and went back to his usual routine|Once settled, he returned to his usual routine/);
     const k = keys(r.note);
     const idx = key => k.findIndex(x => x.startsWith(key));
     assert.ok(idx("open") < idx("before_") && idx("before_") < idx("beh_") && idx("beh_") < idx("behText") && idx("behText") < idx("comm_")
@@ -63,10 +63,10 @@ test("a fall with an injury: what happened, what staff did, the injury, and a pr
     injury: "injury", injuryType: ["graze", "bruise"], injuryWhere: "left elbow", injuryObs: ["painobs", "conscious"], outcome: "monitored", len: "full" });
   const r = compose(s);
   const t = r.note.text;
-  assert.match(t, /a fall/i); assert.match(t, /bathroom/); assert.match(t, /found (?:him )?on the floor/);
-  assert.match(t, /said he had slipped/); assert.match(t, /First aid was given|gave first aid/); assert.match(t, /non-emergency line/);
+  assert.match(t, /a fall/i); assert.match(t, /bathroom/); assert.match(t, /found (?:him )?on the floor|on the floor when staff found him/);
+  assert.match(t, /said he had slipped/); assert.match(t, /first aid/i); assert.match(t, /non-emergency line/);
   assert.match(t, /injury was seen: graze and bruise to left elbow|saw an injury: graze and bruise to left elbow/);
-  assert.match(t, /conscious and alert/); assert.match(t, /Someone was hurt/); assert.match(t, /He was hurt|He was the one hurt/);
+  assert.match(t, /conscious and alert/); assert.match(t, /Someone was hurt|A person was hurt/); assert.match(t, /He was hurt|He was the one hurt|He was the person who was hurt/);
   assert.match(t, /monitor/);
   assert.doesNotMatch(t, /ambulance|hospital|police|body map|incident form|GP/);
   assert.deepEqual(G.provenance.verify(r.note.sentences, r.s), []);

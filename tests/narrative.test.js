@@ -143,7 +143,7 @@ test("a college session the person did not go to never says they attended", () =
   for(let salt = 0; salt < 30; salt++){
     const text = compose({ s, profile: P.none }, salt).note.text;
     assert.doesNotMatch(text, /\battended\b|was at college from|session ran|class lasted/, text);
-    assert.match(text, /due/);
+    assert.match(text, /due|timetabled/);
   }
 });
 

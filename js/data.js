@@ -151,48 +151,48 @@ DURING.communication = [["comm-greeted","Greeted others"],["comm-turns","Took tu
                         ["comm-listened","Listened while others spoke"],["comm-newsign","Practised a new word or sign"],
                         ["comm-initiated","Started a conversation themselves"]];
 const DURINGBANK = {
- "food-hands":["{S} washed {p} hands before handling food.","Before handling food, {s} washed {p} hands."],
- "food-ingredients":["{S} chose the ingredients.","{S} picked out the ingredients."],
- "food-recipe":["{S} followed the recipe.","{S} worked through the recipe."],
- "food-hob":["{S} used the hob or oven safely.","{S} used the hob or oven without incident."],
- "food-served":["{S} served the food.","{S} served up the food."],
- "food-tasted":["{S} tasted what {s} had made.","{S} tried what {s} had made."],
- "music-chose":["{S} chose the music.","{S} picked the music."],
- "music-sang":["{S} sang along.","{S} joined in with the singing."],
- "music-instrument":["{S} played an instrument.","{S} played along on an instrument."],
- "music-danced":["{S} danced.","{S} danced to the music."],
- "music-listened":["{S} listened and kept time with the music.","{S} kept time with the music."],
- "arts-materials":["{S} chose the materials.","{S} picked out the materials {s} wanted to use."],
- "arts-made":["{S} made something of {p} own design.","{S} made a piece of {p} own design."],
- "arts-showed":["{S} showed {p} work to others.","{S} showed others what {s} had made."],
- "physical-warmup":["{S} joined in the warm-up.","{S} took part in the warm-up."],
- "physical-pace":["{S} set {p} own pace.","{S} went at {p} own pace."],
- "physical-rest":["{S} took a rest when {s} needed one.","{S} rested when {s} needed to."],
- "water-changed":["{S} got changed for the water.","{S} changed into {p} swimwear."],
- "water-swam":["{S} swam and moved about in the water.","{S} moved about in the water."],
- "walking-route":["{S} chose the route.","{S} decided which way to go."],
- "walking-stopped":["{S} stopped to look at things on the way.","{S} took time to look at things along the way."],
- "shopping-list":["{S} used a shopping list.","{S} worked from a shopping list."],
- "shopping-items":["{S} chose the items.","{S} picked the items {s} wanted."],
- "shopping-bags":["{S} carried the bags.","{S} carried the shopping."],
- "garden-planted":["{S} planted and watered.","{S} did some planting and watering."],
- "garden-tools":["{S} used garden tools.","{S} worked with garden tools."],
- "laundry-sorted":["{S} sorted the washing.","{S} sorted the washing into loads."],
- "laundry-machine":["{S} loaded and started the machine.","{S} loaded the machine and started it."],
- "laundry-folded":["{S} folded the clean washing.","{S} folded the washing once it was dry."],
- "chores-room":["{S} tidied {p} own room.","{S} tidied {p} room."],
- "social-friends":["{S} met up with {p} friends.","{S} spent time with {p} friends there."],
- "social-joined":["{S} joined in the group activity.","{S} took part in what the group was doing."],
- "social-new":["{S} spoke to someone new.","{S} talked to someone {s} had not met before."],
- "social-snack":["{S} bought {r} a drink or snack.","{S} chose and bought a drink or snack."],
- "comm-greeted":["{S} greeted the others.","{S} said hello to the others."],
- "comm-turns":["{S} took turns in a conversation.","{S} waited for {p} turn to speak and took it."],
- "comm-aid":["{S} used {p} communication aid.","{S} communicated using {p} aid."],
- "comm-symbols":["{S} made a choice using pictures or symbols.","{S} chose using pictures or symbols."],
- "comm-listened":["{S} listened while others spoke.","{S} listened to the others."],
- "comm-newsign":["{S} practised a new word or sign.","{S} tried out a new word or sign."],
- "comm-initiated":["{S} started a conversation {r}.","{S} began a conversation without being prompted."],
- "chores-hoover":["{S} hoovered and dusted.","{S} did the hoovering and dusting."]
+ "food-hands":["{S} washed {p} hands before handling food.","Before handling food, {s} washed {p} hands.","Before touching the food, {s} washed {p} hands."],
+ "food-ingredients":["{S} chose the ingredients.","{S} picked out the ingredients.","{S} selected the ingredients."],
+ "food-recipe":["{S} followed the recipe.","{S} worked through the recipe.","{S} followed the steps of the recipe."],
+ "food-hob":["{S} used the hob or oven safely.","{S} used the hob or oven without incident.","{S} safely used the hob or oven."],
+ "food-served":["{S} served the food.","{S} served up the food.","{S} dished up the food."],
+ "food-tasted":["{S} tasted what {s} had made.","{S} tried what {s} had made.","{S} had a taste of what {s} had made."],
+ "music-chose":["{S} chose the music.","{S} picked the music.","{S} selected the music."],
+ "music-sang":["{S} sang along.","{S} joined in with the singing.","{S} joined in and sang along."],
+ "music-instrument":["{S} played an instrument.","{S} played along on an instrument.","{S} joined in by playing an instrument."],
+ "music-danced":["{S} danced.","{S} danced to the music.","{S} had a dance."],
+ "music-listened":["{S} listened and kept time with the music.","{S} kept time with the music.","{S} listened to the music and kept time with it."],
+ "arts-materials":["{S} chose the materials.","{S} picked out the materials {s} wanted to use.","{S} selected the materials."],
+ "arts-made":["{S} made something of {p} own design.","{S} made a piece of {p} own design.","{S} created something of {p} own design."],
+ "arts-showed":["{S} showed {p} work to others.","{S} showed others what {s} had made.","{S} shared {p} work with others."],
+ "physical-warmup":["{S} joined in the warm-up.","{S} took part in the warm-up.","{S} did the warm-up."],
+ "physical-pace":["{S} set {p} own pace.","{S} went at {p} own pace.","{S} decided on {p} own pace."],
+ "physical-rest":["{S} took a rest when {s} needed one.","{S} rested when {s} needed to.","{S} had a rest when {s} needed one."],
+ "water-changed":["{S} got changed for the water.","{S} changed into {p} swimwear.","{S} changed ready for the water."],
+ "water-swam":["{S} swam and moved about in the water.","{S} moved about in the water.","{S} moved around in the water."],
+ "walking-route":["{S} chose the route.","{S} decided which way to go.","{S} picked the route."],
+ "walking-stopped":["{S} stopped to look at things on the way.","{S} took time to look at things along the way.","{S} paused on the way to look at things."],
+ "shopping-list":["{S} used a shopping list.","{S} worked from a shopping list.","{S} used a list for the shopping."],
+ "shopping-items":["{S} chose the items.","{S} picked the items {s} wanted.","{S} selected the items."],
+ "shopping-bags":["{S} carried the bags.","{S} carried the shopping.","{S} carried the shopping bags."],
+ "garden-planted":["{S} planted and watered.","{S} did some planting and watering.","{S} planted things and watered them."],
+ "garden-tools":["{S} used garden tools.","{S} worked with garden tools.","{S} used tools in the garden."],
+ "laundry-sorted":["{S} sorted the washing.","{S} sorted the washing into loads.","{S} sorted out the washing."],
+ "laundry-machine":["{S} loaded and started the machine.","{S} loaded the machine and started it.","{S} put the washing in the machine and started it."],
+ "laundry-folded":["{S} folded the clean washing.","{S} folded the washing once it was dry.","{S} folded up the clean washing."],
+ "chores-room":["{S} tidied {p} own room.","{S} tidied {p} room.","{S} tidied up {p} room."],
+ "social-friends":["{S} met up with {p} friends.","{S} spent time with {p} friends there.","{S} got together with {p} friends."],
+ "social-joined":["{S} joined in the group activity.","{S} took part in what the group was doing.","{S} joined in with the group."],
+ "social-new":["{S} spoke to someone new.","{S} talked to someone {s} had not met before.","{S} had a conversation with someone new."],
+ "social-snack":["{S} bought {r} a drink or snack.","{S} chose and bought a drink or snack.","{S} bought a drink or snack for {r}."],
+ "comm-greeted":["{S} greeted the others.","{S} said hello to the others.","{S} greeted the other people there."],
+ "comm-turns":["{S} took turns in a conversation.","{S} waited for {p} turn to speak and took it.","{S} took turns to speak in a conversation."],
+ "comm-aid":["{S} used {p} communication aid.","{S} communicated using {p} aid.","{S} made use of {p} communication aid."],
+ "comm-symbols":["{S} made a choice using pictures or symbols.","{S} chose using pictures or symbols.","{S} used pictures or symbols to make a choice."],
+ "comm-listened":["{S} listened while others spoke.","{S} listened to the others.","{S} listened while the others were speaking."],
+ "comm-newsign":["{S} practised a new word or sign.","{S} tried out a new word or sign.","{S} had a go at a new word or sign."],
+ "comm-initiated":["{S} started a conversation {r}.","{S} began a conversation without being prompted.","{S} started a conversation of {p} own accord."],
+ "chores-hoover":["{S} hoovered and dusted.","{S} did the hoovering and dusting.","{S} did some hoovering and dusting."]
 };
 
 /* the overall level in step 3, most to least independent */
@@ -234,227 +234,227 @@ personal:[
   prompt:["{S} had {opt}, completing it {r} with prompts from staff.","With prompts from staff, {s} washed {r} during {opt}.","{S} had {opt} and needed only prompting."],
   part:["During {opt}, {s} washed the areas {s} could manage and staff supported with the rest.","{S} had {opt}; {s} did as much as {s} could {r} and staff supported with the rest.","{S} had {opt} with part support from staff."],
   full:["Staff provided full support with {opt}.","{S} had {opt} with full support from staff.","Staff carried out {opt} for {o}."],
-  declined:["{S} declined {opt} on this occasion.","{S} did not want {opt} and this was respected."]},
+  declined:["{S} declined {opt} on this occasion.","{S} did not want {opt} and this was respected.","{S} chose not to have {opt} this time, and staff respected this."]},
 
  {id:"hair",label:"Hair washing",nf:"Hair Washing",verb:"washed {p} hair",noun:"washing {p} hair",
-  ind:["{S} washed {p} own hair.","{S} washed {p} hair without help."],
-  prompt:["{S} washed {p} hair after a prompt from staff.","{S} washed {p} hair {r} once staff prompted {o}."],
-  part:["{S} washed {p} hair with some hands-on help from staff.","{S} did part of washing {p} hair and staff supported with the rest."],
-  full:["Staff washed {p} hair.","Staff washed {p} hair for {o}."],
-  declined:["{S} declined to have {p} hair washed today.","{S} chose not to wash {p} hair and this was respected."]},
+  ind:["{S} washed {p} own hair.","{S} washed {p} hair without help.","{S} took care of washing {p} hair independently."],
+  prompt:["{S} washed {p} hair after a prompt from staff.","{S} washed {p} hair {r} once staff prompted {o}.","Once prompted by staff, {s} washed {p} hair."],
+  part:["{S} washed {p} hair with some hands-on help from staff.","{S} did part of washing {p} hair and staff supported with the rest.","Staff gave some hands-on help while {s} washed {p} hair."],
+  full:["Staff washed {p} hair.","Staff washed {p} hair for {o}.","{P} hair was washed by staff."],
+  declined:["{S} declined to have {p} hair washed today.","{S} chose not to wash {p} hair and this was respected.","{S} did not want {p} hair washed this time, and staff respected this."]},
 
  {id:"shave",label:"Shaving",nf:"Shaving",verb:"shaved",noun:"shaving",
-  ind:["{S} shaved {r}.","{S} shaved independently."],
-  prompt:["{S} shaved {r} after a prompt from staff.","{S} shaved with prompts from staff."],
-  part:["{S} shaved part of {p} face and staff finished the rest.","{S} shaved with some hands-on help from staff."],
-  full:["Staff shaved {o}.","Staff carried out {p} shave."],
-  declined:["{S} declined a shave today.","{S} did not want to shave and this was respected."]},
+  ind:["{S} shaved {r}.","{S} shaved independently.","{S} managed {p} own shave without support."],
+  prompt:["{S} shaved {r} after a prompt from staff.","{S} shaved with prompts from staff.","Once prompted by staff, {s} shaved."],
+  part:["{S} shaved part of {p} face and staff finished the rest.","{S} shaved with some hands-on help from staff.","Staff gave some hands-on help while {s} shaved."],
+  full:["Staff shaved {o}.","Staff carried out {p} shave.","{S} {vbe} shaved by staff."],
+  declined:["{S} declined a shave today.","{S} did not want to shave and this was respected.","{S} chose not to shave this time, and staff respected this."]},
 
  {id:"oral",label:"Oral care",nf:"Oral Care",opts:["{p} teeth","{p} teeth with an electric toothbrush","{p} dentures"],
   verb:"brushed {opt}",
-  ind:["{S} brushed {opt} without any support.","{S} carried out {p} own oral care, brushing {opt}."],
-  prompt:["{S} brushed {opt} after a prompt.","With prompting, {s} brushed {opt} {r}."],
-  part:["{S} started brushing {opt} and staff supported to finish.","{S} brushed {opt} with some hands-on help from staff."],
-  full:["Staff carried out oral care for {o}, brushing {opt}.","Staff brushed {opt} for {o}."],
-  declined:["{S} declined to have {opt} brushed on this occasion.","{S} did not want support with {opt} and this was respected."]},
+  ind:["{S} brushed {opt} without any support.","{S} carried out {p} own oral care, brushing {opt}.","{S} brushed {opt} independently."],
+  prompt:["{S} brushed {opt} after a prompt.","With prompting, {s} brushed {opt} {r}.","Once prompted, {s} brushed {opt}."],
+  part:["{S} started brushing {opt} and staff supported to finish.","{S} brushed {opt} with some hands-on help from staff.","Staff gave some hands-on help while {s} brushed {opt}."],
+  full:["Staff carried out oral care for {o}, brushing {opt}.","Staff brushed {opt} for {o}.","{S} {vbe} supported by staff, who brushed {opt}."],
+  declined:["{S} declined to have {opt} brushed on this occasion.","{S} did not want support with {opt} and this was respected.","{S} chose not to have {opt} brushed this time, and staff respected this."]},
 
  {id:"nails",label:"Nail care",nf:"Nail Care",verb:"cared for {p} nails",noun:"nail care",
-  ind:["{S} attended to {p} own nails.","{S} cared for {p} nails {r}."],
-  prompt:["{S} attended to {p} nails after a prompt from staff.","With prompting, {s} cared for {p} nails."],
-  part:["{S} cared for {p} nails with some hands-on help from staff.","{S} did part of {p} nail care and staff supported with the rest."],
-  full:["Staff attended to {p} nails.","Staff carried out {p} nail care."],
-  declined:["{S} declined nail care today.","{S} did not want {p} nails done and this was respected."]},
+  ind:["{S} attended to {p} own nails.","{S} cared for {p} nails {r}.","{S} did {p} nail care independently."],
+  prompt:["{S} attended to {p} nails after a prompt from staff.","With prompting, {s} cared for {p} nails.","Once prompted by staff, {s} attended to {p} nails."],
+  part:["{S} cared for {p} nails with some hands-on help from staff.","{S} did part of {p} nail care and staff supported with the rest.","Staff gave some hands-on help while {s} cared for {p} nails."],
+  full:["Staff attended to {p} nails.","Staff carried out {p} nail care.","{P} nails were cared for by staff."],
+  declined:["{S} declined nail care today.","{S} did not want {p} nails done and this was respected.","{S} chose not to have nail care this time, and staff respected this."]},
 
  {id:"creams",label:"Creams",nf:"Creams Applied as per MAR chart",verb:"applied {p} prescribed cream",noun:"{p} prescribed cream",
-  ind:["{S} applied {p} prescribed cream {r}.","{S} put on {p} own prescribed cream."],
-  prompt:["{S} applied {p} prescribed cream after a prompt from staff.","Following a prompt, {s} applied {p} prescribed cream."],
-  part:["{S} applied {p} prescribed cream to the areas {s} could reach and staff applied the rest.","{S} applied some of {p} prescribed cream and staff supported with the rest."],
-  full:["Staff applied {p} prescribed cream.","{P} prescribed cream was applied by staff."],
-  declined:["{S} declined {p} prescribed cream.","{S} did not want {p} prescribed cream on this occasion."]},
+  ind:["{S} applied {p} prescribed cream {r}.","{S} put on {p} own prescribed cream.","{S} applied {p} prescribed cream independently."],
+  prompt:["{S} applied {p} prescribed cream after a prompt from staff.","Following a prompt, {s} applied {p} prescribed cream.","Once prompted by staff, {s} applied {p} prescribed cream."],
+  part:["{S} applied {p} prescribed cream to the areas {s} could reach and staff applied the rest.","{S} applied some of {p} prescribed cream and staff supported with the rest.","Staff supported {o} with part of {p} prescribed cream, and {s} applied the rest {r}."],
+  full:["Staff applied {p} prescribed cream.","{P} prescribed cream was applied by staff.","{S} had {p} prescribed cream applied by staff."],
+  declined:["{S} declined {p} prescribed cream.","{S} did not want {p} prescribed cream on this occasion.","{S} chose not to have {p} prescribed cream this time."]},
 
  {id:"dress",label:"Dressing &amp; clothing choice",nf:"Choice of clothing made?",verb:"dressed in clothes {s} chose",noun:"dressing",
-  ind:["{S} chose {p} own clothes and dressed without help.","{S} picked out {p} clothes and dressed {r}."],
-  prompt:["{S} chose {p} clothes and dressed {r} with prompts from staff.","{S} selected {p} clothes and dressed following prompts."],
-  part:["{S} chose {p} clothes and dressed with some hands-on help from staff.","{S} chose {p} clothes and staff supported with part of dressing."],
-  full:["Staff dressed {o}.","Staff supported {o} fully with dressing."],
-  declined:["{S} declined to change {p} clothes at this point.","{S} kept on the clothes {s} {vbe} wearing."]},
+  ind:["{S} chose {p} own clothes and dressed without help.","{S} picked out {p} clothes and dressed {r}.","{S} made {p} own choice of clothes and got dressed independently."],
+  prompt:["{S} chose {p} clothes and dressed {r} with prompts from staff.","{S} selected {p} clothes and dressed following prompts.","With prompting from staff, {s} chose {p} clothes and got dressed."],
+  part:["{S} chose {p} clothes and dressed with some hands-on help from staff.","{S} chose {p} clothes and staff supported with part of dressing.","After choosing {p} clothes, {s} got dressed with some hands-on help from staff."],
+  full:["Staff dressed {o}.","Staff supported {o} fully with dressing.","{S} {vbe} fully dressed by staff."],
+  declined:["{S} declined to change {p} clothes at this point.","{S} kept on the clothes {s} {vbe} wearing.","{S} chose to stay in the clothes {s} {vbe} wearing."]},
 
  {id:"continence",label:"Continence support",nf:"Continence chart",verb:"used the toilet",noun:"using the toilet",
-  ind:["{S} used the toilet independently.","{S} took {r} to the toilet without support."],
-  prompt:["{S} used the toilet after a prompt from staff.","Following a prompt, {s} used the toilet {r}."],
-  part:["{S} used the toilet with some hands-on help from staff.","Staff supported {o} to use the toilet, and {s} did part of it {r}."],
-  full:["Staff provided full continence support.","Continence support was given by staff."],
-  declined:["{S} declined support with the toilet at this time.","{S} did not want continence support and this was respected."]},
+  ind:["{S} used the toilet independently.","{S} took {r} to the toilet without support.","{S} went to the toilet {r}, without support."],
+  prompt:["{S} used the toilet after a prompt from staff.","Following a prompt, {s} used the toilet {r}.","Once prompted by staff, {s} used the toilet."],
+  part:["{S} used the toilet with some hands-on help from staff.","Staff supported {o} to use the toilet, and {s} did part of it {r}.","Staff gave some hands-on help while {s} used the toilet."],
+  full:["Staff provided full continence support.","Continence support was given by staff.","{S} {vbe} given full continence support by staff."],
+  declined:["{S} declined support with the toilet at this time.","{S} did not want continence support and this was respected.","{S} chose not to have support with the toilet this time, and staff respected this."]},
 
  {id:"hearing",label:"Hearing aids",nf:"Hearing Aid(s)",verb:"put in {p} hearing aids",noun:"{p} hearing aids",
-  ind:["{S} put in {p} hearing aids {r}.","{S} fitted {p} own hearing aids."],
-  prompt:["{S} put in {p} hearing aids after a prompt.","Following a prompt, {s} fitted {p} hearing aids."],
-  part:["Staff helped {o} to fit {p} hearing aids.","{S} fitted {p} hearing aids with some hands-on help."],
-  full:["Staff fitted {p} hearing aids.","{P} hearing aids were fitted by staff."],
-  declined:["{S} declined to wear {p} hearing aids today.","{S} chose not to wear {p} hearing aids."]},
+  ind:["{S} put in {p} hearing aids {r}.","{S} fitted {p} own hearing aids.","{S} fitted {p} hearing aids without support."],
+  prompt:["{S} put in {p} hearing aids after a prompt.","Following a prompt, {s} fitted {p} hearing aids.","Once prompted, {s} put in {p} hearing aids."],
+  part:["Staff helped {o} to fit {p} hearing aids.","{S} fitted {p} hearing aids with some hands-on help.","{S} put in {p} hearing aids with some help from staff."],
+  full:["Staff fitted {p} hearing aids.","{P} hearing aids were fitted by staff.","Staff put in {p} hearing aids for {o}."],
+  declined:["{S} declined to wear {p} hearing aids today.","{S} chose not to wear {p} hearing aids.","{S} did not want to wear {p} hearing aids this time."]},
 
  {id:"glasses",label:"Glasses / lenses",nf:"Glasses / Contact Lenses",verb:"put on {p} glasses",noun:"{p} glasses",
-  ind:["{S} put on {p} glasses {r}.","{S} put on {p} glasses without help."],
-  prompt:["{S} put on {p} glasses after a prompt.","Following a prompt, {s} put on {p} glasses."],
-  part:["{S} put on {p} glasses with some help from staff.","Staff helped {o} to put on {p} glasses."],
-  full:["Staff put {p} glasses on for {o}.","Staff fitted {p} glasses for {o}."],
-  declined:["{S} declined to wear {p} glasses today.","{S} chose not to wear {p} glasses."]},
+  ind:["{S} put on {p} glasses {r}.","{S} put on {p} glasses without help.","{S} put {p} glasses on independently."],
+  prompt:["{S} put on {p} glasses after a prompt.","Following a prompt, {s} put on {p} glasses.","Once prompted, {s} put {p} glasses on."],
+  part:["{S} put on {p} glasses with some help from staff.","Staff helped {o} to put on {p} glasses.","Staff gave some help while {s} put on {p} glasses."],
+  full:["Staff put {p} glasses on for {o}.","Staff fitted {p} glasses for {o}.","{P} glasses were put on by staff."],
+  declined:["{S} declined to wear {p} glasses today.","{S} chose not to wear {p} glasses.","{S} did not want to wear {p} glasses this time."]},
 
  {id:"aids",label:"Assistive aids",nf:"Assistive Aids Checked, Cleaned & Issued",verb:"used {p} assistive aids",noun:"{p} assistive aids",
-  ind:["{S} collected and used {p} own equipment.","{S} used {p} assistive aids without support."],
-  prompt:["{S} used {p} equipment after a prompt from staff.","Following a prompt, {s} used {p} assistive aids."],
-  part:["{S} used {p} assistive aids with some help from staff.","Staff helped {o} to use {p} equipment."],
-  full:["Staff checked, cleaned and issued {p} equipment.","{P} assistive aids were checked, cleaned and issued by staff."],
-  declined:["{S} declined to use {p} equipment on this occasion.","{S} chose not to use {p} assistive aids."]},
+  ind:["{S} collected and used {p} own equipment.","{S} used {p} assistive aids without support.","{S} managed {p} own equipment independently."],
+  prompt:["{S} used {p} equipment after a prompt from staff.","Following a prompt, {s} used {p} assistive aids.","Once prompted by staff, {s} used {p} equipment."],
+  part:["{S} used {p} assistive aids with some help from staff.","Staff helped {o} to use {p} equipment.","Staff gave some help while {s} used {p} equipment."],
+  full:["Staff checked, cleaned and issued {p} equipment.","{P} assistive aids were checked, cleaned and issued by staff.","Staff checked and cleaned {p} assistive aids, then issued them."],
+  declined:["{S} declined to use {p} equipment on this occasion.","{S} chose not to use {p} assistive aids.","{S} did not want to use {p} equipment this time."]},
 
  {id:"jewellery",label:"Watch &amp; jewellery",nf:"Watch & Jewellery",verb:"put on {p} watch and jewellery",noun:"{p} watch and jewellery",
-  ind:["{S} chose and put on {p} own watch and jewellery.","{S} put on the jewellery {s} wanted to wear."],
-  prompt:["{S} put on {p} watch and jewellery after a prompt.","Following a prompt, {s} put on {p} watch and jewellery."],
-  part:["{S} chose {p} jewellery and staff helped fasten it.","Staff helped {o} put on the watch and jewellery {s} chose."],
-  full:["Staff put on {p} watch and jewellery for {o}.","Staff fitted {p} watch and jewellery."],
-  declined:["{S} chose not to wear jewellery today.","{S} declined {p} watch and jewellery."]},
+  ind:["{S} chose and put on {p} own watch and jewellery.","{S} put on the jewellery {s} wanted to wear.","{S} picked out {p} own watch and jewellery and put them on."],
+  prompt:["{S} put on {p} watch and jewellery after a prompt.","Following a prompt, {s} put on {p} watch and jewellery.","Once prompted, {s} put on {p} watch and jewellery."],
+  part:["{S} chose {p} jewellery and staff helped fasten it.","Staff helped {o} put on the watch and jewellery {s} chose.","{S} chose the jewellery {s} wanted, and staff helped to put it on."],
+  full:["Staff put on {p} watch and jewellery for {o}.","Staff fitted {p} watch and jewellery.","{P} watch and jewellery were put on by staff."],
+  declined:["{S} chose not to wear jewellery today.","{S} declined {p} watch and jewellery.","{S} did not want to wear {p} watch and jewellery this time."]},
 
  {id:"nightwear",label:"Night clothes",nf:"Choice of clothing made?",verb:"changed into {p} night clothes",noun:"changing into {p} night clothes",
-  ind:["{S} chose {p} night clothes and changed independently.","{S} got changed for bed without any help."],
-  prompt:["{S} changed into {p} night clothes after a prompt.","With prompting, {s} changed into {p} night clothes."],
-  part:["{S} changed into {p} night clothes with some hands-on help from staff.","Staff supported {o} to change into {p} night clothes, and {s} did part of it {r}."],
-  full:["Staff supported {o} fully to change into {p} night clothes.","Staff changed {o} into {p} night clothes."],
-  declined:["{S} preferred to stay in what {s} {vbe} wearing and this was respected.","{S} declined to change for bed."]},
+  ind:["{S} chose {p} night clothes and changed independently.","{S} got changed for bed without any help.","{S} changed into {p} night clothes independently."],
+  prompt:["{S} changed into {p} night clothes after a prompt.","With prompting, {s} changed into {p} night clothes.","Once prompted, {s} changed into {p} night clothes."],
+  part:["{S} changed into {p} night clothes with some hands-on help from staff.","Staff supported {o} to change into {p} night clothes, and {s} did part of it {r}.","Staff gave some hands-on help while {s} changed into {p} night clothes."],
+  full:["Staff supported {o} fully to change into {p} night clothes.","Staff changed {o} into {p} night clothes.","{S} {vbe} changed into {p} night clothes by staff."],
+  declined:["{S} preferred to stay in what {s} {vbe} wearing and this was respected.","{S} declined to change for bed.","{S} chose not to change for bed and stayed in what {s} {vbe} wearing."]},
 
  {id:"reposition",label:"Repositioning",nf:"Repositioning chart",verb:"changed position in bed",noun:"repositioning",
-  ind:["{S} repositioned {r} in bed.","{S} changed position {r}."],
-  prompt:["{S} repositioned {r} after a prompt from staff.","Following a prompt, {s} changed position {r}."],
-  part:["{S} changed position with some hands-on help from staff.","Staff supported {o} to reposition, and {s} did part of it {r}."],
-  full:["Staff repositioned {o}.","Staff changed {p} position."],
-  declined:["{S} did not want to be repositioned and this was respected.","{S} declined repositioning at this time."]},
+  ind:["{S} repositioned {r} in bed.","{S} changed position {r}.","{S} moved position in bed independently."],
+  prompt:["{S} repositioned {r} after a prompt from staff.","Following a prompt, {s} changed position {r}.","Once prompted by staff, {s} repositioned {r}."],
+  part:["{S} changed position with some hands-on help from staff.","Staff supported {o} to reposition, and {s} did part of it {r}.","Staff gave some hands-on help while {s} changed position."],
+  full:["Staff repositioned {o}.","Staff changed {p} position.","{S} {vbe} repositioned by staff."],
+  declined:["{S} did not want to be repositioned and this was respected.","{S} declined repositioning at this time.","{S} chose not to be repositioned this time."]},
 
  {id:"settle",label:"Settling for the night",nf:"Daily note",verb:"settled for the night",noun:"settling for the night",
-  ind:["{S} took {r} to bed when {s} {vbe} ready.","{S} decided when to go to bed and settled independently."],
-  prompt:["{S} went to bed after a prompt from staff.","Following a prompt, {s} settled for the night."],
-  part:["{S} got into bed with some hands-on help from staff.","Staff supported {o} to get into bed, and {s} did part of it {r}."],
-  full:["Staff supported {o} fully to settle into bed.","Staff settled {o} for the night."],
-  declined:["{S} {vbe} not ready for bed and chose to stay up.","{S} declined to settle at this point."]},
+  ind:["{S} took {r} to bed when {s} {vbe} ready.","{S} decided when to go to bed and settled independently.","{S} went to bed when {s} chose and settled {r}."],
+  prompt:["{S} went to bed after a prompt from staff.","Following a prompt, {s} settled for the night.","Once prompted by staff, {s} went to bed."],
+  part:["{S} got into bed with some hands-on help from staff.","Staff supported {o} to get into bed, and {s} did part of it {r}.","Staff gave some hands-on help while {s} got into bed."],
+  full:["Staff supported {o} fully to settle into bed.","Staff settled {o} for the night.","{S} {vbe} fully supported by staff to settle into bed."],
+  declined:["{S} {vbe} not ready for bed and chose to stay up.","{S} declined to settle at this point.","{S} chose to stay up rather than settle at this point."]},
 
  {id:"sleepcheck",label:"Night check",nf:"Night checks",
-  ind:["{S} needed no support at the night check.","No support was needed at the night check."],
-  prompt:["{S} needed only verbal reassurance at the night check.","At the night check, {s} needed verbal reassurance only."],
-  min:["{S} needed minimal hands-on support at the night check.","Minimal hands-on support was given at the night check."],
-  part:["Staff gave {o} some hands-on support at the night check.","{S} {vbe} given some hands-on support at the night check."],
-  full:["Staff carried out the night check.","A night check was completed by staff."],
-  declined:["{S} asked not to be disturbed at the night check.","{S} declined the night check."]},
+  ind:["{S} needed no support at the night check.","No support was needed at the night check.","At the night check, {s} did not need any support."],
+  prompt:["{S} needed only verbal reassurance at the night check.","At the night check, {s} needed verbal reassurance only.","Verbal reassurance was all {s} needed at the night check."],
+  min:["{S} needed minimal hands-on support at the night check.","Minimal hands-on support was given at the night check.","At the night check, {s} {vbe} given minimal hands-on support."],
+  part:["Staff gave {o} some hands-on support at the night check.","{S} {vbe} given some hands-on support at the night check.","At the night check, staff gave {o} some hands-on support."],
+  full:["Staff carried out the night check.","A night check was completed by staff.","The night check was carried out by staff."],
+  declined:["{S} asked not to be disturbed at the night check.","{S} declined the night check.","{S} did not want the night check."]},
 
  {id:"makeup",label:"Make up",nf:"Make Up",verb:"applied {p} make up",noun:"{p} make up",
-  ind:["{S} applied {p} own make up.","{S} did {p} make up without support."],
-  prompt:["{S} applied {p} make up after a prompt.","{S} did {p} make up following a prompt."],
-  part:["{S} applied some of {p} make up and staff supported with the rest.","{S} did {p} make up with some help from staff."],
-  full:["Staff applied {p} make up.","Staff did {p} make up for {o}."],
-  declined:["{S} declined make up today.","{S} chose not to wear make up."]}
+  ind:["{S} applied {p} own make up.","{S} did {p} make up without support.","{S} put on {p} make up independently."],
+  prompt:["{S} applied {p} make up after a prompt.","{S} did {p} make up following a prompt.","Once prompted, {s} applied {p} make up."],
+  part:["{S} applied some of {p} make up and staff supported with the rest.","{S} did {p} make up with some help from staff.","Staff gave some help while {s} did {p} make up."],
+  full:["Staff applied {p} make up.","Staff did {p} make up for {o}.","{P} make up was applied by staff."],
+  declined:["{S} declined make up today.","{S} chose not to wear make up.","{S} did not want to wear make up this time."]}
 ],
 
 eating:[
  {id:"choose",label:"Choosing the meal",nf:"Choices Offered",verb:"chose {p} meal",noun:"choosing {p} meal",
-  ind:["{S} decided what {s} wanted without any help.","{S} chose {p} meal independently."],
-  prompt:["{S} chose {p} meal after prompting from staff.","With prompting, {s} made {p} choice of meal."],
-  part:["{S} chose {p} meal with some support from staff.","Staff supported {o} to choose {p} meal."],
-  full:["Staff made the choice of meal on {p} behalf.","The meal was chosen by staff on {p} behalf."],
-  declined:["{S} did not want to choose a meal at this point.","{S} declined to choose a meal."]},
+  ind:["{S} decided what {s} wanted without any help.","{S} chose {p} meal independently.","{S} made {p} own choice of meal without support."],
+  prompt:["{S} chose {p} meal after prompting from staff.","With prompting, {s} made {p} choice of meal.","Once prompted by staff, {s} chose {p} meal."],
+  part:["{S} chose {p} meal with some support from staff.","Staff supported {o} to choose {p} meal.","{S} made {p} choice of meal with some support from staff."],
+  full:["Staff made the choice of meal on {p} behalf.","The meal was chosen by staff on {p} behalf.","Staff chose the meal for {o}."],
+  declined:["{S} did not want to choose a meal at this point.","{S} declined to choose a meal.","{S} chose not to pick a meal this time."]},
 
  {id:"prep",label:"Preparing the meal",nf:"Daily note",verb:"prepared the meal",noun:"preparing the meal",
-  ind:["{S} prepared the meal {r}.","{S} made the meal independently."],
-  prompt:["{S} prepared the meal with prompts from staff.","{S} made the meal following prompts from staff."],
-  part:["{S} prepared part of the meal and staff supported with the rest.","{S} prepared the meal with some hands-on help from staff."],
-  full:["Staff prepared the meal.","The meal was prepared by staff."],
-  declined:["{S} did not want to help prepare the meal today.","{S} declined to take part in preparing the meal."]},
+  ind:["{S} prepared the meal {r}.","{S} made the meal independently.","{S} prepared the meal without support."],
+  prompt:["{S} prepared the meal with prompts from staff.","{S} made the meal following prompts from staff.","With prompting from staff, {s} prepared the meal."],
+  part:["{S} prepared part of the meal and staff supported with the rest.","{S} prepared the meal with some hands-on help from staff.","Staff gave some hands-on help while {s} prepared the meal."],
+  full:["Staff prepared the meal.","The meal was prepared by staff.","Staff made the meal."],
+  declined:["{S} did not want to help prepare the meal today.","{S} declined to take part in preparing the meal.","{S} chose not to help prepare the meal this time."]},
 
  {id:"eat",label:"Eating",nf:"Amount Eaten (%)",verb:"ate {p} meal",noun:"eating",
-  ind:["{S} ate independently.","{S} ate the meal without any support."],
-  prompt:["{S} ate {r} with prompting from staff.","{S} ate {r}, with prompts from staff to keep going."],
-  part:["{S} ate with some hands-on help from staff.","{S} ate {r} for part of the meal, and staff supported {o} for the rest."],
-  full:["Staff supported {o} to eat.","Staff gave {o} full support to eat."],
-  declined:["{S} declined the meal.","{S} did not want to eat at this time."]},
+  ind:["{S} ate independently.","{S} ate the meal without any support.","{S} managed the meal independently."],
+  prompt:["{S} ate {r} with prompting from staff.","{S} ate {r}, with prompts from staff to keep going.","With prompting from staff, {s} ate {r}."],
+  part:["{S} ate with some hands-on help from staff.","{S} ate {r} for part of the meal, and staff supported {o} for the rest.","Staff gave some hands-on help while {s} ate."],
+  full:["Staff supported {o} to eat.","Staff gave {o} full support to eat.","{S} {vbe} fully supported by staff to eat."],
+  declined:["{S} declined the meal.","{S} did not want to eat at this time.","{S} chose not to have the meal."]},
 
  {id:"drink",label:"Drinking",nf:"Daily Fluid Intake",verb:"had {p} drink",noun:"drinking",
-  ind:["{S} had {p} drink without support.","{S} drank independently."],
-  prompt:["{S} drank after a prompt from staff.","Following a prompt, {s} had {p} drink."],
-  part:["{S} drank with some hands-on help from staff.","Staff supported {o} with part of {p} drink."],
-  full:["Staff supported {o} to drink.","Staff gave {o} full support with {p} drink."],
-  declined:["{S} declined a drink at this point.","{S} did not want a drink."]}
+  ind:["{S} had {p} drink without support.","{S} drank independently.","{S} managed {p} drink independently."],
+  prompt:["{S} drank after a prompt from staff.","Following a prompt, {s} had {p} drink.","Once prompted by staff, {s} drank."],
+  part:["{S} drank with some hands-on help from staff.","Staff supported {o} with part of {p} drink.","Staff gave some hands-on help while {s} drank."],
+  full:["Staff supported {o} to drink.","Staff gave {o} full support with {p} drink.","{S} {vbe} fully supported by staff to drink."],
+  declined:["{S} declined a drink at this point.","{S} did not want a drink.","{S} chose not to have a drink at this point."]}
 ],
 
 medication:[
  {id:"medtake",label:"Taking the medication",nf:"Support to take medication",
   opts:["{p} tablets","{p} liquid medicine","{p} inhaler","{p} eye drops","{p} prescribed cream"],verb:"took {opt}",
-  ind:["{S} took {opt} {r}, with no hands-on help.","{S} managed {opt} without support."],
-  prompt:["{S} took {opt} after a prompt from staff.","With prompting, {s} took {opt} {r}."],
-  part:["{S} took {opt} with some hands-on help from staff.","Staff handed {o} {opt} and {s} took them {r}."],
-  full:["Staff administered {opt}.","Staff gave {o} {opt}."],
-  declined:["{S} declined {opt}.","{S} did not want {opt} on this occasion."]},
+  ind:["{S} took {opt} {r}, with no hands-on help.","{S} managed {opt} without support.","{S} took {opt} independently, without hands-on help."],
+  prompt:["{S} took {opt} after a prompt from staff.","With prompting, {s} took {opt} {r}.","Once prompted by staff, {s} took {opt}."],
+  part:["{S} took {opt} with some hands-on help from staff.","Staff handed {o} {opt} and {s} took them {r}.","Staff gave some hands-on help while {s} took {opt}."],
+  full:["Staff administered {opt}.","Staff gave {o} {opt}.","{S} {vbe} given {opt} by staff."],
+  declined:["{S} declined {opt}.","{S} did not want {opt} on this occasion.","{S} chose not to have {opt}."]},
  {id:"medwater",label:"Having a drink with it",nf:"Daily note",verb:"had a drink with it",noun:"a drink with it",
-  ind:["{S} had a drink with it {r}.","{S} got {r} a drink to take it with."],
-  prompt:["{S} had a drink with it after a prompt.","Following a prompt, {s} had a drink with it."],
-  part:["{S} had a drink with it, with some help from staff.","Staff helped {o} with a drink to take it with."],
-  full:["Staff gave {o} a drink to take it with.","Staff held the drink for {o} to take it with."],
-  declined:["{S} did not want a drink with it.","{S} declined a drink with it."]}
+  ind:["{S} had a drink with it {r}.","{S} got {r} a drink to take it with.","{S} took a drink with it without help."],
+  prompt:["{S} had a drink with it after a prompt.","Following a prompt, {s} had a drink with it.","Staff prompted {o}, and {s} then had a drink with it."],
+  part:["{S} had a drink with it, with some help from staff.","Staff helped {o} with a drink to take it with.","With some help from staff, {s} had a drink to take it with."],
+  full:["Staff gave {o} a drink to take it with.","Staff held the drink for {o} to take it with.","{S} {vbe} given a drink by staff to take it with."],
+  declined:["{S} did not want a drink with it.","{S} declined a drink with it.","{S} chose not to have a drink with it."]}
 ],
 
 abc:[], incident:[],
 
 activity:[
  {id:"plan",label:"Planning &amp; preparing",nf:"Daily note",phase:"start",verb:"got ready",noun:"getting ready",
-  ind:["{S} got ready for {act} without any help.","{S} prepared for {act} independently."],
-  prompt:["{S} got ready for {act} with prompts from staff.","With prompting, {s} got ready for {act}."],
-  part:["{S} got ready for {act} with some hands-on help from staff.","Staff supported {o} to get ready for {act}."],
-  full:["Staff got everything ready for {act}.","Staff prepared for {act} on {p} behalf."],
-  declined:["{S} declined {act} at the planning stage.","{S} did not want to go ahead with {act} and this was respected."]},
+  ind:["{S} got ready for {act} without any help.","{S} prepared for {act} independently.","{S} did all the preparation for {act} {r}."],
+  prompt:["{S} got ready for {act} with prompts from staff.","With prompting, {s} got ready for {act}.","{S} prepared for {act}, with staff giving prompts."],
+  part:["{S} got ready for {act} with some hands-on help from staff.","Staff supported {o} to get ready for {act}.","Staff gave {o} some hands-on help to get ready for {act}."],
+  full:["Staff got everything ready for {act}.","Staff prepared for {act} on {p} behalf.","Staff did the preparation for {act}."],
+  declined:["{S} declined {act} at the planning stage.","{S} did not want to go ahead with {act} and this was respected.","When {act} was being planned, {s} chose not to go ahead with it."]},
 
  {id:"travel",label:"Travelling there",nf:"Daily note",phase:"start",
   opts:["by cab","by bus","by train","on foot","in the staff vehicle","by minibus"],
   verb:"travelled {opt}",
-  ind:["{S} travelled {opt} independently.","{S} made {p} own way there {opt} without support."],
-  prompt:["{S} travelled {opt} with prompting from staff.","Staff travelled {opt} with {o} and gave prompts where needed."],
-  part:["{S} travelled {opt} with some support from staff.","Staff supported {o} for part of the journey {opt}."],
-  full:["Staff supported {o} throughout the journey {opt}.","{S} travelled {opt} with full support from staff."],
-  declined:["{S} declined to travel {opt} today.","{S} chose not to travel {opt}, and this was respected."]},
+  ind:["{S} travelled {opt} independently.","{S} made {p} own way there {opt} without support.","{S} made the journey {opt} without help."],
+  prompt:["{S} travelled {opt} with prompting from staff.","Staff travelled {opt} with {o} and gave prompts where needed.","{S} made the journey {opt}, with staff prompting where needed."],
+  part:["{S} travelled {opt} with some support from staff.","Staff supported {o} for part of the journey {opt}.","Staff gave {o} some support on the journey {opt}."],
+  full:["Staff supported {o} throughout the journey {opt}.","{S} travelled {opt} with full support from staff.","{S} {vbe} fully supported by staff on the journey {opt}."],
+  declined:["{S} declined to travel {opt} today.","{S} chose not to travel {opt}, and this was respected.","{S} did not want to travel {opt}."]},
 
  {id:"engage",label:"Taking part",nf:"Daily note",verb:"{did}",
   ind:["{S} {did} without any support.","{S} {did} on {p} own.","{S} {did} independently."],
   prompt:["{S} {did} with prompts from staff.","{S} {did} following prompts from staff.","With prompting, {s} {did}."],
-  part:["{S} {did} with some support from staff.","{S} did part of {act} {r} and staff supported with the rest."],
-  full:["Staff supported {o} throughout {act}.","{S} {vbe} fully supported by staff during {act}."],
-  declined:["{S} chose not to take part in {act}.","{S} declined {act}."]},
+  part:["{S} {did} with some support from staff.","{S} did part of {act} {r} and staff supported with the rest.","With some support from staff, {s} {did}."],
+  full:["Staff supported {o} throughout {act}.","{S} {vbe} fully supported by staff during {act}.","Staff gave {o} full support for the whole of {act}."],
+  declined:["{S} chose not to take part in {act}.","{S} declined {act}.","{S} did not want to take part in {act}."]},
 
  {id:"tools",label:"Using equipment",nf:"Daily note",verb:"used the equipment",noun:"using the equipment",
-  ind:["{S} used the equipment without supervision.","{S} set up and used the equipment {r}."],
-  prompt:["{S} used the equipment after prompts from staff.","Following prompts from staff, {s} used the equipment."],
-  part:["{S} used the equipment with some support from staff.","{S} used the equipment, with staff supporting part of the task."],
-  full:["Staff operated the equipment.","The equipment was operated by staff."],
-  declined:["{S} did not want to use the equipment today.","{S} declined to use the equipment."]},
+  ind:["{S} used the equipment without supervision.","{S} set up and used the equipment {r}.","{S} used the equipment independently."],
+  prompt:["{S} used the equipment after prompts from staff.","Following prompts from staff, {s} used the equipment.","Staff prompted {o}, and {s} then used the equipment."],
+  part:["{S} used the equipment with some support from staff.","{S} used the equipment, with staff supporting part of the task.","Staff gave {o} some support as {s} used the equipment."],
+  full:["Staff operated the equipment.","The equipment was operated by staff.","Staff used the equipment on {p} behalf."],
+  declined:["{S} did not want to use the equipment today.","{S} declined to use the equipment.","{S} chose not to use the equipment."]},
 
  {id:"money",label:"Money &amp; paying",nf:"Daily note",verb:"paid",noun:"paying",
-  ind:["{S} paid {r}.","{S} handled {p} own money and paid independently."],
-  prompt:["{S} paid after a prompt from staff.","Following a prompt, {s} paid {r}."],
-  part:["{S} paid with some support from staff.","Staff supported {o} with part of paying."],
-  full:["Staff handled the payment.","Payment was made by staff."],
-  declined:["{S} did not want to handle money today.","{S} declined to pay."]},
+  ind:["{S} paid {r}.","{S} handled {p} own money and paid independently.","{S} paid without any help."],
+  prompt:["{S} paid after a prompt from staff.","Following a prompt, {s} paid {r}.","Staff prompted {o}, and {s} then paid."],
+  part:["{S} paid with some support from staff.","Staff supported {o} with part of paying.","{S} paid, with staff supporting part of it."],
+  full:["Staff handled the payment.","Payment was made by staff.","Staff paid on {p} behalf."],
+  declined:["{S} did not want to handle money today.","{S} declined to pay.","{S} chose not to pay."]},
 
  {id:"tidy",label:"Clearing up afterwards",nf:"Daily note",phase:"end",verb:"cleared up afterwards",noun:"clearing up",
-  ind:["{S} cleared up afterwards without support.","{S} tidied away independently."],
-  prompt:["{S} cleared up after a prompt from staff.","Following a prompt, {s} tidied away {r}."],
-  part:["{S} cleared up with some help from staff.","Staff and {N} cleared up together afterwards."],
-  full:["Staff cleared up afterwards.","Clearing up was done by staff."],
-  declined:["{S} did not want to clear up today.","{S} declined to help tidy away."]},
+  ind:["{S} cleared up afterwards without support.","{S} tidied away independently.","{S} did the clearing up {r} afterwards."],
+  prompt:["{S} cleared up after a prompt from staff.","Following a prompt, {s} tidied away {r}.","Staff prompted {o}, and {s} then cleared up."],
+  part:["{S} cleared up with some help from staff.","Staff and {N} cleared up together afterwards.","With some help from staff, {s} cleared up afterwards."],
+  full:["Staff cleared up afterwards.","Clearing up was done by staff.","Staff did the clearing up afterwards."],
+  declined:["{S} did not want to clear up today.","{S} declined to help tidy away.","{S} chose not to clear up."]},
 
  {id:"finish",label:"Finishing &amp; coming home",nf:"Daily note",phase:"end",
-  ind:["{S} decided when to finish.","{S} chose when to stop."],
-  prompt:["{S} finished after a prompt from staff.","Following a prompt, {s} finished."],
-  min:["{S} finished with minimal support from staff.","Minimal support from staff was needed to finish."],
-  part:["{S} finished {act} with some support from staff.","Staff supported {o} to finish {act}."],
-  full:["Staff brought {act} to a close.","Staff ended {act}."],
-  declined:["{S} did not want to finish {act}.","{S} wanted to carry on with {act}."]}
+  ind:["{S} decided when to finish.","{S} chose when to stop.","{S} made {p} own decision about when to finish."],
+  prompt:["{S} finished after a prompt from staff.","Following a prompt, {s} finished.","Staff prompted {o}, and {s} then finished."],
+  min:["{S} finished with minimal support from staff.","Minimal support from staff was needed to finish.","Staff gave {o} minimal support to finish."],
+  part:["{S} finished {act} with some support from staff.","Staff supported {o} to finish {act}.","With some support from staff, {s} finished {act}."],
+  full:["Staff brought {act} to a close.","Staff ended {act}.","Staff drew {act} to a close."],
+  declined:["{S} did not want to finish {act}.","{S} wanted to carry on with {act}.","{S} did not want {act} to end."]}
 ]};
 
 /* minimal hands-on help, said the same way for every task that has a verb */
-const MIN_FROM_VERB = ["{S} {verb} with minimal hands-on help from staff.","{S} {verb}, needing only a little hands-on help."];
+const MIN_FROM_VERB = ["{S} {verb} with minimal hands-on help from staff.","{S} {verb}, needing only a little hands-on help.","Staff gave a little hands-on help as {s} {verb}."];
 Object.keys(TASKS).forEach(k => TASKS[k].forEach(t => {
   if(!t.min && t.verb) t.min = MIN_FROM_VERB.map(x => x.replace("{verb}", t.verb));
 }));
@@ -463,18 +463,18 @@ Object.keys(TASKS).forEach(k => TASKS[k].forEach(t => {
 const GROUPBANK = {
   ind:["{S} {list} without any support.","Without any help, {s} {list}.","{S} {list} independently."],
   prompt:["With prompting, {s} {list}.","{S} {list}, needing only prompts from staff.","{S} {list} with prompts from staff."],
-  min:["{S} {list} with minimal hands-on help.","With a little hands-on help from staff, {s} {list}."],
-  full:["Staff gave {o} full support with {nouns}.","{S} {vbe} fully supported by staff with {nouns}."],
-  declined:["{S} declined {nouns}.","{S} chose not to have support with {nouns}."]
+  min:["{S} {list} with minimal hands-on help.","With a little hands-on help from staff, {s} {list}.","{S} {list}, needing only a little hands-on help."],
+  full:["Staff gave {o} full support with {nouns}.","{S} {vbe} fully supported by staff with {nouns}.","{S} received full support from staff with {nouns}."],
+  declined:["{S} declined {nouns}.","{S} chose not to have support with {nouns}.","{S} said no to {nouns}."]
 };
 
 /* the overall level, said only when no task row carries a level */
 const LEVELBANK = {
   ind:["{S} completed this independently.","No hands-on support was needed.","{S} managed the whole interaction {r}."],
-  prompt:["Support was limited to prompting; no hands-on help was needed.","{S} needed prompts only, with no hands-on support."],
-  min:["{S} needed minimal hands-on support.","Support was kept to minimal hands-on help."],
-  part:["{S} did what {s} could {r} and staff supported with the rest.","Support was shared: {s} did part {r} and staff supported with the rest."],
-  full:["Staff provided full hands-on support.","Full hands-on support was given by staff."]
+  prompt:["Support was limited to prompting; no hands-on help was needed.","{S} needed prompts only, with no hands-on support.","{S} managed with prompts alone and needed no hands-on help."],
+  min:["{S} needed minimal hands-on support.","Support was kept to minimal hands-on help.","Only minimal hands-on support was needed."],
+  part:["{S} did what {s} could {r} and staff supported with the rest.","Support was shared: {s} did part {r} and staff supported with the rest.","{S} managed part of it {r}, and staff supported with the rest."],
+  full:["Staff provided full hands-on support.","Full hands-on support was given by staff.","Support was fully hands-on and provided by staff."]
 };
 
 /* ---------- opening & communication banks ---------- */
@@ -531,25 +531,25 @@ const LEARN = [
 ];
 const LEARNBANK = {
   skill:["{S} practised the skill {s} {vhave} been working on.",
-         "{S} worked on a skill {s} {vhave} been building."],
+         "{S} worked on a skill {s} {vhave} been building.","{S} spent time on a skill {s} {vhave} been practising."],
   instructions:["{S} followed the tutor's instructions.",
-                "{S} listened to the tutor and followed the instructions given."],
+                "{S} listened to the tutor and followed the instructions given.","{S} did as the tutor instructed."],
   alongside:["{S} worked alongside others.",
-             "{S} shared the space and the work with others."],
+             "{S} shared the space and the work with others.","{S} worked side by side with others."],
   conversation:["{S} talked with others during the session.",
-                "{S} joined in conversation with others."],
+                "{S} joined in conversation with others.","{S} took part in conversation with others."],
   turn:["{S} waited {p} turn and shared with others.",
-        "{S} took turns with the others."],
+        "{S} took turns with the others.","{S} shared and took turns with others."],
   askedhelp:["{S} asked for help when {s} needed it.",
-             "{S} let staff know when {s} needed help."],
+             "{S} let staff know when {s} needed help.","When {s} needed help, {s} asked for it."],
   safe:["{S} used tools and equipment safely.",
-        "{S} handled the equipment safely."],
+        "{S} handled the equipment safely.","{S} handled tools and equipment in a safe way."],
   finished:["{S} finished a piece of work.",
-            "{S} completed a piece of work."],
+            "{S} completed a piece of work.","{S} saw a piece of work through to the end."],
   pride:["{S} showed pride in what {s} had done.",
-         "{S} {vbe} visibly pleased with {p} work."],
+         "{S} {vbe} visibly pleased with {p} work.","{S} took pride in what {s} had done."],
   change:["{S} managed a change of plan.",
-          "{S} coped with a change to the usual plan."]
+          "{S} coped with a change to the usual plan.","{S} adapted to a change of plan."]
 };
 /* safeguarding on the journey belongs with the journey, not after the class */
 const TRAVEL_RISK = ["seatbelt","doortodoor","stop","fare","crossing","road"];
@@ -572,7 +572,7 @@ const OPEN_COLLEGE = [
 /* a college session they did not go to must not open with "attended" */
 const OPEN_COLLEGE_DECLINED = [
   "{N} was due to attend {act} at college at {time}{ratio}.",
-  "At {time}, {N} was due at college for {act}{ratio}."
+  "At {time}, {N} was due at college for {act}{ratio}.","{N} was timetabled for {act} at college at {time}{ratio}."
 ];
 const OPEN_ACT = {
  choice:[
@@ -627,7 +627,7 @@ incident:[
 /* what was offered, when it is not already named by the opener */
 const OFFERBANK = {
  two:["{S} {vbe} offered a choice of {offerA} or {offerB}.","Staff offered {o} a choice of {offerA} or {offerB}.","The options offered were {offerA} or {offerB}."],
- one:["{S} {vbe} offered {offerA}.","Staff offered {o} {offerA}."]
+ one:["{S} {vbe} offered {offerA}.","Staff offered {o} {offerA}.","Staff gave {o} the option of {offerA}."]
 };
 
 /* a college session with both times recorded - the times as entered, and
@@ -640,45 +640,45 @@ const SESSIONBANK = [
 
 /* food and drink, built only from what was entered */
 const INTAKEBANK = {
- ateWhat:["{P} meal was {whatAte}; {s} ate {ate} of it.","{S} had {whatAte} and ate {ate} of it."],
- ate:["{S} ate {ate} of {p} meal.","{S} ate {ate} of what was served."],
- what:["{S} had {whatAte}.","{P} meal was {whatAte}."],
- offeredDrunk:["{S} {vbe} offered {offered}ml{ofDrink} and drank {drunk}ml.","{S} drank {drunk}ml of the {offered}ml{ofDrink} offered."],
- drunk:["{S} drank {drunk}ml{ofDrink}.","{S} had {drunk}ml{ofDrink} to drink."],
- drink:["{S} chose {drink} to drink.","{S} picked {drink} as {p} drink."]
+ ateWhat:["{P} meal was {whatAte}; {s} ate {ate} of it.","{S} had {whatAte} and ate {ate} of it.","{S} ate {ate} of {p} meal, which was {whatAte}."],
+ ate:["{S} ate {ate} of {p} meal.","{S} ate {ate} of what was served.","Of {p} meal, {s} ate {ate}."],
+ what:["{S} had {whatAte}.","{P} meal was {whatAte}.","The meal {s} had was {whatAte}."],
+ offeredDrunk:["{S} {vbe} offered {offered}ml{ofDrink} and drank {drunk}ml.","{S} drank {drunk}ml of the {offered}ml{ofDrink} offered.","Staff offered {o} {offered}ml{ofDrink}; {s} drank {drunk}ml."],
+ drunk:["{S} drank {drunk}ml{ofDrink}.","{S} had {drunk}ml{ofDrink} to drink.","The amount {s} drank was {drunk}ml{ofDrink}."],
+ drink:["{S} chose {drink} to drink.","{S} picked {drink} as {p} drink.","{S} decided on {drink} to drink."]
 };
 const COMMBANK = {
  verbal:["Staff used short, clear sentences.","Staff spoke in short, simple sentences.","Staff kept the language short and clear."],
  makaton:["Staff used Makaton signing.","Makaton signs were used by staff.","Staff signed in Makaton."],
  pictures:["Staff used {p} picture-based communication book.","Pictures were used to communicate with {o}.","Staff showed {o} pictures from {p} communication book."],
  nownext:["Staff used a Now and Next board.","A Now and Next board was used with {o}.","Staff set out what was happening on a Now and Next board."],
- objects:["Staff used objects of reference.","Objects of reference were used with {o}."],
- gesture:["Staff watched {p} body language and responded to the cues {s} gave.","Staff read {p} gestures and expressions."]
+ objects:["Staff used objects of reference.","Objects of reference were used with {o}.","Staff communicated with {o} using objects of reference."],
+ gesture:["Staff watched {p} body language and responded to the cues {s} gave.","Staff read {p} gestures and expressions.","Staff picked up on {p} body language and responded to it."]
 };
 const RESPBANK = {
- happy:["{S} {vbe} happy to take it.","{S} took it willingly."],
- hesitant:["{S} {vbe} hesitant at first. {declined} {S} then agreed to take it.","{S} hesitated to begin with. {declined} {S} then took it."],
+ happy:["{S} {vbe} happy to take it.","{S} took it willingly.","{S} {vbe} willing to take it."],
+ hesitant:["{S} {vbe} hesitant at first. {declined} {S} then agreed to take it.","{S} hesitated to begin with. {declined} {S} then took it.","{S} held back at first. {declined} {S} then agreed to take it."],
  choseA:["{S} chose {chosen}.","{S} indicated {chosen}.","{S} picked {chosen}."],
  choseB:["{S} chose {chosen}.","{S} went for {chosen}.","{S} selected {chosen}."],
  agreed:["{S} agreed to what was offered.","{S} agreed to go ahead.","{S} accepted the offer."],
  nonverbal:["{S} gave a clear non-verbal response.","{S} made {p} preference clear without words.","{S} showed {p} choice non-verbally."],
- delayed:["{S} declined at first. {declined} {S} then agreed.","{S} said no to begin with. {declined} {S} then agreed."],
- declined:["{S} declined. {declined}","{S} did not want to go ahead. {declined}"],
- keen:["{S} {vbe} ready and keen to go.","{S} {vbe} keen to go and ready to leave."],
- agreedgo:["{S} agreed readily to go.","{S} readily agreed to attend."],
- encouraged:["{S} needed some encouragement before agreeing to go.","{S} agreed to go after some encouragement from staff."],
- reluctant:["{S} {vbe} reluctant at first. {declined} {S} then agreed to attend.","{S} did not want to go to begin with. {declined} {S} then agreed to go."],
- declinedgo:["{S} declined to attend today. {declined}","{S} chose not to go to college today. {declined}"],
- noresp:["{S} did not give a clear response.","No clear response was given."]
+ delayed:["{S} declined at first. {declined} {S} then agreed.","{S} said no to begin with. {declined} {S} then agreed.","{S} did not agree at first. {declined} {S} then agreed."],
+ declined:["{S} declined. {declined}","{S} did not want to go ahead. {declined}","{S} said no. {declined}"],
+ keen:["{S} {vbe} ready and keen to go.","{S} {vbe} keen to go and ready to leave.","{S} {vbe} eager and ready to go."],
+ agreedgo:["{S} agreed readily to go.","{S} readily agreed to attend.","{S} {vbe} quick to agree to go."],
+ encouraged:["{S} needed some encouragement before agreeing to go.","{S} agreed to go after some encouragement from staff.","With some encouragement from staff, {s} agreed to go."],
+ reluctant:["{S} {vbe} reluctant at first. {declined} {S} then agreed to attend.","{S} did not want to go to begin with. {declined} {S} then agreed to go.","{S} {vbe} unwilling to go at first. {declined} {S} then agreed to attend."],
+ declinedgo:["{S} declined to attend today. {declined}","{S} chose not to go to college today. {declined}","{S} did not want to attend today. {declined}"],
+ noresp:["{S} did not give a clear response.","No clear response was given.","{S} gave no clear response."]
 };
 const HOWBANK = {
- said:["{S} told staff what {s} wanted.","{S} said so in {p} own words."],
- pointed:["{S} pointed to {p} choice.","{S} made {p} choice by pointing."],
- signed:["{S} signed {p} choice.","{S} signed to show what {s} wanted."],
- nodded:["{S} nodded to show {p} choice.","{S} nodded to let staff know."],
- led:["{S} led staff to what {s} wanted.","{S} took staff to {p} choice."],
- reached:["{S} reached for the option {s} wanted.","{S} reached out towards {p} choice."],
- facial:["{P} facial expression made {p} preference clear.","{S} showed {p} preference through {p} facial expression."]
+ said:["{S} told staff what {s} wanted.","{S} said so in {p} own words.","{S} said what {s} wanted."],
+ pointed:["{S} pointed to {p} choice.","{S} made {p} choice by pointing.","{S} showed {p} choice by pointing to it."],
+ signed:["{S} signed {p} choice.","{S} signed to show what {s} wanted.","{S} used signing to show {p} choice."],
+ nodded:["{S} nodded to show {p} choice.","{S} nodded to let staff know.","{S} gave a nod to show {p} choice."],
+ led:["{S} led staff to what {s} wanted.","{S} took staff to {p} choice.","{S} guided staff to {p} choice."],
+ reached:["{S} reached for the option {s} wanted.","{S} reached out towards {p} choice.","{S} reached for {p} choice."],
+ facial:["{P} facial expression made {p} preference clear.","{S} showed {p} preference through {p} facial expression.","{P} preference was clear from {p} facial expression."]
 };
 /* College is not offered on the day; what matters is that staff told the
    person it was college today, how they told them, and how the person showed
@@ -694,13 +694,13 @@ const TELLBANK = [
  "{tellWhen}, staff explained to {N} that it was college today, for {act}{tellHow}."
 ];
 const HOWBANK_COLLEGE = {
- said:["{S} told staff {s} {vbe} happy to go.","{S} said {s} wanted to go."],
- pointed:["{S} pointed to show {s} understood and would go.","{S} pointed to show {s} would go."],
- signed:["{S} signed to show {s} would go.","{S} signed that {s} {vbe} happy to go."],
- nodded:["{S} nodded to show {s} would go.","{S} nodded when told."],
- led:["{S} led staff to the door, ready to go.","{S} took staff to the door to show {s} {vbe} ready."],
- reached:["{S} reached for {p} things, ready to go.","{S} got {p} things together, ready to go."],
- facial:["{P} expression showed {s} {vbe} happy to go.","{S} showed with {p} expression that {s} {vbe} happy to go."]
+ said:["{S} told staff {s} {vbe} happy to go.","{S} said {s} wanted to go.","{S} said {s} would like to go."],
+ pointed:["{S} pointed to show {s} understood and would go.","{S} pointed to show {s} would go.","{S} pointed to let staff know {s} would go."],
+ signed:["{S} signed to show {s} would go.","{S} signed that {s} {vbe} happy to go.","{S} used signs to let staff know {s} would go."],
+ nodded:["{S} nodded to show {s} would go.","{S} nodded when told.","{S} gave a nod when told."],
+ led:["{S} led staff to the door, ready to go.","{S} took staff to the door to show {s} {vbe} ready.","{S} showed {s} {vbe} ready by leading staff to the door."],
+ reached:["{S} reached for {p} things, ready to go.","{S} got {p} things together, ready to go.","{S} gathered {p} things, ready to go."],
+ facial:["{P} expression showed {s} {vbe} happy to go.","{S} showed with {p} expression that {s} {vbe} happy to go.","{S} {vbe} happy to go, as {p} expression showed."]
 };
 const HOW_JOIN_COLLEGE = {
  said:"telling staff so", pointed:"pointing to show it", signed:"signing to show it", nodded:"nodding to show it",
@@ -715,8 +715,8 @@ const HOW_JOIN = {
 };
 const CONSENTBANK = {
  yes:["Consent was obtained before any support began.","{S} gave consent before support started.","Consent was checked and given before staff began."],
- implied:["Consent was implied through {p} cooperation.","{S} cooperated, and consent was implied by {p} response."],
- no:["Consent was not given.","{S} did not give consent."]
+ implied:["Consent was implied through {p} cooperation.","{S} cooperated, and consent was implied by {p} response.","Through {p} cooperation, {s} gave implied consent."],
+ no:["Consent was not given.","{S} did not give consent.","No consent was given."]
 };
 /* what was done about a new mark belongs to the follow-up the staff member
    ticks - body map, handover - never to this sentence */
@@ -730,22 +730,22 @@ const SKINBANK = {
 };
 
 const MOODBANK = {
- settled:["{S} remained settled throughout.","{S} {vbe} calm and settled."],
- cheerful:["{S} {vbe} cheerful.","{S} seemed in good spirits."],
- quiet:["{S} {vbe} quiet.","{S} {vbe} quiet during the interaction."],
- chatty:["{S} chatted with staff.","{S} {vbe} talkative."],
- tired:["{S} appeared tired.","{S} seemed tired."],
- anxious:["{S} appeared anxious.","{S} showed signs of anxiety."],
- unsettled:["{S} {vbe} unsettled at points.","{S} appeared unsettled."]
+ settled:["{S} remained settled throughout.","{S} {vbe} calm and settled.","{S} stayed settled."],
+ cheerful:["{S} {vbe} cheerful.","{S} seemed in good spirits.","{S} {vbe} in a cheerful mood."],
+ quiet:["{S} {vbe} quiet.","{S} {vbe} quiet during the interaction.","{S} came across as quiet."],
+ chatty:["{S} chatted with staff.","{S} {vbe} talkative.","{S} {vbe} chatty with staff."],
+ tired:["{S} appeared tired.","{S} seemed tired.","{S} looked tired."],
+ anxious:["{S} appeared anxious.","{S} showed signs of anxiety.","{S} looked anxious."],
+ unsettled:["{S} {vbe} unsettled at points.","{S} appeared unsettled.","{S} seemed unsettled at times."]
 };
 const WELLBANK = {
  nochange:["No change from {p} usual presentation, appetite or energy was observed.",
            "Nothing was different from {p} usual self.",
            "{S} presented as usual with no change in appetite, energy or mood."],
- appetite:["{P} appetite was different from usual today.","A change in {p} usual appetite was noticed today."],
- pain:["{S} showed signs of discomfort during the interaction.","Signs of discomfort were observed during the interaction."],
- cough:["{S} coughed during the interaction.","Coughing was observed during the interaction."],
- sleep:["{S} had slept poorly.","{S} slept poorly."]
+ appetite:["{P} appetite was different from usual today.","A change in {p} usual appetite was noticed today.","{P} appetite today was not the same as usual."],
+ pain:["{S} showed signs of discomfort during the interaction.","Signs of discomfort were observed during the interaction.","Staff observed signs of discomfort during the interaction."],
+ cough:["{S} coughed during the interaction.","Coughing was observed during the interaction.","During the interaction, {s} coughed."],
+ sleep:["{S} had slept poorly.","{S} slept poorly.","{P} sleep had been poor."]
 };
 
 /* Context-aware observation sets. Each is shown only where it applies, and
@@ -753,25 +753,25 @@ const WELLBANK = {
 const DIGNITY = [["knocked","Knocked and waited before entering"],["door","Closed the door for privacy"],
                  ["covered","Kept them covered where possible"],["explained","Explained each step before doing it"]];
 const DIGNITYBANK = {
- knocked:["Staff knocked and waited before entering.","Staff knocked and waited for a response before going in."],
- door:["Staff closed the door to maintain {p} privacy.","The door was closed for {p} privacy."],
- covered:["Staff kept {o} covered where possible.","{S} {vbe} kept covered where possible."],
- explained:["Staff explained each step before doing it.","Each step was explained to {o} before it happened."]
+ knocked:["Staff knocked and waited before entering.","Staff knocked and waited for a response before going in.","Before going in, staff knocked and waited."],
+ door:["Staff closed the door to maintain {p} privacy.","The door was closed for {p} privacy.","Staff shut the door to protect {p} privacy."],
+ covered:["Staff kept {o} covered where possible.","{S} {vbe} kept covered where possible.","Where possible, staff kept {o} covered."],
+ explained:["Staff explained each step before doing it.","Each step was explained to {o} before it happened.","Staff talked {o} through each step before doing it."]
 };
 
 const CONT_OBS = [["urine","Passed urine"],["bowels","Bowels opened"],["dry","Dry when checked"],["episode","Incontinence episode"]];
 const CONTBANK = {
- urine:["{S} passed urine.","{S} passed urine during the support."],
- bowels:["{S} opened {p} bowels.","{P} bowels were opened."],
- dry:["{S} {vbe} dry when checked.","{S} {vbe} found to be dry."],
- episode:["{S} had an episode of incontinence.","An episode of incontinence occurred."]
+ urine:["{S} passed urine.","{S} passed urine during the support.","Urine was passed by {o}."],
+ bowels:["{S} opened {p} bowels.","{P} bowels were opened.","{S} had {p} bowels open."],
+ dry:["{S} {vbe} dry when checked.","{S} {vbe} found to be dry.","When checked, {s} {vbe} dry."],
+ episode:["{S} had an episode of incontinence.","An episode of incontinence occurred.","There was an episode of incontinence."]
 };
 
 const SLEEP_OBS = [["asleep","Asleep when checked"],["awakesettled","Awake and settled"],["awakeunsettled","Awake and unsettled"]];
 const SLEEPBANK = {
- asleep:["{S} {vbe} asleep when checked.","{S} {vbe} asleep at the check."],
- awakesettled:["{S} {vbe} awake and settled when checked.","{S} {vbe} awake but settled."],
- awakeunsettled:["{S} {vbe} awake and unsettled when checked.","{S} {vbe} awake and appeared unsettled."]
+ asleep:["{S} {vbe} asleep when checked.","{S} {vbe} asleep at the check.","When checked, {s} {vbe} asleep."],
+ awakesettled:["{S} {vbe} awake and settled when checked.","{S} {vbe} awake but settled.","At the check, {s} {vbe} awake and settled."],
+ awakeunsettled:["{S} {vbe} awake and unsettled when checked.","{S} {vbe} awake and appeared unsettled.","At the check, {s} {vbe} awake and unsettled."]
 };
 
 /* observable behaviour - what staff are asked for instead of "difficult" */
@@ -782,24 +782,24 @@ const BEHAVIOUR = [["raised","Raised voice"],["shouted","Shouted or swore"],["mo
                    ["repeated","Repeated a question or phrase"],["cried","Cried"],["smiled","Smiled or laughed"],
                    ["other","Other \u2014 describe"]];
 const BEHAVIOURBANK = {
- raised:["{S} raised {p} voice.","{S} spoke with a raised voice."],
- movedaway:["{S} moved away from staff.","{S} moved away from the staff member."],
- declinedact:["{S} declined the activity.","{S} said no to the activity."],
- pushed:["{S} pushed an item away.","{S} pushed an item away from {r}."],
- askedleave:["{S} asked to leave several times.","{S} repeatedly asked to leave."],
- smiled:["{S} smiled and laughed.","{S} {vbe} seen smiling and laughing."],
- shouted:["{S} shouted and swore.","{S} raised {p} voice and swore."],
- threw:["{S} threw an item.","{S} picked up an item and threw it."],
- hitout:["{S} hit out at someone.","{S} struck out at someone."],
- kicked:["{S} kicked or pushed someone.","{S} kicked out at someone."],
- grabbed:["{S} grabbed someone or something.","{S} took hold of someone or something."],
- selfinj:["{S} hit, bit or scratched {r}.","{S} hurt {r} by hitting, biting or scratching."],
- damaged:["{S} damaged property.","Property was damaged by {o}."],
- smeared:["{S} smeared faeces.","There was smearing of faeces by {o}."],
- leave:["{S} tried to leave the building.","{S} made for the door and tried to leave."],
- paced:["{S} paced up and down.","{S} walked up and down repeatedly."],
- repeated:["{S} repeated a question or phrase.","{S} asked the same thing again and again."],
- cried:["{S} cried.","{S} {vbe} crying."]
+ raised:["{S} raised {p} voice.","{S} spoke with a raised voice.","{S} used a raised voice."],
+ movedaway:["{S} moved away from staff.","{S} moved away from the staff member.","{S} put some distance between {r} and staff."],
+ declinedact:["{S} declined the activity.","{S} said no to the activity.","{S} declined to take part in the activity."],
+ pushed:["{S} pushed an item away.","{S} pushed an item away from {r}.","An item was pushed away by {o}."],
+ askedleave:["{S} asked to leave several times.","{S} repeatedly asked to leave.","{S} asked to leave on several occasions."],
+ smiled:["{S} smiled and laughed.","{S} {vbe} seen smiling and laughing.","{S} {vbe} smiling and laughing."],
+ shouted:["{S} shouted and swore.","{S} raised {p} voice and swore.","{S} shouted and used swear words."],
+ threw:["{S} threw an item.","{S} picked up an item and threw it.","An item was thrown by {o}."],
+ hitout:["{S} hit out at someone.","{S} struck out at someone.","{S} hit out at another person."],
+ kicked:["{S} kicked or pushed someone.","{S} kicked out at someone.","{S} kicked out at another person."],
+ grabbed:["{S} grabbed someone or something.","{S} took hold of someone or something.","{S} grabbed hold of someone or something."],
+ selfinj:["{S} hit, bit or scratched {r}.","{S} hurt {r} by hitting, biting or scratching.","By hitting, biting or scratching, {s} hurt {r}."],
+ damaged:["{S} damaged property.","Property was damaged by {o}.","{S} caused damage to property."],
+ smeared:["{S} smeared faeces.","There was smearing of faeces by {o}.","Faeces were smeared by {o}."],
+ leave:["{S} tried to leave the building.","{S} made for the door and tried to leave.","{S} attempted to leave the building."],
+ paced:["{S} paced up and down.","{S} walked up and down repeatedly.","{S} {vbe} pacing up and down."],
+ repeated:["{S} repeated a question or phrase.","{S} asked the same thing again and again.","{S} kept repeating a question or phrase."],
+ cried:["{S} cried.","{S} {vbe} crying.","{S} {vbe} in tears."]
 };
 
 /* what was done about it - each one appears only when it was actually done */
@@ -808,15 +808,15 @@ const FOLLOWUP = [["handover","Handed over to the next shift"],["senior","Senior
                   ["bodymap","Body map completed"],["mar","MAR chart signed"],["incident","Incident form completed"],
                   ["police","Police informed"],["safeguarding","Safeguarding concern raised in line with procedure"]];
 const FOLLOWBANK = {
- handover:["This was handed over to the next shift.","Staff handed this over to the next shift."],
- senior:["A senior colleague or manager was informed.","Staff informed a senior colleague or manager."],
- health:["A health professional was contacted.","Staff contacted a health professional."],
- family:["{P} family or representative was informed.","Staff informed {p} family or representative."],
- bodymap:["A body map was completed.","Staff completed a body map."],
- mar:["The MAR chart was signed.","Staff signed the MAR chart."],
- incident:["An incident form was completed.","Staff completed an incident form."],
- police:["The police were informed.","Staff informed the police."],
- safeguarding:["A safeguarding concern was raised in line with procedure.","Staff raised a safeguarding concern in line with procedure."]
+ handover:["This was handed over to the next shift.","Staff handed this over to the next shift.","This was included in the handover to the next shift."],
+ senior:["A senior colleague or manager was informed.","Staff informed a senior colleague or manager.","Staff told a senior colleague or manager."],
+ health:["A health professional was contacted.","Staff contacted a health professional.","Staff got in touch with a health professional."],
+ family:["{P} family or representative was informed.","Staff informed {p} family or representative.","Staff let {p} family or representative know."],
+ bodymap:["A body map was completed.","Staff completed a body map.","Staff filled in a body map."],
+ mar:["The MAR chart was signed.","Staff signed the MAR chart.","The MAR chart was signed by staff."],
+ incident:["An incident form was completed.","Staff completed an incident form.","Staff filled in an incident form."],
+ police:["The police were informed.","Staff informed the police.","Staff let the police know."],
+ safeguarding:["A safeguarding concern was raised in line with procedure.","Staff raised a safeguarding concern in line with procedure.","In line with procedure, staff raised a safeguarding concern."]
 };
 
 /* ---------- behaviour (ABC chart) and incidents ----------
@@ -839,16 +839,16 @@ const BEFORE = [["routine","A change to the usual routine"],["noise","Noise or a
                 ["transition","Moving from one activity to another"],["pain","Signs of pain or discomfort beforehand"],
                 ["unwell","Seemed unwell or tired beforehand"],["nothing","Nothing noticeable"]];
 const BEFOREBANK = {
- routine:["Just before, there had been a change to {p} usual routine.","Beforehand, {p} usual routine had changed."],
- noise:["Just before, the environment was noisy and busy.","It was noisy and busy beforehand."],
- asked:["Just before, {s} had been asked to do something.","Beforehand, staff had asked {o} to do something."],
- waiting:["Just before, {s} had been waiting for something.","Beforehand, {s} {vbe} waiting for something."],
- toldno:["Just before, {s} had been told no, or that {s} had to stop.","Beforehand, {s} had been told no, or asked to stop."],
- interaction:["Just before, there had been an interaction with another person.","Beforehand, {s} had been interacting with someone else."],
- transition:["Just before, {s} {vbe} moving from one activity to another.","It happened as {s} {vbe} changing from one activity to another."],
- pain:["Beforehand, {s} had shown signs of pain or discomfort.","There were signs of pain or discomfort beforehand."],
- unwell:["Beforehand, {s} had seemed unwell or tired.","{S} had seemed unwell or tired beforehand."],
- nothing:["Nothing noticeable happened beforehand.","Staff noticed nothing unusual beforehand."]
+ routine:["Just before, there had been a change to {p} usual routine.","Beforehand, {p} usual routine had changed.","{P} usual routine had been changed just before this."],
+ noise:["Just before, the environment was noisy and busy.","It was noisy and busy beforehand.","The surroundings were noisy and busy just before."],
+ asked:["Just before, {s} had been asked to do something.","Beforehand, staff had asked {o} to do something.","{S} had been asked to do something just before."],
+ waiting:["Just before, {s} had been waiting for something.","Beforehand, {s} {vbe} waiting for something.","{S} had been waiting for something just before."],
+ toldno:["Just before, {s} had been told no, or that {s} had to stop.","Beforehand, {s} had been told no, or asked to stop.","{S} had been told no, or asked to stop, just before."],
+ interaction:["Just before, there had been an interaction with another person.","Beforehand, {s} had been interacting with someone else.","{S} had been interacting with another person just before."],
+ transition:["Just before, {s} {vbe} moving from one activity to another.","It happened as {s} {vbe} changing from one activity to another.","{S} {vbe} moving between activities just before."],
+ pain:["Beforehand, {s} had shown signs of pain or discomfort.","There were signs of pain or discomfort beforehand.","{S} had been showing signs of pain or discomfort beforehand."],
+ unwell:["Beforehand, {s} had seemed unwell or tired.","{S} had seemed unwell or tired beforehand.","Before this, {s} had seemed unwell or tired."],
+ nothing:["Nothing noticeable happened beforehand.","Staff noticed nothing unusual beforehand.","Nothing unusual was noticed beforehand."]
 };
 const STAFFDID = [["reassured","Reassured them verbally"],["space","Gave them space and time"],["distraction","Used distraction"],
                   ["redirected","Redirected them to something else"],["calming","Used a calming technique (breathing, music)"],
@@ -858,44 +858,44 @@ const STAFFDID = [["reassured","Reassured them verbally"],["space","Gave them sp
                   ["cleaned","Cleaned and disinfected the area"],["senior","Called a senior colleague for support"],
                   ["stayed","Stayed nearby and watched"],["plan","Followed their behaviour support plan"]];
 const STAFFBANK = {
- reassured:["Staff reassured {o} verbally.","Staff spoke to {o} calmly and reassured {o}."],
- space:["Staff gave {o} space and time.","Staff stepped back and gave {o} time."],
- distraction:["Staff used distraction.","Staff tried to distract {o}."],
- redirected:["Staff redirected {o} to something else.","Staff guided {o} towards something else."],
- calming:["Staff used a calming technique with {o}.","Staff used a calming technique, such as breathing or music."],
- quiet:["Staff supported {o} to a quieter space.","{S} {vbe} supported to move to a quieter space."],
- sensory:["Staff reduced the noise and light around {o}.","Noise and light were reduced."],
- alternative:["Staff offered {o} an alternative activity.","An alternative activity was offered."],
- comfort:["Staff offered physical comfort, which {s} accepted.","{S} accepted physical comfort from staff."],
- prn:["PRN medication was given as prescribed.","{P} PRN medication was given as prescribed."],
- safety:["Staff moved others and items away to keep everyone safe.","Staff kept everyone safe by moving others and items away."],
- wash:["Staff supported {o} to wash and change.","{S} {vbe} supported to wash and change."],
- cleaned:["Staff cleaned and disinfected the area.","The area was cleaned and disinfected by staff."],
- senior:["Staff called a senior colleague for support.","A senior colleague was called to support."],
- stayed:["Staff stayed nearby and kept watch.","Staff remained nearby, watching."],
- plan:["Staff followed {p} behaviour support plan.","{P} behaviour support plan was followed."]
+ reassured:["Staff reassured {o} verbally.","Staff spoke to {o} calmly and reassured {o}.","Staff reassured {o} by talking to {o}."],
+ space:["Staff gave {o} space and time.","Staff stepped back and gave {o} time.","Staff allowed {o} space and time."],
+ distraction:["Staff used distraction.","Staff tried to distract {o}.","Staff used distraction techniques with {o}."],
+ redirected:["Staff redirected {o} to something else.","Staff guided {o} towards something else.","Staff steered {o} on to something else."],
+ calming:["Staff used a calming technique with {o}.","Staff used a calming technique, such as breathing or music.","A calming technique was used with {o}."],
+ quiet:["Staff supported {o} to a quieter space.","{S} {vbe} supported to move to a quieter space.","Staff helped {o} move to a quieter space."],
+ sensory:["Staff reduced the noise and light around {o}.","Noise and light were reduced.","The noise and light around {o} were reduced by staff."],
+ alternative:["Staff offered {o} an alternative activity.","An alternative activity was offered.","{S} {vbe} offered a different activity."],
+ comfort:["Staff offered physical comfort, which {s} accepted.","{S} accepted physical comfort from staff.","{S} accepted the physical comfort staff offered."],
+ prn:["PRN medication was given as prescribed.","{P} PRN medication was given as prescribed.","{S} {vbe} given PRN medication as prescribed."],
+ safety:["Staff moved others and items away to keep everyone safe.","Staff kept everyone safe by moving others and items away.","To keep everyone safe, staff moved others and items away."],
+ wash:["Staff supported {o} to wash and change.","{S} {vbe} supported to wash and change.","Staff helped {o} to wash and change."],
+ cleaned:["Staff cleaned and disinfected the area.","The area was cleaned and disinfected by staff.","Staff cleaned the area and then disinfected it."],
+ senior:["Staff called a senior colleague for support.","A senior colleague was called to support.","Staff called on a senior colleague for support."],
+ stayed:["Staff stayed nearby and kept watch.","Staff remained nearby, watching.","Staff kept watch from nearby."],
+ plan:["Staff followed {p} behaviour support plan.","{P} behaviour support plan was followed.","Staff worked to {p} behaviour support plan."]
 };
 const AFTER = [["quick","Settled within a few minutes"],["gradual","Settled gradually"],["laterst","Settled later in the shift"],
                ["nochange","No change while staff were with them"],["worse","Became more distressed at first"],["unsettled","Remained unsettled"]];
 const AFTERBANK = {
- quick:["{S} settled within a few minutes.","Within a few minutes, {s} had settled."],
- gradual:["{S} settled gradually.","{S} gradually became calmer."],
- laterst:["{S} settled later in the shift.","{S} did not settle straight away but did later in the shift."],
- nochange:["There was no change while staff were with {o}.","{S} stayed the same while staff were with {o}."],
- worse:["{S} became more distressed at first.","At first {s} became more distressed."],
- unsettled:["{S} remained unsettled.","{S} stayed unsettled."]
+ quick:["{S} settled within a few minutes.","Within a few minutes, {s} had settled.","{S} {vbe} settled within a few minutes."],
+ gradual:["{S} settled gradually.","{S} gradually became calmer.","{S} settled bit by bit."],
+ laterst:["{S} settled later in the shift.","{S} did not settle straight away but did later in the shift.","Later in the shift, {s} settled."],
+ nochange:["There was no change while staff were with {o}.","{S} stayed the same while staff were with {o}.","While staff were with {o}, there was no change."],
+ worse:["{S} became more distressed at first.","At first {s} became more distressed.","Initially, {s} became more distressed."],
+ unsettled:["{S} remained unsettled.","{S} stayed unsettled.","{S} continued to be unsettled."]
 };
 const IMPACT = [["none","No one was hurt and nothing was damaged"],["risk","Someone was at risk but no one was hurt"],
                 ["hurt","Someone was hurt"],["damage","Property was damaged"]];
 const IMPACTBANK = {
- none:["No one was hurt and nothing was damaged.","Nobody was hurt and there was no damage."],
- risk:["Someone was at risk, but no one was hurt.","There was a risk to someone, but no one was hurt."],
- hurt:["Someone was hurt.","Someone was hurt during this."],
- damage:["Property was damaged.","There was damage to property."]
+ none:["No one was hurt and nothing was damaged.","Nobody was hurt and there was no damage.","There were no injuries and no damage."],
+ risk:["Someone was at risk, but no one was hurt.","There was a risk to someone, but no one was hurt.","No one was hurt, though someone was at risk."],
+ hurt:["Someone was hurt.","Someone was hurt during this.","A person was hurt."],
+ damage:["Property was damaged.","There was damage to property.","Some property was damaged."]
 };
 const IMPACTWHO = [["self","The person themselves"],["staff","A member of staff"],["otherperson","Another person"]];
-const IMPACTWHOBANK = { self:["{S} {vbe} hurt.","{S} {vbe} the one hurt."], staff:["A member of staff was hurt.","A staff member was hurt."],
-                        otherperson:["Another person was hurt.","Someone else was hurt."] };
+const IMPACTWHOBANK = { self:["{S} {vbe} hurt.","{S} {vbe} the one hurt.","{S} {vbe} the person who was hurt."], staff:["A member of staff was hurt.","A staff member was hurt.","One of the staff was hurt."],
+                        otherperson:["Another person was hurt.","Someone else was hurt.","A different person was hurt."] };
 const HAPPENED = {
   fall:[["fall-found","Found on the floor"],["fall-seen","Seen to fall"],["fall-trip","Tripped"],["fall-slip","Slipped"],["fall-bed","Fell from bed"],["fall-chair","Fell from a chair"]],
   choking:[["chok-cough","Coughing"],["chok-nospeak","Could not speak or breathe"],["chok-back","Back blows given"],["chok-abdo","Abdominal thrusts given"],
@@ -907,45 +907,45 @@ const HAPPENED = {
   propertydamage:[["prop-broke","Something was broken"],["prop-thrown","Something was thrown"],["prop-wall","A wall, door or window was damaged"]]
 };
 const HAPPENEDBANK = {
- "fall-found":["{S} {vbe} found on the floor.","Staff found {o} on the floor."], "fall-seen":["{S} {vbe} seen to fall.","Staff saw {o} fall."],
- "fall-trip":["{S} tripped.","{S} tripped and fell."], "fall-slip":["{S} slipped.","{S} slipped and fell."],
- "fall-bed":["{S} fell from {p} bed.","{S} fell out of bed."], "fall-chair":["{S} fell from a chair.","{S} fell from {p} chair."],
- "chok-cough":["{S} {vbe} coughing.","{S} began coughing."], "chok-nospeak":["{S} could not speak or breathe.","{S} {vbe} unable to speak or breathe."],
- "chok-back":["Back blows were given.","Staff gave back blows."], "chok-abdo":["Abdominal thrusts were given.","Staff gave abdominal thrusts."],
- "chok-self":["{S} cleared it by coughing.","{S} coughed it clear {r}."], "chok-staff":["It was cleared with help from staff.","Staff helped {o} clear it."],
- "miss-left":["{S} left the building unaccompanied.","{S} went out of the building without staff."],
- "miss-search":["Staff searched the area.","Staff searched the building and surrounding area."],
- "miss-found":["{S} {vbe} found by staff.","Staff found {o}."], "miss-returned":["{S} returned by {r}.","{S} came back on {p} own."],
- "miss-brought":["{S} {vbe} brought back by someone else.","Someone else brought {o} back."],
- "med-missed":["A dose was missed.","A dose of medication was missed."], "med-wrongtime":["It was given at the wrong time.","The medication was given at the wrong time."],
- "med-dropped":["A dose was dropped or spilled.","A dose of medication was dropped or spilled."],
- "med-wrongperson":["It was given to the wrong person.","The medication was given to the wrong person."],
- "med-wrongdose":["The wrong dose was given.","The dose given was wrong."],
- "prop-broke":["Something was broken.","An item was broken."], "prop-thrown":["Something was thrown.","An item was thrown."],
- "prop-wall":["A wall, door or window was damaged.","There was damage to a wall, door or window."]
+ "fall-found":["{S} {vbe} found on the floor.","Staff found {o} on the floor.","{S} {vbe} on the floor when staff found {o}."], "fall-seen":["{S} {vbe} seen to fall.","Staff saw {o} fall.","Staff witnessed {o} falling."],
+ "fall-trip":["{S} tripped.","{S} tripped and fell.","{S} had a trip."], "fall-slip":["{S} slipped.","{S} slipped and fell.","{S} had a slip."],
+ "fall-bed":["{S} fell from {p} bed.","{S} fell out of bed.","{S} had a fall from {p} bed."], "fall-chair":["{S} fell from a chair.","{S} fell from {p} chair.","{S} had a fall from a chair."],
+ "chok-cough":["{S} {vbe} coughing.","{S} began coughing.","{S} started coughing."], "chok-nospeak":["{S} could not speak or breathe.","{S} {vbe} unable to speak or breathe.","{S} {vbe} not able to speak or breathe."],
+ "chok-back":["Back blows were given.","Staff gave back blows.","Staff carried out back blows."], "chok-abdo":["Abdominal thrusts were given.","Staff gave abdominal thrusts.","Staff carried out abdominal thrusts."],
+ "chok-self":["{S} cleared it by coughing.","{S} coughed it clear {r}.","{S} managed to clear it {r} by coughing."], "chok-staff":["It was cleared with help from staff.","Staff helped {o} clear it.","With help from staff, it was cleared."],
+ "miss-left":["{S} left the building unaccompanied.","{S} went out of the building without staff.","{S} left the building without a member of staff."],
+ "miss-search":["Staff searched the area.","Staff searched the building and surrounding area.","Staff carried out a search of the area."],
+ "miss-found":["{S} {vbe} found by staff.","Staff found {o}.","Staff located {o}."], "miss-returned":["{S} returned by {r}.","{S} came back on {p} own.","{S} made {p} own way back."],
+ "miss-brought":["{S} {vbe} brought back by someone else.","Someone else brought {o} back.","Another person brought {o} back."],
+ "med-missed":["A dose was missed.","A dose of medication was missed.","A scheduled dose was missed."], "med-wrongtime":["It was given at the wrong time.","The medication was given at the wrong time.","It was not given at the right time."],
+ "med-dropped":["A dose was dropped or spilled.","A dose of medication was dropped or spilled.","A dose was spilled or dropped."],
+ "med-wrongperson":["It was given to the wrong person.","The medication was given to the wrong person.","The medication went to the wrong person."],
+ "med-wrongdose":["The wrong dose was given.","The dose given was wrong.","An incorrect dose was given."],
+ "prop-broke":["Something was broken.","An item was broken.","An object was broken."], "prop-thrown":["Something was thrown.","An item was thrown.","An object was thrown."],
+ "prop-wall":["A wall, door or window was damaged.","There was damage to a wall, door or window.","Damage was caused to a wall, door or window."]
 };
 const INJURY = [["noinjury","No injury seen"],["injury","Injury seen"]];
 const INJURYTYPE = [["bruise","Bruise"],["cut","Cut"],["graze","Graze"],["skintear","Skin tear"],["swelling","Swelling"],["burn","Burn"],["otherinjury","Other"]];
 const INJURYOBS = [["bleeding","Bleeding"],["head","Hit their head"],["conscious","Conscious and alert throughout"],
                    ["unconscious","Brief loss of consciousness observed"],["painobs","Complained of or showed pain"]];
 const INJURYOBSBANK = {
- bleeding:["There was bleeding.","The injury was bleeding."], head:["{S} hit {p} head.","{S} banged {p} head."],
- conscious:["{S} {vbe} conscious and alert throughout.","{S} remained conscious and alert."],
- unconscious:["A brief loss of consciousness was observed.","{S} briefly lost consciousness."],
- painobs:["{S} complained of pain or showed signs of it.","{S} showed signs of pain."]
+ bleeding:["There was bleeding.","The injury was bleeding.","Bleeding was present."], head:["{S} hit {p} head.","{S} banged {p} head.","{S} sustained a blow to {p} head."],
+ conscious:["{S} {vbe} conscious and alert throughout.","{S} remained conscious and alert.","{S} stayed conscious and alert throughout."],
+ unconscious:["A brief loss of consciousness was observed.","{S} briefly lost consciousness.","For a short time, {s} lost consciousness."],
+ painobs:["{S} complained of pain or showed signs of it.","{S} showed signs of pain.","There were signs that {s} {vbe} in pain."]
 };
 const ACTIONS = [["firstaid","First aid given"],["stayed","Stayed with them"],["checked","Checked them for injuries"],["safe","Made the area safe"],
                  ["moved","Moved others to safety"],["ambulance","Ambulance called"],["nhsline","NHS non-emergency line called"],
                  ["gp","GP contacted"],["hospital","Taken to hospital"],["prn","PRN medication given as prescribed"],
                  ["observations","Observations started (say how often in the handover)"]];
 const ACTIONBANK = {
- firstaid:["First aid was given.","Staff gave first aid."], stayed:["Staff stayed with {o}.","Staff remained with {o} throughout."],
- checked:["Staff checked {o} for injuries.","{S} {vbe} checked for injuries."], safe:["Staff made the area safe.","The area was made safe."],
- moved:["Staff moved others to safety.","Others were moved to safety."], ambulance:["An ambulance was called.","Staff called an ambulance."],
- nhsline:["The NHS non-emergency line was called.","Staff called the NHS non-emergency line for advice."],
- gp:["The GP was contacted.","Staff contacted the GP."], hospital:["{S} {vbe} taken to hospital.","{S} went to hospital."],
- prn:["PRN medication was given as prescribed.","{P} PRN medication was given as prescribed."],
- observations:["Observations were started.","Staff began regular observations."]
+ firstaid:["First aid was given.","Staff gave first aid.","{S} {vbe} given first aid."], stayed:["Staff stayed with {o}.","Staff remained with {o} throughout.","Staff kept {o} company."],
+ checked:["Staff checked {o} for injuries.","{S} {vbe} checked for injuries.","Staff looked {o} over for injuries."], safe:["Staff made the area safe.","The area was made safe.","The area was made safe by staff."],
+ moved:["Staff moved others to safety.","Others were moved to safety.","Others were taken to safety by staff."], ambulance:["An ambulance was called.","Staff called an ambulance.","An ambulance was called by staff."],
+ nhsline:["The NHS non-emergency line was called.","Staff called the NHS non-emergency line for advice.","Staff rang the NHS non-emergency line."],
+ gp:["The GP was contacted.","Staff contacted the GP.","The GP was contacted by staff."], hospital:["{S} {vbe} taken to hospital.","{S} went to hospital.","{S} attended hospital."],
+ prn:["PRN medication was given as prescribed.","{P} PRN medication was given as prescribed.","{S} {vbe} given PRN medication as prescribed."],
+ observations:["Observations were started.","Staff began regular observations.","Staff started observations."]
 };
 
 /* Phrases in a staff member's own words that mean the same as a tick option,
@@ -1035,23 +1035,23 @@ const MATCH = {
 const ENJOY = [["throughout","Enjoyed it throughout"],["parts","Enjoyed parts of it"],
                ["notmuch","Did not appear to enjoy it"],["unclear","Hard to tell how much they enjoyed it"]];
 const ENJOYBANK = {
- throughout:["{S} appeared to enjoy it throughout.","{S} clearly enjoyed {r} throughout."],
- parts:["{S} appeared to enjoy parts of it.","{S} enjoyed some parts more than others."],
- notmuch:["{S} did not appear to enjoy it.","{S} showed little sign of enjoying it."],
- unclear:["It was hard to tell how much {s} enjoyed it.","How much {s} enjoyed it was hard to tell."]
+ throughout:["{S} appeared to enjoy it throughout.","{S} clearly enjoyed {r} throughout.","{S} seemed to enjoy it from start to finish."],
+ parts:["{S} appeared to enjoy parts of it.","{S} enjoyed some parts more than others.","{S} seemed to enjoy some parts of it."],
+ notmuch:["{S} did not appear to enjoy it.","{S} showed little sign of enjoying it.","{S} did not seem to enjoy it."],
+ unclear:["It was hard to tell how much {s} enjoyed it.","How much {s} enjoyed it was hard to tell.","It was not easy to tell how much {s} enjoyed it."]
 };
 const BENEFIT = [["asked","Something they had asked to do"],["goal","Works towards a goal in their support plan"],
                  ["routine","Part of a routine they value"],["social","Time with people they like being with"],
                  ["out","Time out and about in the community"],["control","Gave them choice and control over their day"],
                  ["confidence","Built their confidence"]];
 const BENEFITBANK = {
- asked:["This was something {s} had asked to do.","{S} had asked to do this."],
- goal:["This works towards a goal in {p} support plan.","It is part of working towards a goal in {p} support plan."],
- routine:["It is part of a routine that matters to {o}.","This is one of the routines {s} {vhave} kept up."],
- social:["It gave {o} time with people who matter to {o}.","{S} spent time with people who matter to {o}."],
- out:["It gave {o} time out and about in the community.","{S} had time out and about in the community."],
- control:["It gave {o} choice and control over {p} day.","{S} had choice and control over how {s} spent the time."],
- confidence:["It built {p} confidence.","{S} grew in confidence doing it."]
+ asked:["This was something {s} had asked to do.","{S} had asked to do this.","Doing this was {p} own request."],
+ goal:["This works towards a goal in {p} support plan.","It is part of working towards a goal in {p} support plan.","This helps {o} work towards a goal in {p} support plan."],
+ routine:["It is part of a routine that matters to {o}.","This is one of the routines {s} {vhave} kept up.","This is a routine that is important to {o}."],
+ social:["It gave {o} time with people who matter to {o}.","{S} spent time with people who matter to {o}.","It meant time spent with people who matter to {o}."],
+ out:["It gave {o} time out and about in the community.","{S} had time out and about in the community.","It meant time out and about in the community for {o}."],
+ control:["It gave {o} choice and control over {p} day.","{S} had choice and control over how {s} spent the time.","{S} made choices and had control over how {s} spent the time."],
+ confidence:["It built {p} confidence.","{S} grew in confidence doing it.","Doing it built up {p} confidence."]
 };
 /* a college course the person chose for the year, as ticked on their timetable */
 const ENROLBANK = [
@@ -1071,10 +1071,10 @@ const RESP_MED = [["happy","Happy to take it"],["hesitant","Hesitant at first, t
 const MED = [["explained","Told them what the medication was and what it is for"],["label","Checked the label against the MAR chart"],
              ["water","Offered a drink to take it with"],["watched","Stayed with them until it was taken"],["prescribed","Given as prescribed"]];
 const MEDBANK = {
- label:["Staff checked the label against {p} MAR chart before giving it.","The label was checked against {p} MAR chart first."],
- water:["Staff offered {o} a drink to take it with.","A drink was offered to take it with."],
- watched:["Staff stayed with {o} until it was taken.","Staff remained with {o} until {s} had taken it."],
- prescribed:["The medication was given as prescribed.","It was given as prescribed."]
+ label:["Staff checked the label against {p} MAR chart before giving it.","The label was checked against {p} MAR chart first.","Before it was given, staff checked the label against {p} MAR chart."],
+ water:["Staff offered {o} a drink to take it with.","A drink was offered to take it with.","Staff offered a drink for {o} to take it with."],
+ watched:["Staff stayed with {o} until it was taken.","Staff remained with {o} until {s} had taken it.","Staff did not leave {o} until it had been taken."],
+ prescribed:["The medication was given as prescribed.","It was given as prescribed.","The medication was administered as prescribed."]
 };
 /* told them what it was, and how - the communication methods ticked become the clause */
 const MEDTELLBANK = [
@@ -1083,39 +1083,39 @@ const MEDTELLBANK = [
  "Before giving it, staff told {N} what it was and what it is for{tellHow}."
 ];
 const HOWBANK_MED = {
- said:["{S} said {s} {vbe} happy to take it.","{S} told staff {s} would take it."],
- pointed:["{S} pointed to show {s} understood.","{S} pointed to show {s} {vbe} ready to take it."],
- signed:["{S} signed to show {s} would take it.","{S} signed that {s} {vbe} happy to take it."],
- nodded:["{S} nodded to show {s} would take it.","{S} nodded when asked."],
- led:["{S} came to staff to take it.","{S} came over ready to take it."],
- reached:["{S} reached out to take it.","{S} held out {p} hand for it."],
- facial:["{P} expression showed {s} {vbe} happy to take it.","{S} showed with {p} expression that {s} {vbe} happy to take it."]
+ said:["{S} said {s} {vbe} happy to take it.","{S} told staff {s} would take it.","{S} told staff {s} {vbe} willing to take it."],
+ pointed:["{S} pointed to show {s} understood.","{S} pointed to show {s} {vbe} ready to take it.","{S} responded by pointing."],
+ signed:["{S} signed to show {s} would take it.","{S} signed that {s} {vbe} happy to take it.","{S} used signs to show {s} would take it."],
+ nodded:["{S} nodded to show {s} would take it.","{S} nodded when asked.","{S} gave a nod when asked."],
+ led:["{S} came to staff to take it.","{S} came over ready to take it.","{S} came over to staff, ready to take it."],
+ reached:["{S} reached out to take it.","{S} held out {p} hand for it.","{S} put out {p} hand to take it."],
+ facial:["{P} expression showed {s} {vbe} happy to take it.","{S} showed with {p} expression that {s} {vbe} happy to take it.","{S} {vbe} happy to take it, as {p} expression showed."]
 };
 const HOW_JOIN_MED = { said:"telling staff so", pointed:"pointing to show it", signed:"signing to show it", nodded:"nodding to show it",
                        led:"coming over to take it", reached:"reaching out for it", facial:"{p} expression making it clear" };
 const MED_ISSUES = [["spat","Spat it out"],["swallow","Difficulty swallowing it"],["late","Given later than the scheduled time"],["partial","Took only part of it"]];
 const MEDISSUEBANK = {
- spat:["{S} spat it out.","{S} spat the medication out."],
- swallow:["{S} had difficulty swallowing it.","{S} found it difficult to swallow."],
- late:["It was given later than the scheduled time.","The medication was given later than scheduled."],
- partial:["{S} took only part of it.","{S} did not take all of it."]
+ spat:["{S} spat it out.","{S} spat the medication out.","{S} spat out the dose."],
+ swallow:["{S} had difficulty swallowing it.","{S} found it difficult to swallow.","Swallowing it was difficult for {o}."],
+ late:["It was given later than the scheduled time.","The medication was given later than scheduled.","It was not given until after the scheduled time."],
+ partial:["{S} took only part of it.","{S} did not take all of it.","{S} took some, but not all, of it."]
 };
 
 /* how staff communicated this time; the profile only says which are usual */
 const STAFFING = [["","Not stated"],["1:1","1:1"],["2:1","2:1"],["shared","Shared staffing"]];
 
 const RISKBANK = {
- sight:["Staff remained within sight of {o} throughout.","{S} stayed within staff sight throughout."],
- road:["Near roads, staff walked on the traffic side.","Staff walked on the traffic side near roads."],
- toilet:["{S} used the toilet before leaving.","{S} went to the toilet before going out."],
- accessible:["Staff found an accessible toilet.","An accessible toilet was located by staff."],
- space:["Staff kept {p} walking path clear.","{P} walking path was kept clear."],
- plan:["The plan was explained to {o} in advance.","Staff explained the plan to {o} beforehand."],
- seatbelt:["{S} wore a seatbelt for the journey.","{S} wore {p} seatbelt for the journey."],
- doortodoor:["Staff escorted {o} door to door.","{S} {vbe} escorted door to door."],
- stop:["Staff waited with {o} at the stop.","Staff and {N} waited together at the stop."],
- fare:["Staff held the fare or ticket for {o}.","Staff held {p} fare or ticket."],
- crossing:["Staff supported {o} at crossings.","{S} {vbe} supported by staff at crossings."]
+ sight:["Staff remained within sight of {o} throughout.","{S} stayed within staff sight throughout.","{S} {vbe} kept within sight of staff throughout."],
+ road:["Near roads, staff walked on the traffic side.","Staff walked on the traffic side near roads.","Staff kept to the traffic side when walking near roads."],
+ toilet:["{S} used the toilet before leaving.","{S} went to the toilet before going out.","Before leaving, {s} used the toilet."],
+ accessible:["Staff found an accessible toilet.","An accessible toilet was located by staff.","Staff located an accessible toilet."],
+ space:["Staff kept {p} walking path clear.","{P} walking path was kept clear.","Staff made sure {p} walking path stayed clear."],
+ plan:["The plan was explained to {o} in advance.","Staff explained the plan to {o} beforehand.","Staff talked {o} through the plan in advance."],
+ seatbelt:["{S} wore a seatbelt for the journey.","{S} wore {p} seatbelt for the journey.","For the journey, {s} wore a seatbelt."],
+ doortodoor:["Staff escorted {o} door to door.","{S} {vbe} escorted door to door.","Staff accompanied {o} from door to door."],
+ stop:["Staff waited with {o} at the stop.","Staff and {N} waited together at the stop.","At the stop, staff waited with {o}."],
+ fare:["Staff held the fare or ticket for {o}.","Staff held {p} fare or ticket.","The fare or ticket was held by staff for {o}."],
+ crossing:["Staff supported {o} at crossings.","{S} {vbe} supported by staff at crossings.","At crossings, staff supported {o}."]
 };
 const OUTBANK = {
  ready:["{N} was clean, comfortable and ready for the day.",
@@ -1128,23 +1128,23 @@ const OUTBANK = {
           "{S} showed {s} had enjoyed it and would like to do it again.",
           "{S} had enjoyed it and would do it again."],
  proud:["{S} seemed pleased with what {s} had done.",
-        "{S} looked pleased with {r} afterwards."],
+        "{S} looked pleased with {r} afterwards.","{S} appeared pleased with what {s} had done."],
  home:["{S} returned home safely and settled.",
-       "{S} got home safely and settled."],
+       "{S} got home safely and settled.","{S} arrived home safely and settled."],
  later:["Support was left for now and will be offered again later.",
-        "This will be offered again later."],
+        "This will be offered again later.","Staff will offer this again later."],
  nightsettled:["{N} was settled in bed and comfortable.",
         "{S} {vbe} settled in bed and appeared comfortable.",
         "{S} got into bed and settled."],
  slept:["{S} settled and {vbe} asleep at the next check.",
-        "{S} {vbe} asleep at the next check."],
+        "{S} {vbe} asleep at the next check.","At the next check, {s} {vbe} asleep."],
  resettled:["{S} resettled without distress.",
-        "{S} settled again without distress."],
+        "{S} settled again without distress.","{S} settled back down without distress."],
  nochangeout:["The interaction finished with no concerns and {p} usual routine continued.",
-              "There were no concerns and {s} carried on with {p} usual routine."],
- calmagain:["{S} settled and returned to {p} usual routine.","{S} {vbe} settled again and went back to {p} usual routine."],
- monitored:["{S} {vbe} being monitored afterwards.","Staff continued to monitor {o} afterwards."],
- hospital:["{S} {vbe} taken to hospital.","{S} went to hospital."]
+              "There were no concerns and {s} carried on with {p} usual routine.","No concerns arose, and {p} usual routine carried on."],
+ calmagain:["{S} settled and returned to {p} usual routine.","{S} {vbe} settled again and went back to {p} usual routine.","Once settled, {s} returned to {p} usual routine."],
+ monitored:["{S} {vbe} being monitored afterwards.","Staff continued to monitor {o} afterwards.","Staff kept monitoring {o} afterwards."],
+ hospital:["{S} {vbe} taken to hospital.","{S} went to hospital.","{S} attended hospital."]
 };
 /* an outcome that can take "Afterwards, " in front without saying it twice */
 const OUT_LEAD = ["", "Afterwards, ", "By the end, "];

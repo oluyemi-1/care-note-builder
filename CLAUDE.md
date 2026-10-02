@@ -55,7 +55,13 @@ add wording that carries a fact, add a GUARD for it.**
 Other rules the tests and the owner hold to:
 
 - Rewording changes wording only. `provenance.sameFacts` must pass; `banks.test.js`
-  requires every variant of a phrase-bank sentence to use the same fact tokens.
+  requires every variant of a phrase-bank sentence to use the same fact tokens, and every
+  bank to have at least three variants. `pick` avoids, in order: every wording already shown
+  for this entry (`onScreen`, newest first), wording that repeats the note so far
+  (`repeats`: shared three-word phrases, two sentences in a row opening "Staff"), then
+  wording recently used for this person.
+- Personal care reads in the order care happens: knocking (`arrive` section) before the
+  offer; door, covering and explaining (`prepare`) after consent and before any task.
 - Support level has no default. A ticked task with no level says nothing; Copy stays locked.
 - Copy is gated: the organisation's seven audit checks (`quality.orgAudit`, provider can mark
   some optional), no unexplained contradiction, a recorded choking/seizure must be

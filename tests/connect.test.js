@@ -14,7 +14,7 @@ test("Connect & communication is an activity at home or out, and a college cours
                         tasks: [{ id: "engage", level: "prompt", opt: "" }], during: ["comm-aid", "comm-turns"], len: "full" });
   const r = G.narrative.compose({ s, profile: P.none }, { salt: 2 });
   assert.match(r.note.text, /Connect and Communication session/);
-  assert.match(r.note.text, /communication aid/);
+  assert.match(r.note.text, /communication aid|using (?:his|her|their) aid/);
   assert.match(r.note.text, /turn/);
   assert.deepEqual(G.provenance.verify(r.note.sentences, r.s), []);
   const home = G.narrative.compose({ s: makeState({ kind: "activity", setting: "community", slot: "connect", time: "14:00" }), profile: P.none }, { salt: 1 });

@@ -17,7 +17,7 @@ test("the note says staff told him it was college today, how, and how he showed 
     const r = compose(makeState(base), salt);
     const t = r.note.text;
     assert.match(t, /That morning, staff (?:told|let|explained to) TH .*college today.*music class.*using Makaton alongside speech\./, t);
-    assert.match(t, /nodd/, t);
+    assert.match(t, /nodd|a nod/, t);
     assert.doesNotMatch(t, /Staff (?:used|signed in) Makaton/, "the method is in the telling sentence, not a second one");
     assert.doesNotMatch(t, /what he wanted|his choice/, "college wording, not choosing wording");
     const k = keys(r.note);

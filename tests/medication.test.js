@@ -20,10 +20,10 @@ test("a medication note follows the process: told, agreed, label checked, taken,
     const t = r.note.text;
     assert.match(t, /morning medication/);
     assert.match(t, /Staff (?:told|explained to) TM what (?:the medication|it) was and (?:what it is for|why she takes it), in short, clear sentences\.|Before giving it, staff told TM what it was and what it is for, in short, clear sentences\./, t);
-    assert.match(t, /happy to take it|took it willingly/);
+    assert.match(t, /happy to take it|took it willingly|willing to take it/);
     assert.match(t, /MAR chart/);
-    assert.match(t, /took her tablets herself|managed her tablets without support/);
-    assert.match(t, /given as prescribed/i);
+    assert.match(t, /took her tablets herself|managed her tablets without support|took her tablets independently/);
+    assert.match(t, /(?:given|administered) as prescribed/i);
     assert.match(t, /MAR chart was signed|signed the MAR chart/);
     const k = keys(r.note);
     assert.ok(k.indexOf("medtell") < k.indexOf("resp"), "told before the response");
@@ -43,7 +43,7 @@ test("nothing ticked, nothing said: no telling, label, prescribed or issue sente
 test("a declined dose: the note says so, and 'given as prescribed' alongside it is a contradiction", () => {
   const s = makeState(Object.assign({}, base, { resp: "declined", consent: "no", declined: "offered again in ten minutes", med: ["explained", "label"], tasks: [] }));
   const r = compose(s);
-  assert.match(r.note.text, /declined/i);
+  assert.match(r.note.text, /declined|said no|did not want/i);
   const sa = G.smartAssist.collect(makeCtx(s, SHE));
   assert.ok(sa.items.some(i => i.id === "h:medication-declined" || i.id === "r:medication-declined"), "handover and MAR recording are suggested");
   assert.ok(sa.handovers.some(h => /Declined her morning medication/.test(h)), sa.handovers.join(" | "));
@@ -54,8 +54,8 @@ test("a declined dose: the note says so, and 'given as prescribed' alongside it 
 test("issues are recorded as facts and offered for handover", () => {
   const s = makeState(Object.assign({}, base, { medIssues: ["swallow", "partial"], med: ["explained", "label"] }));
   const r = compose(s);
-  assert.match(r.note.text, /difficulty swallowing|difficult to swallow/);
-  assert.match(r.note.text, /only part of it|did not take all/);
+  assert.match(r.note.text, /difficulty swallowing|difficult to swallow|Swallowing it was difficult/);
+  assert.match(r.note.text, /only part of it|did not take all|not all, of it/);
   const sa = G.smartAssist.collect(makeCtx(s, SHE));
   assert.ok(sa.handovers.some(h => /Issue with her morning medication: difficulty swallowing it, took only part of it/.test(h)), sa.handovers.join(" | "));
 });
